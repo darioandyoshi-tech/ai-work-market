@@ -17,15 +17,36 @@
   - URL: https://github.com/caramaschiHG/awesome-ai-agents-2026/pull/245
   - Rationale: listed as protocol/tooling infrastructure for AI-agent work settlement.
 
+### Built locally / awaiting publish
+
+- MCP integration and revenue model committed locally.
+  - Commit: `bdde0b4 Add MCP integration and revenue model`
+- Rapid launch funnel assets committed locally.
+  - Commit: `276b887 Add rapid launch funnel assets`
+- Local branch is ahead of `origin/main` by 2 commits; needs GitHub auth to push.
+
+### New launch assets in local commits
+
+- `/manifesto` — category statement: trusted work layer for AI labor.
+- `/trust` — beta trust policy for scoped work, proof, escrow, disputes.
+- `/founding-testers` — CTA for agent/framework builders.
+- `/use-cases/research`, `/automation`, `/coding`, `/content`, `/support` — SEO/use-case pages.
+- GitHub issue templates for founding testers and work requests.
+- `docs/launch-sprint.md` — rapid channel plan and post copy.
+- `docs/directory-submissions.md` — corrected directory/listing copy and targets.
+
 ### Intentionally skipped / deferred
 
 - `evilsocket/awesomeagents`: skipped for now because its criteria require a specific production-ready agent, not a testnet platform/protocol layer.
-- HN / Reddit / Farcaster / Discord communities: prepared copy exists, but these should be posted from the relevant logged-in human/community account with norms checked live. Avoiding blind spam.
+- HN / Reddit / Farcaster / Discord communities: prepared copy exists, but these require logged-in/community accounts and active comment monitoring. Avoiding blind spam.
+- Directory research that referenced `ai2human`/BNB was discarded as stale/wrong for AI Work Market; only the target/channel structure was retained.
 
-### Next recommended public moves
+### Fastest next public moves once auth/accounts are available
 
-1. Post Show HN during a good window with the prepared copy in `docs/launch-messages.md`.
-2. Post a text-first Reddit thread in r/AI_Agents or r/LocalLLaMA, link in comments if rules require.
-3. Post to Farcaster `/base-builds` with Base/USDC framing.
-4. Retry Moltbook registration after rate limit; post the Moltbook-specific launch note.
-5. Build a minimal x402/MCP integration example before approaching x402/Circle/Cloudflare communities.
+1. Push local commits `bdde0b4` and `276b887` to GitHub.
+2. Redeploy Vercel so `/manifesto`, `/trust`, `/founding-testers`, and use-case pages go live.
+3. Post Show HN with `docs/launch-sprint.md` copy.
+4. Post/cast one tailored x402/Base note: CDP Discord or Farcaster `/x402`.
+5. Open clean PR to `Merit-Systems/awesome-x402` if contribution format fits.
+6. Submit to first no-login directories using `docs/directory-submissions.md`.
+7. Retry Moltbook registration after rate limit; post the Moltbook-specific launch note.
