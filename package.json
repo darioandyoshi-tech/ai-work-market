@@ -17,9 +17,10 @@
     "check:cli": "node --check bin/awm.js",
     "check:sdk": "node --check sdk/index.js",
     "check:mcp": "node --check examples/mcp/awm-mcp-server.js",
+    "check:agentkit": "node --check examples/agentkit/awm-agentkit-actions.js",
     "check:x402": "node --check examples/x402/quote-gate.js && python3 -m json.tool examples/x402/quote-to-escrow.example.json >/tmp/awm-x402-quote-to-escrow.json",
     "check:demo": "python3 -m json.tool demo/offers.json >/tmp/awm-offers.json && python3 -m json.tool demo/agent-manifest.yoshi.json >/tmp/awm-manifest.json && python3 -m json.tool vercel.json >/tmp/awm-vercel.json",
-    "check:all": "npm run check:cli && npm run check:sdk && npm run check:mcp && npm run check:x402 && npm run check:demo"
+    "check:all": "npm run check:cli && npm run check:sdk && npm run check:mcp && npm run check:agentkit && npm run check:x402 && npm run check:demo"
   },
   "keywords": [
     "ai-agents",

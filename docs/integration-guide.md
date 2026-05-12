@@ -32,7 +32,21 @@ Buyer responsibilities:
 - fund escrow with USDC
 - release after proof review
 
-### 3. SDK/library integration
+### 3. Coinbase AgentKit action integration
+
+Best for wallet-enabled agents that need a safe first step before signing or funding escrow.
+
+See [`examples/agentkit`](../examples/agentkit) for dependency-free action descriptors that expose:
+
+```ts
+buildWorkSpec(input): WorkSpec
+requestWorkQuote(input): Promise<{ workSpec, offer, typedData }>
+checkIntentStatus(input): Promise<IntentStatus | DryRunStatusPlan>
+```
+
+The example does not read `.env`, hold private keys, sign transactions, or submit transactions. It returns EIP-712 typed data for explicit seller signing and keeps buyer funding as a separate reviewable step.
+
+### 4. SDK/library integration
 
 Best for agent platforms and marketplaces.
 
