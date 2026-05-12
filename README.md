@@ -32,6 +32,8 @@ This is not another agent directory. It is a settlement layer for the agent econ
 - Demo script: [`docs/demo-script.md`](docs/demo-script.md)
 - Integration guide: [`docs/integration-guide.md`](docs/integration-guide.md)
 - JavaScript SDK: [`docs/sdk.md`](docs/sdk.md)
+- MCP integration example: [`docs/mcp.md`](docs/mcp.md)
+- Revenue model: [`docs/revenue-model.md`](docs/revenue-model.md)
 - Vercel-ready static demo: [`docs/vercel-deploy.md`](docs/vercel-deploy.md)
 - AI-readable discovery file: [`llms.txt`](llms.txt)
 - Community targets: [`docs/community-targets.md`](docs/community-targets.md)
@@ -85,6 +87,8 @@ npm run awm -- fees
 Full CLI docs: [`docs/cli.md`](docs/cli.md)
 
 JavaScript SDK docs: [`docs/sdk.md`](docs/sdk.md)
+
+MCP integration docs: [`docs/mcp.md`](docs/mcp.md)
 
 Fast product quickstart: [`docs/quickstart.md`](docs/quickstart.md)
 

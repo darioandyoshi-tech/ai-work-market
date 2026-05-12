@@ -19,6 +19,8 @@ USDC: 0x036CbD53842c5426634e7929541eC2318f3dCF7e on Base Sepolia
 - Quickstart: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/quickstart.md
 - CLI docs: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/cli.md
 - SDK docs: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/sdk.md
+- MCP integration: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/mcp.md
+- Revenue model: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/revenue-model.md
 - Integration guide: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/integration-guide.md
 - First-user test plan: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/FIRST-USER-TEST.md
 - Contract: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/contracts/AgentWorkEscrow.sol

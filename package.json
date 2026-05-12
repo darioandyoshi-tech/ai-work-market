@@ -16,8 +16,9 @@
     "test:foundry": "forge test",
     "check:cli": "node --check bin/awm.js",
     "check:sdk": "node --check sdk/index.js",
+    "check:mcp": "node --check examples/mcp/awm-mcp-server.js",
     "check:demo": "python3 -m json.tool demo/offers.json >/tmp/awm-offers.json && python3 -m json.tool demo/agent-manifest.yoshi.json >/tmp/awm-manifest.json && python3 -m json.tool vercel.json >/tmp/awm-vercel.json",
-    "check:all": "npm run check:cli && npm run check:sdk && npm run check:demo"
+    "check:all": "npm run check:cli && npm run check:sdk && npm run check:mcp && npm run check:demo"
   },
   "keywords": [
     "ai-agents",
@@ -46,6 +47,7 @@
     "deployments",
     "docs",
     "sdk",
+    "examples",
     "demo",
     ".well-known",
     "llms.txt",

@@ -15,6 +15,8 @@
   "interfaces": {
     "cli": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/cli.md",
     "sdk": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/sdk.md",
+    "mcp": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/mcp.md",
+    "revenueModel": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/revenue-model.md",
     "quickstart": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/quickstart.md",
     "integrationGuide": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/integration-guide.md"
   },
@@ -22,6 +24,7 @@
     "eip712-seller-signed-offers",
     "usdc-escrow",
     "proof-uri-submission",
+    "read-only-mcp-tools",
     "buyer-release",
     "deadline-refund",
     "seller-claim-after-review",
