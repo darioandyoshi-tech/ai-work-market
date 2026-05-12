@@ -87,3 +87,25 @@
   - Pitch: ag402 + AI Work Market demo for paid agent work, not just paid API calls.
 
 All outreach was explicit about testnet-only / not audited / centralized disputes.
+
+### Controlled blast wave — strategic ecosystems
+
+Dario authorized a broader blast. Kept it controlled and technical: five high-fit GitHub issues, no generic spam.
+
+- Coinbase AgentKit issue opened.
+  - URL: https://github.com/coinbase/agentkit/issues/1198
+  - Pitch: AgentKit action provider for escrowed scoped agent work.
+- Worldcoin AgentKit issue opened.
+  - URL: https://github.com/worldcoin/agentkit/issues/29
+  - Pitch: human-backed/policy-constrained agents + escrowed scoped work.
+- Google A2A x402 issue opened.
+  - URL: https://github.com/google-agentic-commerce/a2a-x402/issues/92
+  - Pitch: A2A x402 service agent with escrowed scoped-work settlement.
+- Sperax ERC-8004 Agents issue opened.
+  - URL: https://github.com/Sperax/erc8004-agents/issues/2
+  - Pitch: ERC-8004 identity/reputation + AI Work Market settlement records.
+- OnChainMee x402/ERC-8004 issue opened.
+  - URL: https://github.com/OnChainMee/x402-erc8004-agent/issues/3
+  - Pitch: A2A/x402/ERC-8004 agent work settlement demo.
+
+All messaging included testnet-only / not audited / centralized disputes guardrails.

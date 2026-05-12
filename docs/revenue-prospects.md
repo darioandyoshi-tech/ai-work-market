@@ -52,24 +52,28 @@ High-signal public targets for AI Work Market paid/custom integration outreach. 
 ### Coinbase AgentKit
 
 - Link: https://github.com/coinbase/agentkit
+- Outreach issue: https://github.com/coinbase/agentkit/issues/1198
 - Fit: Major wallet-enabled agent SDK; active x402/ERC-8004 action providers.
 - Suggested angle: canonical “agent pays for custom integration work” demo with x402/Base settlement.
 
 ### Worldcoin AgentKit
 
 - Link: https://github.com/worldcoin/agentkit
+- Outreach issue: https://github.com/worldcoin/agentkit/issues/29
 - Fit: Human-backed agent identity + x402 access policies.
 - Suggested angle: only human-backed agents can post/accept paid custom work.
 
 ### google-agentic-commerce / a2a-x402
 
 - Link: https://github.com/google-agentic-commerce/a2a-x402
+- Outreach issue: https://github.com/google-agentic-commerce/a2a-x402/issues/92
 - Fit: A2A x402 extension spec/libs for commercial agent-to-agent services.
 - Suggested angle: sample A2A merchant agent that quotes and accepts paid custom integration tasks via x402.
 
 ### Sperax ERC-8004 Agents
 
 - Link: https://github.com/Sperax/erc8004-agents
+- Outreach issue: https://github.com/Sperax/erc8004-agents/issues/2
 - Fit: On-chain agent identity, reputation, validation, MCP/A2A/x402 metadata.
 - Suggested angle: ERC-8004 identities for providers/custom-integration agents, creating a practical reputation/validation demo.
 
@@ -82,6 +86,7 @@ High-signal public targets for AI Work Market paid/custom integration outreach. 
 ### OnChainMee x402/ERC-8004 agent
 
 - Link: https://github.com/OnChainMee/x402-erc8004-agent
+- Outreach issue: https://github.com/OnChainMee/x402-erc8004-agent/issues/3
 - Fit: A2A messaging, x402 micropayments, ERC-8004 identity, UI.
 - Suggested angle: AI Work Market as a concrete paid-work endpoint/use case.
 
