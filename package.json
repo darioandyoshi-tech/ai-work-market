@@ -13,6 +13,7 @@
   "scripts": {
     "awm": "node bin/awm.js",
     "compile": "node scripts/compile.js",
+    "postinstall": "node scripts/postinstall-compile.js",
     "test:foundry": "forge test",
     "check:cli": "node --check bin/awm.js",
     "check:sdk": "node --check sdk/index.js",

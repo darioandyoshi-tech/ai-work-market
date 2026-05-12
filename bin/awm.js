@@ -63,6 +63,12 @@ function getDeployment(file) {
 }
 
 function getAbi() {
+  if (!fs.existsSync(DEFAULT_ARTIFACT)) {
+    throw new Error(
+      `Missing contract artifact: ${DEFAULT_ARTIFACT}\n` +
+      'Run `npm run compile` from the ai-work-market project root, then retry this command.'
+    );
+  }
   const artifact = readJson(DEFAULT_ARTIFACT);
   return artifact.abi;
 }
