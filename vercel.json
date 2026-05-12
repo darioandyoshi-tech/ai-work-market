@@ -6,7 +6,8 @@
     { "source": "/manifesto", "destination": "/manifesto.html" },
     { "source": "/trust", "destination": "/trust.html" },
     { "source": "/founding-testers", "destination": "/founding-testers.html" },
-    { "source": "/first-agents", "destination": "/first-agents.html" }
+    { "source": "/first-agents", "destination": "/first-agents.html" },
+    { "source": "/integration-sprint", "destination": "/integration-sprint.html" }
   ],
   "headers": [
     {

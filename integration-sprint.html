@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>x402 → Escrow Integration Sprint — AI Work Market</title>
+  <meta name="description" content="A 48-hour testnet integration sprint for x402, AgentKit, MCP, and Base builders who want scoped-work escrow next to paid agent access." />
+  <style>
+    :root { color-scheme: dark; --bg:#070807; --ink:#f7f0dd; --muted:#a9a08c; --line:rgba(247,240,221,.16); --gold:#e8b950; --green:#74f09b; --blue:#72d8ff; --red:#ff744f; --panel:rgba(18,21,15,.84); --mono:"Berkeley Mono","IBM Plex Mono",ui-monospace,monospace; --serif:Georgia,serif; --sans:"Avenir Next",Inter,system-ui,sans-serif; }
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 20% 0,rgba(232,185,80,.22),transparent 32rem),radial-gradient(circle at 90% 10%,rgba(114,216,255,.12),transparent 28rem),var(--bg);color:var(--ink);font-family:var(--sans)}
+    .wrap{width:min(1120px,calc(100% - 34px));margin:auto;padding:24px 0 70px}.top{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:48px;font:800 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}a{color:inherit}.top a{text-decoration:none}.nav{display:flex;gap:16px;flex-wrap:wrap}.hero{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}.panel{border:1px solid var(--line);border-radius:34px;background:linear-gradient(145deg,var(--panel),rgba(6,8,5,.78));box-shadow:0 30px 100px rgba(0,0,0,.48);padding:clamp(24px,5vw,56px)}.kicker{display:inline-flex;border:1px solid rgba(232,185,80,.38);border-radius:999px;padding:9px 12px;color:var(--gold);font:900 12px var(--mono);letter-spacing:.13em;text-transform:uppercase;background:rgba(232,185,80,.08)}h1{font:780 clamp(48px,8vw,98px)/.84 var(--serif);letter-spacing:-.07em;margin:24px 0 18px}.lede{font-size:clamp(19px,2.2vw,26px);line-height:1.35;color:#e4dcc8;max-width:760px}.price{font:950 clamp(54px,8vw,90px)/.9 var(--mono);letter-spacing:-.08em;margin:18px 0 6px}.sub{color:var(--muted)}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;border:1px solid rgba(247,240,221,.34);border-radius:999px;padding:13px 18px;text-decoration:none;font-weight:900}.btn.primary{background:var(--gold);border-color:var(--gold);color:#130f05}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.card{border:1px solid var(--line);border-radius:24px;background:rgba(0,0,0,.2);padding:20px}.card b{display:block;margin-bottom:8px;color:var(--ink)}.card p,.panel p,li{color:var(--muted);line-height:1.55}.steps{display:grid;gap:12px;margin-top:18px}.step{display:grid;grid-template-columns:42px 1fr;gap:12px;border:1px solid var(--line);border-radius:20px;padding:16px;background:rgba(0,0,0,.2)}.num{color:var(--green);font:950 18px var(--mono)}h2{font:760 clamp(32px,5vw,58px)/.9 var(--serif);letter-spacing:-.055em;margin:0 0 14px}section{margin-top:18px}.warning{border-color:rgba(255,116,79,.36);background:linear-gradient(145deg,rgba(255,116,79,.11),rgba(6,8,5,.8))}.mono{font-family:var(--mono);color:#d6ffdb;overflow-wrap:anywhere}footer{margin-top:28px;color:var(--muted);font:800 12px/1.5 var(--mono);border-top:1px solid var(--line);padding-top:18px}@media(max-width:880px){.hero,.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top"><a href="/">AI Work Market</a><nav class="nav"><a href="/first-agents">First agents</a><a href="/trust">Trust</a><a href="https://github.com/darioandyoshi-tech/ai-work-market">GitHub</a></nav></header>
+    <section class="hero">
+      <div class="panel">
+        <span class="kicker">48-hour paid pilot</span>
+        <h1>Turn paid agent access into escrowed paid work.</h1>
+        <p class="lede">A fixed-scope integration sprint for x402, Coinbase AgentKit, MCP, and Base builders who want more than pay-per-call: signed work terms, escrow, proof, and release.</p>
+        <div class="actions"><a class="btn primary" href="https://github.com/darioandyoshi-tech/ai-work-market/issues/new?template=job-request.yml&title=x402%20Escrow%20Integration%20Sprint">Request sprint</a><a class="btn" href="/first-agents">See the protocol story</a></div>
+      </div>
+      <aside class="panel">
+        <span class="kicker">Fixed price</span>
+        <div class="price">$1,500</div>
+        <p class="sub">48 hours. Testnet only. One focused quote/intake flow.</p>
+        <div class="steps">
+          <div class="step"><div class="num">01</div><div><b>Map the boundary</b><p>x402 for access. AI Work Market for scoped outcomes.</p></div></div>
+          <div class="step"><div class="num">02</div><div><b>Wire the offer</b><p>Canonical work spec, offer fields, and seller signing path.</p></div></div>
+          <div class="step"><div class="num">03</div><div><b>Run the proof</b><p>Base Sepolia escrow demo: fund, prove, release or document blocker.</p></div></div>
+        </div>
+      </aside>
+    </section>
+    <section class="grid">
+      <article class="card"><b>For x402 builders</b><p>Add the state x402 intentionally does not own: task terms, deadlines, proof URI, review, refund, dispute notes.</p></article>
+      <article class="card"><b>For AgentKit builders</b><p>Show a wallet-enabled agent paying for scoped work, not just transferring tokens or calling paid APIs.</p></article>
+      <article class="card"><b>For MCP/tool hosts</b><p>Move from “pay to call this tool” to “pay for this deliverable, then inspect proof before release.”</p></article>
+    </section>
+    <section class="panel">
+      <h2>Deliverables</h2>
+      <ul>
+        <li>Integration map: where pay-per-call ends and escrowed work begins.</li>
+        <li>Quote endpoint or adapter returning x402/payment metadata, work spec, and AI Work Market offer fields.</li>
+        <li>Proof URI convention and acceptance checklist for your use case.</li>
+        <li>Working Base Sepolia demo or exact documented blocker with next steps.</li>
+        <li>Runbook: sign offer → fund escrow → submit proof → release/refund/dispute notes.</li>
+      </ul>
+    </section>
+    <section class="panel warning">
+      <span class="kicker">Risk label</span>
+      <h2>No production finance cosplay.</h2>
+      <p>This is a testnet integration sprint. AI Work Market is not production audited, not mainnet-ready, and currently uses centralized dispute handling. The value is implementation help, credible demos, and integration feedback before real funds depend on the system.</p>
+    </section>
+    <footer>Contract: <span class="mono">0x489C36738F46e395b4cd26DDf0f85756686A2f07</span> · Source: <a href="https://github.com/darioandyoshi-tech/ai-work-market">github.com/darioandyoshi-tech/ai-work-market</a></footer>
+  </main>
+</body>
+</html>
