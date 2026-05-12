@@ -47,6 +47,8 @@
     "docs",
     "sdk",
     "demo",
+    ".well-known",
+    "llms.txt",
     "README.md",
     "FIRST-USER-TEST.md",
     "MVP-COMPLETE.md",
