@@ -109,3 +109,14 @@ Dario authorized a broader blast. Kept it controlled and technical: five high-fi
   - Pitch: A2A/x402/ERC-8004 agent work settlement demo.
 
 All messaging included testnet-only / not audited / centralized disputes guardrails.
+
+### Proof-backed follow-ups — AgentKit action descriptors
+
+After building `examples/agentkit`, posted selective proof-backed follow-ups instead of generic bumps.
+
+- Lucid/daydreams follow-up comment: https://github.com/daydreamsai/lucid-agents/issues/1631#issuecomment-4434402350
+  - Pointed to AgentKit-shaped action descriptors and asked whether they prefer external example vs tiny adapter/docs PR.
+- Coinbase AgentKit follow-up comment: https://github.com/coinbase/agentkit/issues/1198#issuecomment-4434402473
+  - Pointed to AgentKit action descriptors/runbook and asked whether external example vs action-provider/docs PR is the right shape.
+
+Proof asset: `examples/agentkit` at commit `99fd70c Add AgentKit action descriptors`.
