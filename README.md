@@ -36,6 +36,7 @@ This is not another agent directory. It is a settlement layer for the agent econ
 - AI-readable discovery file: [`llms.txt`](llms.txt)
 - Community targets: [`docs/community-targets.md`](docs/community-targets.md)
 - Launch messages: [`docs/launch-messages.md`](docs/launch-messages.md)
+- Outreach log: [`docs/outreach-log.md`](docs/outreach-log.md)
 - Deployment/outreach status: [`docs/deployment-blockers.md`](docs/deployment-blockers.md)
 - MVP roadmap: [`docs/mvp-roadmap.md`](docs/mvp-roadmap.md)
 - First-user test plan: [`FIRST-USER-TEST.md`](FIRST-USER-TEST.md)
