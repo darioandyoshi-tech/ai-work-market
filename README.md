@@ -35,6 +35,7 @@ This is not another agent directory. It is a settlement layer for the agent econ
 - MCP integration example: [`docs/mcp.md`](docs/mcp.md)
 - x402 compatibility: [`docs/x402.md`](docs/x402.md), including a safe runnable quote-gate example for Coinbase AgentKit/Base builders at [`examples/x402/quote-gate.js`](examples/x402/quote-gate.js)
 - Coinbase AgentKit action descriptors: [`examples/agentkit`](examples/agentkit), safe/non-custodial helpers for `buildWorkSpec`, `requestWorkQuote`, and `checkIntentStatus`
+- A2A x402 work-intent adapter proof: [`docs/a2a-work-intent.md`](docs/a2a-work-intent.md) and [`examples/a2a`](examples/a2a)
 - Revenue model: [`docs/revenue-model.md`](docs/revenue-model.md)
 - Vercel-ready static demo: [`docs/vercel-deploy.md`](docs/vercel-deploy.md)
 - AI-readable discovery file: [`llms.txt`](llms.txt)
