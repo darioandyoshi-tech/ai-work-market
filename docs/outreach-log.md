@@ -17,6 +17,26 @@
   - URL: https://github.com/caramaschiHG/awesome-ai-agents-2026/pull/245
   - Rationale: listed as protocol/tooling infrastructure for AI-agent work settlement.
 
+
+### New public listing PRs
+
+- awesome-x402 PR opened.
+  - URL: https://github.com/Merit-Systems/awesome-x402/pull/231
+  - Rationale: strongest x402 ecosystem fit; frames AI Work Market as complementary escrow/outcome settlement beside x402 pay-per-call.
+- Ultimate Agent Directory PR opened.
+  - URL: https://github.com/moshehbenavraham/Ultimate-Agent-Directory/pull/81
+  - Rationale: broad but legitimate AI-agent tooling directory; submitted YAML source + regenerated README per contribution guide.
+
+### Filtered / not posted yet
+
+- `alternbits/awesome-ai-agents`: deferred; generic AI-agent list and less precise than already-open Awesome AI Agents 2026 PR.
+- `cloudflare/agents`: PR creation is collaborators-only; do not open a generic issue until there is a concrete Cloudflare Agents integration or example.
+- `coinbase/agentkit` / `x402-foundation/x402`: high-fit ecosystem targets, but avoid low-signal issues. Best next move is a concrete AgentKit action provider or x402 adapter before asking maintainers for attention.
+
+### Prepared post queue
+
+- `docs/public-post-queue.md` now contains ready-to-post copy for HN, Farcaster/x402+Base, and x402/CDP Discord-style channels.
+
 ### Built locally / awaiting publish
 
 - MCP integration and revenue model committed locally.
