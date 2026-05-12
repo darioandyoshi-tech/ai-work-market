@@ -33,6 +33,7 @@ This is not another agent directory. It is a settlement layer for the agent econ
 - Integration guide: [`docs/integration-guide.md`](docs/integration-guide.md)
 - JavaScript SDK: [`docs/sdk.md`](docs/sdk.md)
 - MCP integration example: [`docs/mcp.md`](docs/mcp.md)
+- x402 compatibility: [`docs/x402.md`](docs/x402.md)
 - Revenue model: [`docs/revenue-model.md`](docs/revenue-model.md)
 - Vercel-ready static demo: [`docs/vercel-deploy.md`](docs/vercel-deploy.md)
 - AI-readable discovery file: [`llms.txt`](llms.txt)
