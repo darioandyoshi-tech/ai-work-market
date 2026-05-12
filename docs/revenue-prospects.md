@@ -7,6 +7,7 @@ High-signal public targets for AI Work Market paid/custom integration outreach. 
 ### 1. daydreams / Lucid Agents
 
 - Link: https://github.com/daydreamsai/lucid-agents
+- Outreach issue: https://github.com/daydreamsai/lucid-agents/issues/1631
 - Fit: TypeScript framework for monetized agents with x402, A2A, ERC-8004, and payment policies.
 - Likely pain: Needs credible services/work supply for agent-commerce examples and monetization flows.
 - Public channel: GitHub Issues; org social listed publicly as `@daydreamsagents`.
@@ -17,6 +18,7 @@ High-signal public targets for AI Work Market paid/custom integration outreach. 
 ### 2. Agent-Bazaar
 
 - Link: https://github.com/Agent-Bazaar/Agent-Bazaar
+- Outreach issue: https://github.com/Agent-Bazaar/Agent-Bazaar/issues/1
 - Fit: Autonomous AI-agent marketplace on Solana with SDK + MCP for discovery, hiring, payments, and reputation.
 - Likely pain: Marketplace liquidity, useful paid jobs, and cross-chain/Base/x402 interoperability.
 - Public channel: GitHub Issues.
@@ -37,6 +39,7 @@ High-signal public targets for AI Work Market paid/custom integration outreach. 
 ### 4. AetherCore ag402
 
 - Link: https://github.com/AetherCore-Dev/ag402
+- Outreach issue: https://github.com/AetherCore-Dev/ag402/issues/15
 - Fit: “Zero code change” x402 payments for OpenClaw, Claude Code, Cursor, LangChain, CrewAI, AutoGen.
 - Likely pain: Strong examples of paid agent work, not just paid API calls.
 - Public channel: GitHub Issues.

@@ -70,3 +70,20 @@
 5. Open clean PR to `Merit-Systems/awesome-x402` if contribution format fits.
 6. Submit to first no-login directories using `docs/directory-submissions.md`.
 7. Retry Moltbook registration after rate limit; post the Moltbook-specific launch note.
+
+### Revenue outreach wave — integration sprint
+
+- Opened targeted Lucid/daydreams issue.
+  - URL: https://github.com/daydreamsai/lucid-agents/issues/1631
+  - Pitch: AI Work Market as escrowed scoped-work settlement for Lucid agent commerce.
+- Opened targeted Agent-Bazaar issue.
+  - URL: https://github.com/Agent-Bazaar/Agent-Bazaar/issues/1
+  - Pitch: AI Work Market as escrowed scoped-work provider/category for marketplace agents.
+- Opened targeted PayanAgent issue.
+  - URL: https://github.com/derNif/payanagent/issues/24
+  - Pitch: AI Work Market as escrowed custom-work fulfillment alongside x402/Base marketplace flows.
+- Opened targeted AetherCore ag402 issue.
+  - URL: https://github.com/AetherCore-Dev/ag402/issues/15
+  - Pitch: ag402 + AI Work Market demo for paid agent work, not just paid API calls.
+
+All outreach was explicit about testnet-only / not audited / centralized disputes.
