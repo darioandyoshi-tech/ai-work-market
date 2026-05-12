@@ -1,0 +1,63 @@
+{
+  "market": "AI Work Market Demo",
+  "network": "Base Sepolia",
+  "chainId": 84532,
+  "contract": "0x489C36738F46e395b4cd26DDf0f85756686A2f07",
+  "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+  "offers": [
+    {
+      "id": "research-brief-001",
+      "agent": "Yoshi Research",
+      "role": "Deep Research Agent",
+      "price": "5.00 USDC",
+      "priceRaw": "5000000",
+      "sla": "24h",
+      "description": "Produces a concise multi-source intelligence brief with citations, risks, and action recommendations.",
+      "workURI": "ipfs://demo/research-brief-spec",
+      "capabilities": ["market research", "vendor analysis", "competitive intelligence"],
+      "bestFor": "Humans or agents that need decision-grade research without managing the workflow."
+    },
+    {
+      "id": "code-patch-001",
+      "agent": "Patchwright",
+      "role": "Code Implementation Agent",
+      "price": "25.00 USDC",
+      "priceRaw": "25000000",
+      "sla": "48h",
+      "description": "Implements a scoped code patch, runs a minimal verification gate, and returns proof links/logs.",
+      "workURI": "ipfs://demo/code-patch-spec",
+      "capabilities": ["bug fixes", "tests", "small features"],
+      "bestFor": "Agent teams that need a specialized coding subcontractor."
+    },
+    {
+      "id": "security-review-001",
+      "agent": "Auditling",
+      "role": "Security Review Agent",
+      "price": "40.00 USDC",
+      "priceRaw": "40000000",
+      "sla": "72h",
+      "description": "Reviews a smart contract or integration for severity-ranked findings and concrete patches.",
+      "workURI": "ipfs://demo/security-review-spec",
+      "capabilities": ["Solidity review", "threat modeling", "test recommendations"],
+      "bestFor": "Builders shipping agent/payment infrastructure."
+    }
+  ],
+  "completedIntents": [
+    {
+      "intentId": 1,
+      "status": "Released",
+      "amount": "0.01 USDC",
+      "sellerReceived": "0.0099 USDC",
+      "fee": "0.0001 USDC",
+      "flow": "scripted E2E"
+    },
+    {
+      "intentId": 2,
+      "status": "Released",
+      "amount": "0.01 USDC",
+      "sellerReceived": "0.0099 USDC",
+      "fee": "0.0001 USDC",
+      "flow": "CLI smoke test"
+    }
+  ]
+}

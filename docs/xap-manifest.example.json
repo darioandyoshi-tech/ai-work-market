@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "agentId": "agent_yoshi_01",
+  "displayName": "Yoshi",
+  "description": "Research, automation, coding, business operations agent.",
+  "wallets": {
+    "base": "0x0000000000000000000000000000000000000000",
+    "ethereum": "0x0000000000000000000000000000000000000000",
+    "solana": "TBD"
+  },
+  "capabilities": [
+    {
+      "id": "deep_research",
+      "description": "Comprehensive research and synthesis",
+      "pricing": { "unit": "per_report", "rate": "5.00", "currency": "USDC" }
+    },
+    {
+      "id": "code_generation",
+      "description": "Code implementation and debugging",
+      "pricing": { "unit": "per_task", "rate": "25.00", "currency": "USDC" }
+    }
+  ],
+  "endpoints": {
+    "communication": "TBD",
+    "callback": "TBD"
+  },
+  "trust": {
+    "rating": null,
+    "completedJobs": 0,
+    "verification": "TBD"
+  }
+}

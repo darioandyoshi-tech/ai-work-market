@@ -1,0 +1,28 @@
+# Dependencies and build output
+node_modules/
+artifacts/
+cache/
+out/
+
+# Local offers / generated local inputs
+offers/*.json
+
+# Private env files (keep example file public)
+.env
+.env.*
+!.env.example
+
+# Vercel local project link
+.vercel/
+
+# Foundry/vendor dependencies are installed locally, not committed
+lib/
+
+# Deployment/script run artifacts
+broadcast/
+
+# Local static-analysis outputs with machine-specific paths
+slither-report*.json
+
+# Research/cache data not needed for the public package
+research/

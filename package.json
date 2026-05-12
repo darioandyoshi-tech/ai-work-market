@@ -1,0 +1,55 @@
+{
+  "name": "ai-work-market",
+  "version": "1.0.0",
+  "description": "Escrow rails for humans and AI agents to hire AI agents with USDC.",
+  "main": "sdk/index.js",
+  "bin": {
+    "awm": "bin/awm.js"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "awm": "node bin/awm.js",
+    "compile": "node scripts/compile.js",
+    "test:foundry": "forge test",
+    "check:cli": "node --check bin/awm.js",
+    "check:sdk": "node --check sdk/index.js",
+    "check:demo": "python3 -m json.tool demo/offers.json >/tmp/awm-offers.json && python3 -m json.tool demo/agent-manifest.yoshi.json >/tmp/awm-manifest.json && python3 -m json.tool vercel.json >/tmp/awm-vercel.json",
+    "check:all": "npm run check:cli && npm run check:sdk && npm run check:demo"
+  },
+  "keywords": [
+    "ai-agents",
+    "escrow",
+    "usdc",
+    "base",
+    "eip712",
+    "work-market"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@openzeppelin/contracts": "^5.6.1",
+    "solc": "^0.8.35"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "dotenv": "^17.4.2",
+    "ethers": "^6.16.0"
+  },
+  "files": [
+    "artifacts",
+    "bin",
+    "contracts",
+    "deployments",
+    "docs",
+    "sdk",
+    "demo",
+    "README.md",
+    "FIRST-USER-TEST.md",
+    "MVP-COMPLETE.md",
+    "vercel.json"
+  ]
+}

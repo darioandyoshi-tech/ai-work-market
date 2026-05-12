@@ -1,0 +1,61 @@
+{
+  "network": "Base Sepolia",
+  "chainId": 84532,
+  "contract": "AgentWorkEscrow",
+  "address": "0x489C36738F46e395b4cd26DDf0f85756686A2f07",
+  "transactionHash": "0xb15e1f9728bd5aa639d519e27aa23ff442e27308062746cc054ae42304f90a52",
+  "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+  "owner": "0x8d32448cbad55a3d3B12DE901e57782C409399B7",
+  "feeRecipient": "0x8d32448cbad55a3d3B12DE901e57782C409399B7",
+  "deployedAt": "2026-05-12T14:48:00Z",
+  "explorer": "https://sepolia-explorer.base.org/address/0x489C36738F46e395b4cd26DDf0f85756686A2f07",
+  "transactionExplorer": "https://sepolia-explorer.base.org/tx/0xb15e1f9728bd5aa639d519e27aa23ff442e27308062746cc054ae42304f90a52",
+  "verification": {
+    "codePresent": true,
+    "ownerChecked": true,
+    "feeRecipientChecked": true,
+    "usdcChecked": true,
+    "sourceVerifiedOnSourcify": true,
+    "sourcifyStatus": "exact_match"
+  },
+  "e2e": {
+    "script": "script/E2ESignedOfferBaseSepolia.s.sol",
+    "seller": "0x6160f01c066C3013A9037de1776131b67a132dA3",
+    "status": "passed",
+    "intentId": 1,
+    "amountRaw": "10000",
+    "sellerReceivedRaw": "9900",
+    "feeAccruedRaw": "100",
+    "escrowUsdcBalanceRaw": "100",
+    "transactions": {
+      "fundSellerEth": "0xf2b1d58429a7d804311c32036f9ef736a6d32fd160c299cdf15e9e8593dd0d3f",
+      "approve": "0x6851650a618e1f7b577785f8cf26afd0c79049f71d89a337cc37b2ced3c3d9fa",
+      "createIntentFromSignedOffer": "0x502642f61ed63bee679ab4bd85aff14a7ec55c03d58fdc1efe137386fd78203a",
+      "submitProof": "0x32b2d9876e7405eb531d32f9e681bf408b5fa5df8d9f7d372c9ea893ea0b0416",
+      "release": "0xf2e85dc1b63aaf6ac6d215ed359bf9cce51efb1c15428d50cb809cc8293e3fa6"
+    }
+  },
+  "cli": {
+    "path": "bin/awm.js",
+    "npmScript": "npm run awm",
+    "commands": [
+      "deployment",
+      "balances",
+      "status",
+      "fees",
+      "sign-offer",
+      "fund-offer",
+      "submit-proof",
+      "release"
+    ],
+    "liveSmokeTest": {
+      "status": "passed",
+      "intentId": 2,
+      "offerFile": "offers/cli-demo-offer.json",
+      "approve": "0x5748b48d61bce4c8a9ed4dd6f3ad7f4c3efdc7303e58d017463246293fa4fb81",
+      "fundOffer": "0x553dfdbe6a173bbb3b6341b3ba23007b92a15be625f386036fe0a8709d4cdbf9",
+      "submitProof": "0xb0ebffbd0317dc89ced2b8c10ab49e7bdb74ca70aef75caf464297ba37880108",
+      "release": "0xa8a57995570563e707215dbdb2620ac44700224c6b43e9e0b41ea6a4e1c67f7d"
+    }
+  }
+}
