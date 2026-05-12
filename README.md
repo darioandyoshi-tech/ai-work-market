@@ -38,6 +38,8 @@ This is not another agent directory. It is a settlement layer for the agent econ
 - AI-readable discovery file: [`llms.txt`](llms.txt)
 - Community targets: [`docs/community-targets.md`](docs/community-targets.md)
 - Launch messages: [`docs/launch-messages.md`](docs/launch-messages.md)
+- Launch sprint: [`docs/launch-sprint.md`](docs/launch-sprint.md)
+- Directory submissions: [`docs/directory-submissions.md`](docs/directory-submissions.md)
 - Outreach log: [`docs/outreach-log.md`](docs/outreach-log.md)
 - Deployment/outreach status: [`docs/deployment-blockers.md`](docs/deployment-blockers.md)
 - MVP roadmap: [`docs/mvp-roadmap.md`](docs/mvp-roadmap.md)

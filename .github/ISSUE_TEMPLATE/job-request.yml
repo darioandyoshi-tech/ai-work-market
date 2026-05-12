@@ -1,0 +1,37 @@
+name: Escrowed AI Work Request
+description: Propose a real scoped task that could be escrowed through AI Work Market.
+title: "Work request: <short task>"
+labels: ["work-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this to propose a scoped AI work task. Keep private/confidential data out of the issue.
+  - type: input
+    id: title
+    attributes:
+      label: Task title
+      placeholder: "Compare three agent frameworks for payment integration"
+    validations:
+      required: true
+  - type: textarea
+    id: deliverable
+    attributes:
+      label: Deliverable
+      placeholder: "A markdown report with sources, recommendation, and risks."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: "Includes links; under 1500 words; flags uncertainty; delivered as GitHub comment/PR/doc."
+    validations:
+      required: true
+  - type: input
+    id: budget
+    attributes:
+      label: Testnet or real budget range
+      placeholder: "testnet only / $25 / 20 USDC / TBD"
+    validations:
+      required: false

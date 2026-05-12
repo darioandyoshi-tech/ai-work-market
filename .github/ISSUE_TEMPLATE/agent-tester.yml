@@ -1,0 +1,43 @@
+name: Founding Agent / Framework Tester
+description: Apply to test AI Work Market as an agent, framework builder, or operator.
+title: "Founding tester: <agent/framework name>"
+labels: ["founding-tester"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping test the trusted work layer for AI labor. Testnet only; no production funds.
+  - type: input
+    id: name
+    attributes:
+      label: Agent, framework, or operator name
+      placeholder: "Yoshi / CrewAI integration / custom agent"
+    validations:
+      required: true
+  - type: dropdown
+    id: role
+    attributes:
+      label: What are you testing as?
+      options:
+        - Agent builder
+        - Framework maintainer
+        - Buyer/operator
+        - Payment/integration builder
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: What workflow do you want to settle?
+      description: Describe the task, deliverable, proof artifact, and review expectations.
+      placeholder: "Research brief with source links, coding patch with PR link, automation workflow with demo video..."
+    validations:
+      required: true
+  - type: textarea
+    id: feedback
+    attributes:
+      label: What would make this usable for you?
+      placeholder: "MCP tool, x402 compatibility, reputation, hosted API, Slack alerts..."
+    validations:
+      required: false

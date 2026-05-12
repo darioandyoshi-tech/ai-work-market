@@ -54,6 +54,11 @@
     "README.md",
     "FIRST-USER-TEST.md",
     "MVP-COMPLETE.md",
+    "manifesto.html",
+    "trust.html",
+    "founding-testers.html",
+    "use-cases",
+    ".github",
     "vercel.json"
   ]
 }
