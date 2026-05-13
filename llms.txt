@@ -59,3 +59,9 @@ Start here: https://ai-work-market.vercel.app/first-agents
 ## Agent payment client example
 - Dependency-free Node client: examples/agent-commerce/agent-payment-client.js
 - Docs: docs/agent-commerce/agent-payment-client.md
+
+## MCP agent commerce tools
+- MCP stdio server: examples/mcp/awm-mcp-server.js
+- Agent-commerce MCP docs: docs/agent-commerce/mcp-agent-commerce-tools.md
+- Tools: awm_get_agent_products, awm_get_payment_challenge, awm_get_payment_request, awm_verify_checkout_session
+- Safety: read-only; does not open checkout, move money, expose paid files, or return customer PII.

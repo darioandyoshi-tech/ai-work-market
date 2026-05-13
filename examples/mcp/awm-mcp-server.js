@@ -13,6 +13,8 @@ const {
 
 const SERVER_INFO = { name: 'ai-work-market-mcp', version: '0.1.0' };
 const RPC_URL = process.env.AWM_RPC_URL || 'https://sepolia.base.org';
+const AGENT_COMMERCE_ORIGIN = process.env.AWM_AGENT_COMMERCE_ORIGIN || 'https://ai-work-market.vercel.app';
+const REQUEST_TIMEOUT_MS = Number(process.env.AWM_MCP_HTTP_TIMEOUT_MS || 15000);
 
 let buffer = Buffer.alloc(0);
 
@@ -42,6 +44,82 @@ function jsonText(value) {
 
 function sha256Hex(input) {
   return '0x' + crypto.createHash('sha256').update(String(input)).digest('hex');
+}
+
+function urlFor(origin, pathname, params = {}) {
+  const url = new URL(pathname, origin);
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '') url.searchParams.set(key, String(value));
+  }
+  return url;
+}
+
+function safeSessionId(value) {
+  return /^cs_(test|live)_[A-Za-z0-9_]+$/.test(String(value || '').trim());
+}
+
+async function fetchJson(url, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: { accept: 'application/json', ...(options.headers || {}) }
+    });
+    const text = await res.text();
+    let body;
+    try {
+      body = JSON.parse(text || '{}');
+    } catch {
+      body = { raw: text };
+    }
+    return {
+      status: res.status,
+      ok: res.ok,
+      headers: Object.fromEntries(res.headers.entries()),
+      body
+    };
+  } catch (err) {
+    if (err.name === 'AbortError') throw new Error(`HTTP request timed out after ${REQUEST_TIMEOUT_MS}ms: ${url}`);
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function summarizePaymentChallenge(response, sourceUrl, sourceEndpoint) {
+  const body = response.body || {};
+  const checkoutUrl = body.payment && body.payment.checkoutUrl;
+  const linkHeader = response.headers.link || null;
+  return {
+    schema: 'ai-work-market.mcp-payment-challenge-summary.v1',
+    sourceEndpoint,
+    url: sourceUrl.toString(),
+    httpStatus: response.status,
+    paymentRequired: response.status === 402 || Boolean(body.paymentRequired),
+    product: body.product || null,
+    resource: body.resource || null,
+    payment: body.payment || null,
+    linkHeader,
+    warnings: checkoutUrl && linkHeader && !linkHeader.includes(checkoutUrl)
+      ? ['Link rel=payment header differs from JSON payment.checkoutUrl; prefer JSON checkoutUrl unless integration docs say otherwise.']
+      : [],
+    fulfillment: body.fulfillment || null,
+    proof: body.proof || null,
+    protocolNotes: body.protocolNotes || null,
+    nextActions: response.status === 402 ? [
+      'Show payment.checkoutUrl to a human/operator if purchase is desired.',
+      'After checkout, call awm_verify_checkout_session with the Stripe Checkout Session ID.'
+    ] : [],
+    safety: {
+      movesMoney: false,
+      opensCheckout: false,
+      paidAssetsReturned: false,
+      accessTokenRedacted: true
+    },
+    rawSchema: body.schema || null
+  };
 }
 
 function tools() {
@@ -77,6 +155,57 @@ function tools() {
           intentId: { type: 'string', description: 'Escrow intent ID, e.g. 1 or 2.' }
         }
       }
+    },
+    {
+      name: 'awm_get_agent_products',
+      description: 'Fetch the live AI Work Market agent-readable product catalog. Does not move money.',
+      inputSchema: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          origin: { type: 'string', description: 'Optional AI Work Market origin for local/test deployments.' }
+        }
+      }
+    },
+    {
+      name: 'awm_get_payment_challenge',
+      description: 'Fetch a protected resource and summarize the expected HTTP 402 payment challenge. Does not open checkout or pay.',
+      inputSchema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['slug'],
+        properties: {
+          slug: { type: 'string', description: 'Product slug, e.g. agent-commerce-market-map-2026.' },
+          origin: { type: 'string', description: 'Optional AI Work Market origin for local/test deployments.' },
+          accessToken: { type: 'string', description: 'Optional local/test bearer token. Redacted from output.' }
+        }
+      }
+    },
+    {
+      name: 'awm_get_payment_request',
+      description: 'Fetch the standalone payment-request endpoint and normalize the HTTP 402 response. Does not open checkout or pay.',
+      inputSchema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['slug'],
+        properties: {
+          slug: { type: 'string', description: 'Product slug, e.g. agent-commerce-market-map-2026.' },
+          origin: { type: 'string', description: 'Optional AI Work Market origin for local/test deployments.' }
+        }
+      }
+    },
+    {
+      name: 'awm_verify_checkout_session',
+      description: 'Verify Stripe checkout receipt and delivery status through AI Work Market public APIs. Does not expose customer PII or paid assets.',
+      inputSchema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['sessionId'],
+        properties: {
+          sessionId: { type: 'string', description: 'Stripe Checkout Session ID, cs_test_... or cs_live_...' },
+          origin: { type: 'string', description: 'Optional AI Work Market origin for local/test deployments.' }
+        }
+      }
     }
   ];
 }
@@ -106,8 +235,48 @@ async function callTool(name, args = {}) {
     return textResult(jsonText(status));
   }
 
+  if (name === 'awm_get_agent_products') {
+    const origin = args.origin || AGENT_COMMERCE_ORIGIN;
+    const response = await fetchJson(new URL('/api/agent-products', origin));
+    return textResult(jsonText({
+      schema: 'ai-work-market.mcp-agent-products-result.v1',
+      httpStatus: response.status,
+      ok: response.ok,
+      body: response.body
+    }));
+  }
+
+  if (name === 'awm_get_payment_challenge') {
+    const origin = args.origin || AGENT_COMMERCE_ORIGIN;
+    const headers = args.accessToken ? { authorization: `Bearer ${args.accessToken}` } : undefined;
+    const url = urlFor(origin, '/api/protected-resource', { slug: args.slug });
+    const response = await fetchJson(url, { headers });
+    return textResult(jsonText(summarizePaymentChallenge(response, url, '/api/protected-resource')));
+  }
+
+  if (name === 'awm_get_payment_request') {
+    const origin = args.origin || AGENT_COMMERCE_ORIGIN;
+    const url = urlFor(origin, '/api/payment-request', { slug: args.slug });
+    const response = await fetchJson(url);
+    return textResult(jsonText(summarizePaymentChallenge(response, url, '/api/payment-request')));
+  }
+
+  if (name === 'awm_verify_checkout_session') {
+    if (!safeSessionId(args.sessionId)) throw new Error('Invalid sessionId. Expected cs_test_... or cs_live_...');
+    const origin = args.origin || AGENT_COMMERCE_ORIGIN;
+    const receipt = await fetchJson(new URL(`/api/fulfillment-receipt?session_id=${encodeURIComponent(args.sessionId)}`, origin));
+    const delivery = await fetchJson(new URL(`/api/delivery-status?session_id=${encodeURIComponent(args.sessionId)}`, origin));
+    return textResult(jsonText({
+      schema: 'ai-work-market.mcp-checkout-verification-result.v1',
+      receipt: { httpStatus: receipt.status, body: receipt.body },
+      delivery: { httpStatus: delivery.status, body: delivery.body },
+      safety: { noCustomerPiiExpected: true, noAssetUrlsExpected: true }
+    }));
+  }
+
   throw new Error(`Unknown tool: ${name}`);
 }
+
 
 async function handle(message) {
   if (!message || message.jsonrpc !== '2.0') return;

@@ -17,7 +17,7 @@
     "test:foundry": "forge test",
     "check:cli": "node --check bin/awm.js",
     "check:sdk": "node --check sdk/index.js",
-    "check:mcp": "node --check examples/mcp/awm-mcp-server.js",
+    "check:mcp": "node --check examples/mcp/awm-mcp-server.js && node scripts/smoke-mcp-agent-commerce.js",
     "check:agentkit": "node --check examples/agentkit/awm-agentkit-actions.js",
     "check:x402": "node --check examples/x402/quote-gate.js && python3 -m json.tool examples/x402/quote-to-escrow.example.json >/tmp/awm-x402-quote-to-escrow.json",
     "check:a2a": "node --check examples/a2a/awm-a2a-adapter.js",
