@@ -23,9 +23,9 @@ function signToken(payload, secret) {
 }
 
 module.exports = async function handler(req, res) {
-  if (req.method !== 'POST' && req.method !== 'GET') {
+  if (req.method !== 'POST') {
     res.statusCode = 405;
-    res.setHeader('allow', 'GET, POST');
+    res.setHeader('allow', 'POST');
     res.end('method not allowed');
     return;
   }
