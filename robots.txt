@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /purchase-complete
+Sitemap: https://ai-work-market.vercel.app/sitemap.xml

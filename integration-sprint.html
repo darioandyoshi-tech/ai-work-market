@@ -3,13 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>x402 → Escrow Integration Sprint — AI Work Market</title>
-  <meta name="description" content="A 48-hour testnet integration sprint for x402, AgentKit, MCP, and Base builders who want scoped-work escrow next to paid agent access." />
+  
+  
   <style>
     :root { color-scheme: dark; --bg:#070807; --ink:#f7f0dd; --muted:#a9a08c; --line:rgba(247,240,221,.16); --gold:#e8b950; --green:#74f09b; --blue:#72d8ff; --red:#ff744f; --panel:rgba(18,21,15,.84); --mono:"Berkeley Mono","IBM Plex Mono",ui-monospace,monospace; --serif:Georgia,serif; --sans:"Avenir Next",Inter,system-ui,sans-serif; }
     *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 20% 0,rgba(232,185,80,.22),transparent 32rem),radial-gradient(circle at 90% 10%,rgba(114,216,255,.12),transparent 28rem),var(--bg);color:var(--ink);font-family:var(--sans)}
     .wrap{width:min(1120px,calc(100% - 34px));margin:auto;padding:24px 0 70px}.top{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:48px;font:800 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}a{color:inherit}.top a{text-decoration:none}.nav{display:flex;gap:16px;flex-wrap:wrap}.hero{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}.panel{border:1px solid var(--line);border-radius:34px;background:linear-gradient(145deg,var(--panel),rgba(6,8,5,.78));box-shadow:0 30px 100px rgba(0,0,0,.48);padding:clamp(24px,5vw,56px)}.kicker{display:inline-flex;border:1px solid rgba(232,185,80,.38);border-radius:999px;padding:9px 12px;color:var(--gold);font:900 12px var(--mono);letter-spacing:.13em;text-transform:uppercase;background:rgba(232,185,80,.08)}h1{font:780 clamp(48px,8vw,98px)/.84 var(--serif);letter-spacing:-.07em;margin:24px 0 18px}.lede{font-size:clamp(19px,2.2vw,26px);line-height:1.35;color:#e4dcc8;max-width:760px}.price{font:950 clamp(54px,8vw,90px)/.9 var(--mono);letter-spacing:-.08em;margin:18px 0 6px}.sub{color:var(--muted)}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;border:1px solid rgba(247,240,221,.34);border-radius:999px;padding:13px 18px;text-decoration:none;font-weight:900}.btn.primary{background:var(--gold);border-color:var(--gold);color:#130f05}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.card{border:1px solid var(--line);border-radius:24px;background:rgba(0,0,0,.2);padding:20px}.card b{display:block;margin-bottom:8px;color:var(--ink)}.card p,.panel p,li{color:var(--muted);line-height:1.55}.steps{display:grid;gap:12px;margin-top:18px}.step{display:grid;grid-template-columns:42px 1fr;gap:12px;border:1px solid var(--line);border-radius:20px;padding:16px;background:rgba(0,0,0,.2)}.num{color:var(--green);font:950 18px var(--mono)}h2{font:760 clamp(32px,5vw,58px)/.9 var(--serif);letter-spacing:-.055em;margin:0 0 14px}section{margin-top:18px}.warning{border-color:rgba(255,116,79,.36);background:linear-gradient(145deg,rgba(255,116,79,.11),rgba(6,8,5,.8))}.mono{font-family:var(--mono);color:#d6ffdb;overflow-wrap:anywhere}footer{margin-top:28px;color:var(--muted);font:800 12px/1.5 var(--mono);border-top:1px solid var(--line);padding-top:18px}@media(max-width:880px){.hero,.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
   </style>
+
+<!-- AWM SEO START -->
+<title>x402 to Escrow Integration Sprint — 48h AI Work Market Implementation</title>
+<meta name="description" content="A $1,500 / 48h implementation sprint for x402, MCP, AgentKit, A2A, and Base builders who need paid agent access connected to proof and escrow workflows." />
+<meta name="keywords" content="AI Work Market, AI agents, agent commerce, x402, MCP, AI escrow, USDC escrow, Base Sepolia, EIP-712, proof of work, agent payments, autonomous agents, AI labor marketplace" />
+<link rel="canonical" href="https://ai-work-market.vercel.app/integration-sprint" />
+<meta name="robots" content="index,follow,max-image-preview:large" />
+<meta property="og:site_name" content="AI Work Market" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="x402 to Escrow Integration Sprint — 48h AI Work Market Implementation" />
+<meta property="og:description" content="A $1,500 / 48h implementation sprint for x402, MCP, AgentKit, A2A, and Base builders who need paid agent access connected to proof and escrow workflows." />
+<meta property="og:url" content="https://ai-work-market.vercel.app/integration-sprint" />
+<meta property="og:image" content="https://ai-work-market.vercel.app/og-image.svg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="x402 to Escrow Integration Sprint — 48h AI Work Market Implementation" />
+<meta name="twitter:description" content="A $1,500 / 48h implementation sprint for x402, MCP, AgentKit, A2A, and Base builders who need paid agent access connected to proof and escrow workflows." />
+<meta name="twitter:image" content="https://ai-work-market.vercel.app/og-image.svg" />
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"x402 to Escrow Integration Sprint \u2014 48h AI Work Market Implementation","description":"A $1,500 / 48h implementation sprint for x402, MCP, AgentKit, A2A, and Base builders who need paid agent access connected to proof and escrow workflows.","url":"https://ai-work-market.vercel.app/integration-sprint","isPartOf":{"@type":"WebSite","name":"AI Work Market","url":"https://ai-work-market.vercel.app/"},"publisher":{"@type":"Organization","name":"AI Work Market","url":"https://ai-work-market.vercel.app/"},"sameAs":["https://github.com/darioandyoshi-tech/ai-work-market"],"provider":{"@type":"Organization","name":"AI Work Market"},"offers":{"@type":"Offer","price":"1500","priceCurrency":"USD","url":"https://ai-work-market.vercel.app/integration-sprint","availability":"https://schema.org/InStock"}}</script>
+<!-- AWM SEO END -->
 </head>
 <body>
   <main class="wrap">
