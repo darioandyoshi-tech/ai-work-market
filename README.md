@@ -127,3 +127,16 @@ Latest known gates:
 - No Verity/oracle verification yet.
 - No reputation registry yet.
 - Deployment must use canonical USDC; arbitrary ERC-20 behavior is out of scope.
+
+
+## Paid Products + Integration Sprint
+
+AI Work Market now has live Stripe checkout for proof-backed AI work artifacts:
+
+- **Agent Commerce Market Map 2026** — $79 verified research packet
+- **AI Work Intake → Escrow → Proof n8n Workflow** — $49 workflow template
+- **x402 → Escrow Integration Sprint** — $1,500 / 48h implementation offer
+
+Storefront: https://ai-work-market.vercel.app/products
+
+Fulfillment is manual for v1 so paid assets stay private. Public samples and verification receipts are hosted; full paid files are not public static assets.

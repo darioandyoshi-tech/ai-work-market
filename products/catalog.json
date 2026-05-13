@@ -1,0 +1,46 @@
+{
+  "updatedAt": "2026-05-12T19:20:00-05:00",
+  "checkoutStatus": "stripe_payment_links_live",
+  "note": "Stripe live Payment Links are configured for product checkout. Base Sepolia escrow remains testnet-only and is not used for real customer payments.",
+  "products": [
+    {
+      "slug": "agent-commerce-market-map-2026",
+      "name": "Agent Commerce Market Map 2026",
+      "type": "verified_research_packet",
+      "status": "paid_ready_v1",
+      "priceUsd": 79,
+      "teamPriceUsd": 249,
+      "customBriefUsdRange": [
+        750,
+        1500
+      ],
+      "url": "/products/market-map-sample.md",
+      "verificationUrl": "/products/agent-commerce-market-map/verification.json",
+      "sha256": "47d2b72f4fb67c2347921bd160f13d45e65fda62a475e2a4f94c98176bf48620",
+      "checkoutUrl": "https://checkout.dmeomaha.net/b/cNi5kC3bOely5hgcPo8so05",
+      "sampleUrl": "/products/market-map-sample.md",
+      "delivery": "manual_after_stripe_purchase"
+    },
+    {
+      "slug": "awm-work-intake-n8n",
+      "name": "AI Work Intake \u2192 Escrow \u2192 Proof n8n Workflow",
+      "type": "workflow_template",
+      "status": "draft_sellable",
+      "priceUsd": 49,
+      "url": "/products/awm-work-intake-n8n/sample.md",
+      "workflowUrl": "/products/awm-work-intake-n8n/workflow.json",
+      "checkoutUrl": "https://checkout.dmeomaha.net/b/eVq8wO13Ga5i8tsdTs8so06",
+      "sampleUrl": "/products/awm-work-intake-n8n/sample.md",
+      "delivery": "manual_after_stripe_purchase"
+    },
+    {
+      "slug": "x402-escrow-integration-sprint",
+      "name": "x402 \u2192 Escrow Integration Sprint",
+      "type": "service",
+      "status": "offer_live",
+      "priceUsd": 1500,
+      "url": "/integration-sprint",
+      "checkoutUrl": "https://checkout.dmeomaha.net/b/3cI9AS4fS4KYaBA02C8so07"
+    }
+  ]
+}

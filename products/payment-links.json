@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-05-13T01:02:03.054Z",
+  "mode": "live",
+  "publicOrigin": "https://ai-work-market.vercel.app",
+  "products": [
+    {
+      "slug": "agent-commerce-market-map-2026",
+      "name": "Agent Commerce Market Map 2026",
+      "currency": "usd",
+      "unitAmount": 7900,
+      "productId": "prod_UVS54bWGxruzyp",
+      "priceId": "price_1TWRBXD6zlr7wzldmB3GFU5l",
+      "paymentLinkId": "plink_1TWRBYD6zlr7wzldvbiCvtnH",
+      "paymentLinkUrl": "https://checkout.dmeomaha.net/b/cNi5kC3bOely5hgcPo8so05",
+      "afterCompletionUrl": "https://ai-work-market.vercel.app/purchase-complete?paid=agent-commerce-market-map-2026"
+    },
+    {
+      "slug": "awm-work-intake-n8n",
+      "name": "AI Work Intake → Escrow → Proof n8n Workflow",
+      "currency": "usd",
+      "unitAmount": 4900,
+      "productId": "prod_UVS5vmuhzqV7ux",
+      "priceId": "price_1TWRBYD6zlr7wzldRS2gQY3Z",
+      "paymentLinkId": "plink_1TWRBZD6zlr7wzldnFhH2Hn6",
+      "paymentLinkUrl": "https://checkout.dmeomaha.net/b/eVq8wO13Ga5i8tsdTs8so06",
+      "afterCompletionUrl": "https://ai-work-market.vercel.app/purchase-complete?paid=awm-work-intake-n8n"
+    },
+    {
+      "slug": "x402-escrow-integration-sprint",
+      "name": "x402 → Escrow Integration Sprint",
+      "currency": "usd",
+      "unitAmount": 150000,
+      "productId": "prod_UVS5e21mzaBOgI",
+      "priceId": "price_1TWRBZD6zlr7wzldX1W3xvcN",
+      "paymentLinkId": "plink_1TWRBaD6zlr7wzldYu5yo5e6",
+      "paymentLinkUrl": "https://checkout.dmeomaha.net/b/3cI9AS4fS4KYaBA02C8so07",
+      "afterCompletionUrl": "https://ai-work-market.vercel.app/purchase-complete?paid=x402-escrow-integration-sprint"
+    }
+  ],
+  "updatedAt": "2026-05-13T01:42:12.066Z"
+}

@@ -2,19 +2,59 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/manifesto", "destination": "/manifesto.html" },
-    { "source": "/trust", "destination": "/trust.html" },
-    { "source": "/founding-testers", "destination": "/founding-testers.html" },
-    { "source": "/first-agents", "destination": "/first-agents.html" },
-    { "source": "/integration-sprint", "destination": "/integration-sprint.html" }
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/manifesto",
+      "destination": "/manifesto.html"
+    },
+    {
+      "source": "/trust",
+      "destination": "/trust.html"
+    },
+    {
+      "source": "/founding-testers",
+      "destination": "/founding-testers.html"
+    },
+    {
+      "source": "/first-agents",
+      "destination": "/first-agents.html"
+    },
+    {
+      "source": "/integration-sprint",
+      "destination": "/integration-sprint.html"
+    },
+    {
+      "source": "/products",
+      "destination": "/products.html"
+    },
+    {
+      "source": "/products/agent-commerce-market-map",
+      "destination": "/products/market-map-sample.md"
+    },
+    {
+      "source": "/products/awm-work-intake-n8n",
+      "destination": "/products/awm-work-intake-n8n/sample.md"
+    },
+    {
+      "source": "/purchase-complete",
+      "destination": "/purchase-complete.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
       ]
     }
   ]
