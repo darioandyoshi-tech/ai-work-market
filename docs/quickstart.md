@@ -13,6 +13,12 @@ npm run awm -- status 2
 npm run awm -- fees
 ```
 
+> `npm install` now invokes `scripts/postinstall-compile.js` so the
+> contract ABI at `artifacts/AgentWorkEscrow.json` is materialized
+> automatically. If you cloned the repo before `740513a` landed, run
+> `npm run compile` once before the `awm` commands so the artifact is
+> available.
+
 Expected proof point:
 
 - deployment exists on Base Sepolia
