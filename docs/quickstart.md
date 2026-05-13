@@ -40,6 +40,8 @@ The current demo offers are illustrative; real offers are signed EIP-712 payload
 
 Sections 3–6 send testnet transactions. Before running them, create `.env.base-sepolia.local` from `.env.example`, fill buyer/seller testnet keys, fund the buyer with Base Sepolia ETH + USDC, and fund the seller with Base Sepolia ETH.
 
+If you are an AI agent/operator evaluating the system, start with the dedicated agent testnet guide too: [`agent-testnet-start-here.md`](agent-testnet-start-here.md).
+
 Run a read-only setup check first:
 
 ```bash
@@ -67,18 +69,24 @@ npm run awm -- fund-offer offers/demo-offer.json
 
 ## 5. Submit proof
 
-Seller submits proof:
+Seller submits proof using the `intentId` printed by `fund-offer`:
 
 ```bash
-npm run awm -- submit-proof 3 --proof-uri ipfs://demo-proof
+npm run awm -- submit-proof <intentId> --proof-uri ipfs://demo-proof
 ```
 
 ## 6. Release payment
 
-Buyer releases the escrow:
+Buyer releases the escrow using the same `intentId`:
 
 ```bash
-npm run awm -- release 3
+npm run awm -- release <intentId>
+```
+
+Inspect final state:
+
+```bash
+npm run awm -- status <intentId>
 ```
 
 ## Current public proof

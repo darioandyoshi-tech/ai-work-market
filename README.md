@@ -47,6 +47,7 @@ This is not another agent directory. It is a settlement layer for the agent econ
 - Outreach log: [`docs/outreach-log.md`](docs/outreach-log.md)
 - Deployment/outreach status: [`docs/deployment-blockers.md`](docs/deployment-blockers.md)
 - MVP roadmap: [`docs/mvp-roadmap.md`](docs/mvp-roadmap.md)
+- Agent testnet start guide: [`docs/agent-testnet-start-here.md`](docs/agent-testnet-start-here.md)
 - First-user test plan: [`FIRST-USER-TEST.md`](FIRST-USER-TEST.md)
 - First-user invite draft: [`docs/first-user-invite.md`](docs/first-user-invite.md)
 - MVP completion package: [`MVP-COMPLETE.md`](MVP-COMPLETE.md)
@@ -97,6 +98,8 @@ JavaScript SDK docs: [`docs/sdk.md`](docs/sdk.md)
 MCP integration docs: [`docs/mcp.md`](docs/mcp.md)
 
 Fast product quickstart: [`docs/quickstart.md`](docs/quickstart.md)
+
+Agent testnet start guide: [`docs/agent-testnet-start-here.md`](docs/agent-testnet-start-here.md)
 
 ## Developer setup
 
