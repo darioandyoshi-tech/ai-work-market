@@ -151,3 +151,11 @@ Skipped/comment constraints:
 - Coinbase x402 issue search hit could not be commented because `coinbase/x402` has issues disabled.
 - Closed issues were not bumped.
 - All public claims preserved the boundary: Stripe checkout live; AWM escrow remains Base Sepolia testnet-only.
+
+## 2026-05-12 — Google A2A x402 follow-up
+
+- Target: `google-agentic-commerce/a2a-x402#60`
+- Reply: https://github.com/google-agentic-commerce/a2a-x402/issues/60#issuecomment-4436751819
+- Context: `@aeoess` validated the authorization/proof/release/timeout lifecycle and mapped it to `budget_reservation` verbs (`reserve`, `commit`, `release`, `refund`, `query_budget`, `query_reservation`).
+- Follow-up content: announced the new read-only MCP proof surface (`awm_get_agent_products`, `awm_get_payment_challenge`, `awm_get_payment_request`, `awm_verify_checkout_session`) and proposed a direct reservation-vocabulary mapping.
+- Boundary stated: Stripe Payment Links live; AWM protocol escrow remains Base Sepolia/testnet-only, not audited, centralized-dispute MVP.
