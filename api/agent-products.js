@@ -32,6 +32,7 @@ module.exports = async function handler(req, res) {
         mode: product.delivery || (product.type === 'service' ? 'manual_scope_kickoff' : 'manual_after_stripe_purchase'),
         publicSampleUrl: product.sampleUrl ? `${origin}${product.sampleUrl}` : null,
         publicProductUrl: `${origin}/products`,
+        paymentRequestUrl: `${origin}/api/payment-request?slug=${encodeURIComponent(product.slug)}`,
         paidAssetsPublic: false
       },
       proof: product.sha256 ? {
@@ -55,6 +56,7 @@ module.exports = async function handler(req, res) {
       testnetProtocolOnly: true
     },
     paymentRails: ['stripe_payment_links'],
+    paymentRequestApi: `${origin}/api/payment-request`,
     futureRails: ['stripe_mpp', 'x402', 'base_usdc_escrow_production_after_audit'],
     products
   }, null, 2));

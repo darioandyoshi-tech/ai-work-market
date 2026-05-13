@@ -26,3 +26,12 @@ slither-report*.json
 
 # Research/cache data not needed for the public package
 research/
+
+# Private paid product fulfillment assets; public repo/storefront exposes samples only
+products/agent-commerce-market-map/packet.md
+products/agent-commerce-market-map/source-index.md
+products/agent-commerce-market-map/verification.json
+products/awm-work-intake-n8n/README.md
+products/awm-work-intake-n8n/setup.md
+products/awm-work-intake-n8n/test-data.json
+products/awm-work-intake-n8n/workflow.json
