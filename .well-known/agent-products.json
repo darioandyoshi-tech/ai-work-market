@@ -1,0 +1,10 @@
+{
+  "schema": "ai-work-market.agent-products-discovery.v1",
+  "name": "AI Work Market Agent Products",
+  "description": "Agent-readable catalog for proof-backed AI work artifacts and integration services.",
+  "catalogUrl": "https://ai-work-market.vercel.app/api/agent-products",
+  "storefrontUrl": "https://ai-work-market.vercel.app/products",
+  "sourceUrl": "https://github.com/darioandyoshi-tech/ai-work-market",
+  "paymentRails": ["stripe_payment_links"],
+  "futureRails": ["stripe_mpp", "x402"]
+}

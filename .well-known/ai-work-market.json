@@ -41,5 +41,10 @@
     "testnet only",
     "not production audited",
     "centralized dispute resolution in MVP"
+  ],
+  "agentProductsUrl": "https://ai-work-market.vercel.app/api/agent-products",
+  "productStorefrontUrl": "https://ai-work-market.vercel.app/products",
+  "paymentRails": [
+    "stripe_payment_links"
   ]
 }
