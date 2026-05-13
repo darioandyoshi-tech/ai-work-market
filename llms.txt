@@ -55,3 +55,7 @@ Start here: https://ai-work-market.vercel.app/first-agents
 
 ## Agent commerce demo
 - Live 402 protected resource demo: https://ai-work-market.vercel.app/agent-commerce
+
+## Agent payment client example
+- Dependency-free Node client: examples/agent-commerce/agent-payment-client.js
+- Docs: docs/agent-commerce/agent-payment-client.md
