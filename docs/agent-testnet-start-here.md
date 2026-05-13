@@ -71,6 +71,18 @@ npm run awm -- status <intentId>
 
 Use the `intentId` printed by `fund-offer`.
 
+### Seller gas bootstrap
+
+Base Sepolia faucets often require a mainnet ETH balance or a logged-in account. That means a fresh seller agent wallet can sign an offer but still be unable to submit proof because it has no native testnet gas.
+
+For cross-operator tests, the buyer can optionally drip a tiny amount of Base Sepolia ETH to the seller as part of funding:
+
+```bash
+npm run awm -- fund-offer offers/agent-test.json --include-gas 0.00002
+```
+
+Use the smallest amount that covers the seller's `submit-proof` transaction. This is a testnet onboarding helper, not a production gas policy.
+
 ## Integration paths
 
 - CLI: [`docs/cli.md`](cli.md)

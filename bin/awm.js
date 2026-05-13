@@ -374,6 +374,7 @@ function makeProgram() {
   program.command('fund-offer <offerFile>')
     .description('Buyer approves USDC if needed and funds a seller-signed offer')
     .option('--no-approve', 'skip approval transaction')
+    .option('--include-gas <eth>', 'also send a small native-token gas drip to the seller after funding (testnet onboarding helper)')
     .action(async (offerFile, cmd) => {
       const opts = program.opts();
       const provider = getProvider(opts);
@@ -415,7 +416,16 @@ function makeProgram() {
           if (parsed && parsed.name === 'IntentCreated') intentId = parsed.args.intentId.toString();
         } catch { /* ignore */ }
       }
-      console.log(JSON.stringify({ intentId, transactionHash: tx.hash }, null, 2));
+      const out = { intentId, transactionHash: tx.hash };
+      if (cmd.includeGas) {
+        const gasAmount = ethers.parseEther(String(cmd.includeGas));
+        if (gasAmount <= 0n) throw new Error('--include-gas must be greater than 0');
+        const gasTx = await buyerWallet.sendTransaction({ to: offer.seller, value: gasAmount });
+        console.log(`gas drip tx: ${gasTx.hash}`);
+        await waitTx(gasTx);
+        out.gasDrip = { to: offer.seller, amountEth: String(cmd.includeGas), transactionHash: gasTx.hash };
+      }
+      console.log(JSON.stringify(out, null, 2));
     });
 
   program.command('submit-proof <intentId>')
