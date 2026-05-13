@@ -120,3 +120,34 @@ After building `examples/agentkit`, posted selective proof-backed follow-ups ins
   - Pointed to AgentKit action descriptors/runbook and asked whether external example vs action-provider/docs PR is the right shape.
 
 Proof asset: `examples/agentkit` at commit `99fd70c Add AgentKit action descriptors`.
+
+### Full-power revenue strike wave — live 402/receipt demo
+
+Dario said “do it all.” Posted high-signal comments only on open issues directly about x402, MPP, 402 handling, agent payments, or agent commerce. Lead asset: live demo `https://ai-work-market.vercel.app/agent-commerce`.
+
+- Stripe AI / MCP x402+MPP payment gating:
+  - https://github.com/stripe/ai/issues/347#issuecomment-4436558670
+  - Pitch: 402 protected-resource + Stripe receipt verification as reference for MCP payment gating; suggested work-order/proof layer beyond payment.
+- Google A2A x402 spending/circuit breakers:
+  - https://github.com/google-agentic-commerce/a2a-x402/issues/60#issuecomment-4436558754
+  - Pitch: separate payment authorization from work acceptance/proof/release; semantic envelope for circuit breakers.
+- Hugging Face smolagents x402 handler:
+  - https://github.com/huggingface/smolagents/issues/2112#issuecomment-4436558829
+  - Pitch: generic 402 handler policy/tool layer with budget/trust/receipt storage.
+- Firecrawl x402 per-scrape payments:
+  - https://github.com/firecrawl/firecrawl/issues/3279#issuecomment-4436558908
+  - Pitch: receipt + proof of delivered scrape/crawl work, not only payment.
+- Microsoft AutoGen native agent commerce:
+  - https://github.com/microsoft/autogen/issues/7564#issuecomment-4436558976
+  - Pitch: CommercePolicy / PaidResourceTool for 402 → payment → receipt → proof verification.
+- Microsoft AutoGen payment primitive:
+  - https://github.com/microsoft/autogen/issues/7492#issuecomment-4436559051
+  - Pitch: combine spend policy with proof/timeout/refund/dispute policy.
+- OpenViking paid context/skills:
+  - https://github.com/volcengine/OpenViking/issues/1092#issuecomment-4436559133
+  - Pitch: paid context/skills as file-system resources with payment/proof envelope.
+
+Skipped/comment constraints:
+- Coinbase x402 issue search hit could not be commented because `coinbase/x402` has issues disabled.
+- Closed issues were not bumped.
+- All public claims preserved the boundary: Stripe checkout live; AWM escrow remains Base Sepolia testnet-only.
