@@ -366,9 +366,16 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
     }
 
     function _validateURI(string calldata uri) internal pure {
-        uint256 len = bytes(uri).length;
-        if (len == 0) revert InvalidURI();
+        bytes memory b = bytes(uri);
+        uint256 len = b.length;
+        if (len < 7) revert InvalidURI();
         if (len > MAX_URI_BYTES) revert UriTooLong();
+        if (
+            b[0] != 'i' || b[1] != 'p' || b[2] != 'f' || b[3] != 's' || 
+            b[4] != ':' || b[5] != '/' || b[6] != '/'
+        ) {
+            revert InvalidURI();
+        }
     }
 
     function _feeSplit(uint256 amount, uint96 feeBps) internal pure returns (uint256 feeAmount, uint256 sellerAmount) {

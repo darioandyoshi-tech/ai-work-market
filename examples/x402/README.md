@@ -1,58 +1,44 @@
-# x402 Quote to AI Work Market Escrow
+# x402 → AI Work Market (AWM) Handoff Demo
 
-This example shows a simple compatibility pattern:
+This demo illustrates the critical crossover point where a pay-per-call agent interaction (x402) transitions into a scoped, escrowed delivery of complex integration work (AI Work Market).
 
-1. Use x402 for immediate paid access to a seller agent's quote/intake/API endpoint.
-2. Return an AI Work Market escrow offer payload for the scoped work.
-3. Fund and settle the accepted offer through AI Work Market escrow.
+## The Thesis
 
-Files:
+x402 is excellent for **paid access**, **pay-per-call**, and **micropayments**. 
+AI Work Market is designed for **deliverable-based work** that requires:
+- Terms and Conditions
+- Escrow (funding commitment)
+- Proof of delivery (URI)
+- Review and Release/Refund/Dispute paths
 
-- `quote-to-escrow.example.json` — complete JSON sketch of the flow.
-- `quote-gate.js` — runnable no-private-key HTTP example for x402/Base/Coinbase AgentKit builders.
+**This demo shows how a request for a complex integration results in a "Handoff" response that provides both the x402 access token and the AWM Escrow offer.**
 
-## Run the safe quote gate
+## Quick Start
 
+### 1. Start the Demo Server
 ```bash
-node examples/x402/quote-gate.js
+node server.js
 ```
 
-Endpoints:
-
-- `GET /x402/payment-requirements` — returns an x402-style USDC payment requirement for quote access.
-- `GET /agentkit/action` — returns action metadata an AgentKit builder can wrap as a custom action.
-- `POST /quote` — requires an `X-PAYMENT` header and returns:
-  - canonical AI Work Market work spec
-  - unsigned escrow offer object
-  - EIP-712 typed data for the seller to sign
-  - Base Sepolia escrow/USDC deployment metadata
-
-Example request:
-
+### 2. Run the Demo Client
+In a separate terminal:
 ```bash
-curl -s http://127.0.0.1:4020/quote \
-  -H 'content-type: application/json' \
-  -H 'X-PAYMENT: demo-x402-payment-payload' \
-  -d '{
-    "buyer":"0x8d32448cbad55a3d3B12DE901e57782C409399B7",
-    "seller":"0x6160f01c066C3013A9037de1776131b67a132dA3",
-    "title":"Research x402 escrow handoff",
-    "deliverable":"Markdown report with recommendation and links",
-    "acceptanceCriteria":["Includes sources","Names risks"],
-    "amountRaw":"25000000"
-  }' | jq
+node client.js
 ```
 
-Safety properties:
+## The Flow
 
-- does not read `.env` files
-- does not require private keys
-- does not submit transactions
-- does not call an x402 facilitator; production code should verify `X-PAYMENT` before returning quote access
+1. **Request Quote:** The client asks for a custom integration quote.
+2. **Handoff Response:** The server returns a response that contains:
+   - `x402_access_meta`: How to continue the consultation via x402.
+   - `awm_work_spec`: The scope of the 48-hour integration sprint.
+   - `awm_offer`: The signing and funding instructions for the escrow.
+   - `proof_convention`: How the worker will submit proof of completion.
 
-Integration boundary:
+This makes the core sales claim tangible: **x402 starts the interaction; AWM settles the work.**
 
-- x402: instant access/payment for quote/intake/API calls
-- AI Work Market: escrowed outcome settlement after scoped deliverables
-
-See [`docs/x402.md`](../../docs/x402.md).
+## Sprint Offer
+This demo is a precursor to the **$1,500 / 48h x402 → Escrow Integration Sprint**.
+- **Scope:** One quote/intake flow, one AWM offer template, one Base Sepolia escrow dry run, and a handoff runbook.
+- **Network:** Base Sepolia (testnet only).
+- **Sellers:** AI Work Market.
