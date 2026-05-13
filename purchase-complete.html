@@ -19,21 +19,33 @@
 <meta name="twitter:image" content="https://ai-work-market.vercel.app/og-image.svg" />
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Purchase Complete \u2014 AI Work Market Receipt Verification","description":"Verify AI Work Market Stripe checkout receipts and delivery status without exposing paid assets, customer PII, or secrets.","url":"https://ai-work-market.vercel.app/purchase-complete","isPartOf":{"@type":"WebSite","name":"AI Work Market","url":"https://ai-work-market.vercel.app/"},"publisher":{"@type":"Organization","name":"AI Work Market","url":"https://ai-work-market.vercel.app/"},"sameAs":["https://github.com/darioandyoshi-tech/ai-work-market"]}</script>
 <!-- AWM SEO END -->
-</head><body><main><section class="card"><div class="kicker">Payment received</div><h1>Purchase complete.</h1><p class="lede">Thanks — your Stripe checkout completed. Fulfillment is manual for this first release so the paid files stay private and verified.</p><div class="box"><strong>What happens next</strong><ul><li>Delivery goes to the email used at checkout.</li><li>Digital products are delivered manually until the webhook delivery system is fully signature-verified.</li><li>For the integration sprint, we’ll use the payment as the kickoff signal and follow up for scope/access.</li></ul></div><div class="box" id="receipt-status"><strong>Receipt check</strong><p>Checking Stripe receipt if a checkout session ID is present…</p></div><div class="box"><strong>Verification</strong><p>Market Map hash: <code>47d2b72f4fb67c2347921bd160f13d45e65fda62a475e2a4f94c98176bf48620</code></p><p>Public samples remain available; full paid assets are not hosted publicly.</p></div><a class="button" href="/products">Back to products</a><a class="button secondary" href="/trust">Trust notes</a></section></main><script>
+</head><body><main><section class="card"><div class="kicker">Payment received</div><h1>Purchase complete.</h1><p class="lede">Thanks — your Stripe checkout completed. Fulfillment is manual for this first release so the paid files stay private and verified.</p><div class="box"><strong>What happens next</strong><ul><li>Delivery goes to the email used at checkout.</li><li>Digital products use signed private delivery when configured; otherwise manual fulfillment remains active.</li><li>For the integration sprint, we’ll use the payment as the kickoff signal and follow up for scope/access.</li></ul></div><div class="box" id="receipt-status"><strong>Receipt check</strong><p>Checking Stripe receipt if a checkout session ID is present…</p></div><div class="box" id="delivery-link-status"><strong>Private delivery</strong><p>Private download link check will run after receipt verification.</p></div><div class="box"><strong>Verification</strong><p>Market Map hash: <code>47d2b72f4fb67c2347921bd160f13d45e65fda62a475e2a4f94c98176bf48620</code></p><p>Public samples remain available; full paid assets are not hosted publicly.</p></div><a class="button" href="/products">Back to products</a><a class="button secondary" href="/trust">Trust notes</a></section></main><script>
 (async()=>{
   const box=document.getElementById('receipt-status');
+  const deliveryBox=document.getElementById('delivery-link-status');
   const params=new URLSearchParams(location.search);
   const session=params.get('session_id');
   if(!box) return;
-  if(!session){box.innerHTML='<strong>Receipt check</strong><p>No checkout session ID was provided in the redirect. Delivery still goes to the checkout email; keep your Stripe receipt.</p>';return;}
+  if(!session){box.innerHTML='<strong>Receipt check</strong><p>No checkout session ID was provided in the redirect. Delivery still goes to the checkout email; keep your Stripe receipt.</p>'; if(deliveryBox) deliveryBox.innerHTML='<strong>Private delivery</strong><p>No checkout session ID was provided, so signed delivery cannot be requested from this page.</p>'; return;}
   try{
     const res=await fetch('/api/fulfillment-receipt?session_id='+encodeURIComponent(session));
     const data=await res.json();
     if(res.ok&&data.verified){
       box.innerHTML='<strong>Receipt verified</strong><p>Stripe confirms this checkout is paid for <code>'+data.product.id+'</code>. '+data.fulfillment.nextStep+'</p>';
+      if(deliveryBox){
+        try{
+          const dl=await fetch('/api/private-delivery-link?session_id='+encodeURIComponent(session),{method:'POST'});
+          const link=await dl.json();
+          if(dl.ok&&link.delivery&&link.delivery.signedLinkAvailable){
+            deliveryBox.innerHTML='<strong>Private delivery ready</strong><p>Your signed download link expires at <code>'+link.delivery.expiresAt+'</code>.</p><p><a class="button" href="'+link.delivery.url+'">Download paid bundle</a></p><p>No customer PII is embedded in the link.</p>';
+          }else{
+            deliveryBox.innerHTML='<strong>Private delivery</strong><p>'+((link&&link.message)||'Signed private delivery is not configured yet. Manual fulfillment remains active.')+'</p>';
+          }
+        }catch(e){deliveryBox.innerHTML='<strong>Private delivery unavailable</strong><p>Manual fulfillment remains active. Keep your Stripe receipt.</p>';}
+      }
     }else{
-      box.innerHTML='<strong>Receipt pending</strong><p>We could not verify a paid receipt yet. Stripe may still be settling, or fulfillment will use the email receipt. Status: <code>'+((data.checkoutSession&&data.checkoutSession.paymentStatus)||data.error||'unknown')+'</code></p>';
+      box.innerHTML='<strong>Receipt pending</strong><p>We could not verify a paid receipt yet. Stripe may still be settling, or fulfillment will use the email receipt. Status: <code>'+((data.checkoutSession&&data.checkoutSession.paymentStatus)||data.error||'unknown')+'</code></p>'; if(deliveryBox) deliveryBox.innerHTML='<strong>Private delivery locked</strong><p>Receipt is not verified as paid yet.</p>'; 
     }
-  }catch(e){box.innerHTML='<strong>Receipt check unavailable</strong><p>Delivery still goes to the checkout email. Keep your Stripe receipt.</p>';}
+  }catch(e){box.innerHTML='<strong>Receipt check unavailable</strong><p>Delivery still goes to the checkout email. Keep your Stripe receipt.</p>'; if(deliveryBox) deliveryBox.innerHTML='<strong>Private delivery unavailable</strong><p>Manual fulfillment remains active.</p>';}
 })();
 </script></body></html>

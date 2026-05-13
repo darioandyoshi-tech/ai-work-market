@@ -1,5 +1,6 @@
 const catalog = require('../products/catalog.json');
 const paymentLinks = require('../products/payment-links.json');
+const { bundleForProduct } = require('./_commerce-shared');
 
 const STRIPE_API = 'https://api.stripe.com/v1';
 
@@ -45,6 +46,8 @@ async function stripeGet(path) {
 function statusFor(session, product) {
   const paid = session.payment_status === 'paid' || session.status === 'complete';
   const isService = product.type === 'service';
+  const bundle = !isService ? bundleForProduct(product) : null;
+  const privateDownloadConfigured = Boolean(process.env.AWM_DELIVERY_SIGNING_SECRET && bundle && bundle.bundleId);
   return {
     schema: 'ai-work-market.delivery-status.v1',
     verified: paid,
@@ -62,13 +65,15 @@ function statusFor(session, product) {
     delivery: {
       mode: product.delivery || (isService ? 'manual_scope_kickoff' : 'manual_after_stripe_purchase'),
       state: paid ? (isService ? 'kickoff_pending' : 'manual_delivery_pending') : 'awaiting_paid_checkout',
-      privateDownloadConfigured: false,
-      signedLinkAvailable: false,
+      privateDownloadConfigured,
+      signedLinkAvailable: paid && privateDownloadConfigured,
       paidAssetsPublic: false,
       message: paid
         ? (isService
           ? 'Checkout is paid. Scope/access follow-up is handled manually.'
-          : 'Checkout is paid. Paid files are delivered manually; no public asset URL is exposed by this endpoint.')
+          : (privateDownloadConfigured
+            ? 'Checkout is paid. A short-lived private delivery link can be requested from /api/private-delivery-link.'
+            : 'Checkout is paid. Paid files are delivered manually; no public asset URL is exposed by this endpoint.'))
         : 'Checkout is not paid yet; delivery is locked.'
     },
     safety: {
