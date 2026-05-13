@@ -23,10 +23,11 @@
     "check:a2a": "node --check examples/a2a/awm-a2a-adapter.js",
     "check:private-assets": "node --check api/delivery-status.js && node --check api/private-delivery-link.js && node --check api/private-delivery-download.js && node --check scripts/test-private-delivery-link.js && node scripts/test-private-delivery-link.js && node --check scripts/verify-private-assets.js && node scripts/verify-private-assets.js",
     "check:demo": "python3 -m json.tool demo/offers.json >/tmp/awm-offers.json && python3 -m json.tool demo/agent-manifest.yoshi.json >/tmp/awm-manifest.json && python3 -m json.tool vercel.json >/tmp/awm-vercel.json",
-    "check:all": "npm run check:cli && npm run check:sdk && npm run check:mcp && npm run check:agentkit && npm run check:x402 && npm run check:a2a && npm run check:demo && npm run check:private-assets && npm run check:agent-commerce && npm run check:monitor",
+    "check:all": "npm run check:cli && npm run check:sdk && npm run check:mcp && npm run check:agentkit && npm run check:x402 && npm run check:a2a && npm run check:xpay && npm run check:demo && npm run check:private-assets && npm run check:agent-commerce && npm run check:monitor",
     "check:agent-commerce": "node --check examples/agent-commerce/agent-payment-client.js && python3 -m json.tool examples/agent-commerce/mpp-x402-payment-envelope.example.json >/tmp/awm-mpp-envelope.json && python3 -m json.tool examples/agent-commerce/mpp-x402-payment-receipt.example.json >/tmp/awm-mpp-receipt.json",
     "check:monitor": "node --check scripts/escrow-monitor.js",
-    "monitor:escrow": "node scripts/escrow-monitor.js"
+    "monitor:escrow": "node scripts/escrow-monitor.js",
+    "check:xpay": "node --check examples/xpay/lifecycle-bridge.js && node examples/xpay/lifecycle-bridge.js >/tmp/awm-xpay-bridge.json && python3 -m json.tool /tmp/awm-xpay-bridge.json >/tmp/awm-xpay-bridge.pretty.json"
   },
   "keywords": [
     "ai-agents",

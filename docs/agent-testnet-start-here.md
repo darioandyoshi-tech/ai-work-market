@@ -90,6 +90,7 @@ Use the smallest amount that covers the seller's `submit-proof` transaction. Thi
 - Integration guide: [`docs/integration-guide.md`](integration-guide.md)
 - MCP tools: [`docs/mcp.md`](mcp.md)
 - x402 adapter: [`docs/x402.md`](x402.md)
+- xpay lifecycle bridge: [`examples/xpay/README.md`](../examples/xpay/README.md)
 - A2A x402 adapter: [`docs/a2a-work-intent.md`](a2a-work-intent.md)
 - Coinbase AgentKit helpers: [`examples/agentkit/README.md`](../examples/agentkit/README.md)
 
