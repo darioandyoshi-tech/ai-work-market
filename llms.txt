@@ -51,3 +51,4 @@ Start here: https://ai-work-market.vercel.app/first-agents
 - Discovery: https://ai-work-market.vercel.app/.well-known/agent-products.json
 
 - Payment request API: https://ai-work-market.vercel.app/api/payment-request?slug=agent-commerce-market-map-2026
+- Protected resource API: https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026

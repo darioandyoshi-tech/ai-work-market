@@ -33,6 +33,7 @@ module.exports = async function handler(req, res) {
         publicSampleUrl: product.sampleUrl ? `${origin}${product.sampleUrl}` : null,
         publicProductUrl: `${origin}/products`,
         paymentRequestUrl: `${origin}/api/payment-request?slug=${encodeURIComponent(product.slug)}`,
+        protectedResourceUrl: `${origin}/api/protected-resource?slug=${encodeURIComponent(product.slug)}`,
         paidAssetsPublic: false
       },
       proof: product.sha256 ? {

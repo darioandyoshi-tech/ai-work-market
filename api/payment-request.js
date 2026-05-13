@@ -42,6 +42,7 @@ function requestFor(req, product) {
     fulfillment: {
       mode: product.delivery || (product.type === 'service' ? 'manual_scope_kickoff' : 'manual_after_stripe_purchase'),
       publicSampleUrl: product.sampleUrl ? `${base}${product.sampleUrl}` : null,
+      protectedResourceUrl: `${base}/api/protected-resource?slug=${encodeURIComponent(product.slug)}`,
       paidAssetsPublic: false,
       purchaseCompleteUrl: `${base}/purchase-complete?paid=${encodeURIComponent(product.slug)}`
     },
