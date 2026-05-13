@@ -262,3 +262,12 @@ Skipped for now:
 - URL: https://github.com/darioandyoshi-tech/ai-work-market/issues/1#issuecomment-4442203599
 - Commit referenced: https://github.com/darioandyoshi-tech/ai-work-market/commit/76f6bdf
 - Purpose: convert external tester friction into visible product improvement and keep the proof loop unblocked.
+
+### 2026-05-13 — xpay lifecycle bridge demo shipped
+
+- Built and pushed concrete xpay → AWM lifecycle bridge example.
+- Commit: https://github.com/darioandyoshi-tech/ai-work-market/commit/1ceaee8
+- Runbook: https://github.com/darioandyoshi-tech/ai-work-market/tree/main/examples/xpay
+- Follow-up comment: https://github.com/xpaysh/agent-kit/issues/2#issuecomment-4442346527
+- Verification: `npm run check:all` passed after adding `check:xpay`.
+- Posture: safe reference bridge only; no private keys, no `.env`, no network calls, no transaction submission; Base Sepolia testnet-only / unaudited boundary preserved.
