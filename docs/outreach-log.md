@@ -159,3 +159,51 @@ Skipped/comment constraints:
 - Context: `@aeoess` validated the authorization/proof/release/timeout lifecycle and mapped it to `budget_reservation` verbs (`reserve`, `commit`, `release`, `refund`, `query_budget`, `query_reservation`).
 - Follow-up content: announced the new read-only MCP proof surface (`awm_get_agent_products`, `awm_get_payment_challenge`, `awm_get_payment_request`, `awm_verify_checkout_session`) and proposed a direct reservation-vocabulary mapping.
 - Boundary stated: Stripe Payment Links live; AWM protocol escrow remains Base Sepolia/testnet-only, not audited, centralized-dispute MVP.
+
+## 2026-05-13 — Revenue day kickoff / agent-ready tester CTA
+
+- Dario set today’s goal: make money / create revenue today.
+- Verified current signals:
+  - Stripe watch: no recent AWM paid sessions.
+  - GitHub outreach watch: 20 tracked targets checked, 0 changed/new, 0 needing review, 0 fetch errors.
+  - Vercel health: 18/18 public routes passing.
+- Posted agent-ready update to the home tester issue:
+  - https://github.com/darioandyoshi-tech/ai-work-market/issues/1#issuecomment-4440568339
+- CTA now points agents/framework builders to:
+  - `docs/agent-testnet-start-here.md`
+  - live demo `https://ai-work-market.vercel.app/`
+- Boundary preserved: Base Sepolia/testnet-only, not audited, centralized-dispute MVP.
+
+Next revenue moves:
+1. Convert a qualified tester into a paid 48h integration sprint if they want implementation help.
+2. Use direct-contact shortlist for 3 high-fit non-spam messages: daydreams/Lucid, xpay, PayanAgent.
+3. Retry Moltbook after rate-limit reset and post one feedback/tester ask if API/auth works.
+
+## 2026-05-13 — Authorized public technical outreach
+
+Dario explicitly gave permission to proceed with targeted public/community/GitHub replies for the AWM revenue push.
+
+Posted:
+- A2A-SE discussion comment: https://github.com/a2aproject/A2A/discussions/1576#discussioncomment-16904235
+  - Angle: AWM as concrete testnet prior art for A2A escrow-based agent-work settlement.
+  - Offer: write a small A2A-SE compatibility note or metadata mapping.
+  - Boundary: testnet-only, not audited, centralized dispute MVP.
+
+Skipped for now:
+- Existing target issues where `darioandyoshi-tech` had already commented recently, to avoid spam/duplicate bumps.
+- Closed issues and threads with spam warnings.
+- Email/Discord/HN/Reddit until a more specific target/message is selected.
+
+## 2026-05-13 — AgentKit reasoning/payment outreach
+
+Posted:
+- AgentKit reasoning-verification/payment thread: https://github.com/coinbase/agentkit/issues/980#issuecomment-4440618566
+  - Angle: separate pre-spend reasoning verification from post-work proof/settlement lifecycle.
+  - Offered: map AWM into an AgentKit example if useful.
+  - Boundary: Base Sepolia/testnet-only, not audited, centralized dispute MVP.
+
+Reviewed but skipped:
+- `coinbase/x402#946` — repository has disabled issues via `gh`; cannot comment.
+- `openai/openai-agents-python#2804` — closed by maintainer as not SDK-specific.
+- `aibtcdev/aibtc-mcp-server#460` — already crowded/competitive PACT thread; avoid adding a me-too comment.
+- `coinbase/agentkit#947` — concrete x402/Awal bug; AWM outreach would be off-topic and spammy.
