@@ -232,3 +232,18 @@ Revenue/activation significance:
 
 Boundary:
 - Testnet-only. No mainnet funds. No production readiness claim.
+
+## 2026-05-13 — Complementary escrow/MCP outreach
+
+Posted two narrowly scoped interoperability issues after verifying repositories are active and issues are enabled. Kept language technical and testnet-boundary-safe; no production/mainnet claims.
+
+- Fortytwo x402Escrow issue opened:
+  - https://github.com/Fortytwo-Network/fortytwo-x402Escrow/issues/1
+  - Angle: Fortytwo handles metered/usage-based escrow; AWM handles fixed-scope proof/release work settlement.
+- PayMCP issue opened:
+  - https://github.com/PayMCP/paymcp/issues/41
+  - Angle: PayMCP pay-per-call can pair with AWM-style escrowed work orders / pay-for-result lifecycle.
+
+Skipped for now:
+- the402: close conceptual overlap, but best approach is direct partnership/interoperability message, not blind public spam.
+- BofAI/x402 and agentpay-mcp: keep on watchlist; post only with a more concrete adapter or if a relevant thread appears.
