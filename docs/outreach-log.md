@@ -207,3 +207,28 @@ Reviewed but skipped:
 - `openai/openai-agents-python#2804` — closed by maintainer as not SDK-specific.
 - `aibtcdev/aibtc-mcp-server#460` — already crowded/competitive PACT thread; avoid adding a me-too comment.
 - `coinbase/agentkit#947` — concrete x402/Awal bug; AWM outreach would be off-topic and spammy.
+
+## 2026-05-13 — First external cross-operator testnet loop funded
+
+Signal:
+- `kite-builds` posted a signed cross-operator offer in the first tester issue, using seller address `0xC504Fd656330A823C3ffcBAB048c05cF45F60Bdf` and buyer address `0x8d32448cbad55a3d3B12DE901e57782C409399B7`.
+- Offer amount: `0.01` Base Sepolia USDC (`10000` raw).
+- Work URI: https://quikt.surge.sh/awm-deliverable.md
+
+Action taken:
+- Saved offer JSON locally as `offers/kite-cross-operator.json`.
+- Verified work URI resolves and describes the same Base Sepolia loop.
+- Funded offer with testnet funds.
+- Intent ID: `3`.
+- Approve tx: `0xa5c1e8c84f6394fd338d069823d05dfdb5dc770670dad903d18218aca7a1cfb1`.
+- Fund tx: `0x5590e566df134ffd2229481d9d6d8b9f24f856f90ed26b30d2e7112a7c9ce7a8`.
+- Verified `npm run awm -- status 3` returned `Funded`.
+- Commented back: https://github.com/darioandyoshi-tech/ai-work-market/issues/1#issuecomment-4440755660
+- Scheduled follow-up check/release job for 07:25 CDT.
+
+Revenue/activation significance:
+- This is the first outside-operator signed offer moving through the public testnet loop.
+- If proof + release completes, it becomes the strongest near-term case study for the $1,500 integration sprint.
+
+Boundary:
+- Testnet-only. No mainnet funds. No production readiness claim.
