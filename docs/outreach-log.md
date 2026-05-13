@@ -255,3 +255,10 @@ Skipped for now:
 - Angle: xpay handles pay-per-call/tool access; AWM handles pay-for-result lifecycle via signed work terms, escrow, proof URI, and release/refund/dispute.
 - Boundary stated: AWM escrow is Base Sepolia testnet-only, not audited, centralized-dispute MVP; integration learning, not production funds.
 - Follow-up discipline: wait for response or concrete proof/release case study before additional xpay public comments.
+
+### 2026-05-13 — AWM seller gas bootstrap follow-up
+
+- Commented on tester issue with the implemented `--include-gas` CLI fix from the `kite-builds` faucet/gas UX finding.
+- URL: https://github.com/darioandyoshi-tech/ai-work-market/issues/1#issuecomment-4442203599
+- Commit referenced: https://github.com/darioandyoshi-tech/ai-work-market/commit/76f6bdf
+- Purpose: convert external tester friction into visible product improvement and keep the proof loop unblocked.
