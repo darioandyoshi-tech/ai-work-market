@@ -247,3 +247,11 @@ Posted two narrowly scoped interoperability issues after verifying repositories 
 Skipped for now:
 - the402: close conceptual overlap, but best approach is direct partnership/interoperability message, not blind public spam.
 - BofAI/x402 and agentpay-mcp: keep on watchlist; post only with a more concrete adapter or if a relevant thread appears.
+
+### 2026-05-13 — xpay lifecycle bridge outreach
+
+- Opened targeted xpay Agent Kit issue after Dario approved full revenue execution.
+- URL: https://github.com/xpaysh/agent-kit/issues/2
+- Angle: xpay handles pay-per-call/tool access; AWM handles pay-for-result lifecycle via signed work terms, escrow, proof URI, and release/refund/dispute.
+- Boundary stated: AWM escrow is Base Sepolia testnet-only, not audited, centralized-dispute MVP; integration learning, not production funds.
+- Follow-up discipline: wait for response or concrete proof/release case study before additional xpay public comments.
