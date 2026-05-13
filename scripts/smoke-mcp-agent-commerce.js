@@ -2,6 +2,7 @@
 'use strict';
 
 const { spawn } = require('child_process');
+const fs = require('fs');
 
 function frame(message) {
   const body = Buffer.from(JSON.stringify(message), 'utf8');
@@ -66,6 +67,16 @@ async function main() {
   send({ jsonrpc: '2.0', id: 2, method: 'tools/list', params: {} });
   const listed = await waitFor(2);
   const names = listed.result.tools.map((tool) => tool.name);
+  const discovery = JSON.parse(fs.readFileSync('.well-known/awm-mcp.json', 'utf8'));
+  const discoveryNames = discovery.tools.map((tool) => tool.name);
+  for (const name of names) {
+    if (!discoveryNames.includes(name)) throw new Error(`discovery missing tool ${name}`);
+  }
+  for (const tool of listed.result.tools) {
+    if (!tool.annotations || tool.annotations.readOnlyHint !== true || tool.annotations.destructiveHint !== false) {
+      throw new Error(`unsafe or missing annotations for ${tool.name}`);
+    }
+  }
   for (const name of ['awm_get_agent_products', 'awm_get_payment_challenge', 'awm_get_payment_request', 'awm_get_machine_payment_contract_preview', 'awm_verify_checkout_session']) {
     if (!names.includes(name)) throw new Error(`missing tool ${name}`);
   }
@@ -91,6 +102,8 @@ async function main() {
   const paymentRequest = await waitFor(4);
   const requestPayload = JSON.parse(paymentRequest.result.content[0].text);
   if (requestPayload.httpStatus !== 402) throw new Error(`expected payment request 402, got ${requestPayload.httpStatus}`);
+  if (requestPayload.product.id !== payload.product.id) throw new Error('payment challenge/request product mismatch');
+  if (requestPayload.payment.checkoutUrl !== payload.payment.checkoutUrl) throw new Error('payment challenge/request checkout mismatch');
 
   send({
     jsonrpc: '2.0',
@@ -106,9 +119,29 @@ async function main() {
     jsonrpc: '2.0',
     id: 6,
     method: 'tools/call',
+    params: { name: 'awm_get_payment_challenge', arguments: { slug: 'Agent Commerce Market Map' } }
+  });
+  const invalidSlug = await waitFor(6);
+  if (!invalidSlug.error || !invalidSlug.error.message.includes('Invalid slug')) throw new Error('invalid slug guard failed');
+
+  send({
+    jsonrpc: '2.0',
+    id: 7,
+    method: 'tools/call',
+    params: { name: 'awm_get_payment_challenge', arguments: { slug: 'definitely-not-a-real-product' } }
+  });
+  const unknownSlug = await waitFor(7);
+  const unknownPayload = JSON.parse(unknownSlug.result.content[0].text);
+  if (![400, 404].includes(unknownPayload.httpStatus)) throw new Error(`expected unknown slug 400/404, got ${unknownPayload.httpStatus}`);
+  if (unknownPayload.safety.movesMoney !== false) throw new Error('unknown slug safety missing');
+
+  send({
+    jsonrpc: '2.0',
+    id: 8,
+    method: 'tools/call',
     params: { name: 'awm_verify_checkout_session', arguments: { sessionId: 'not_a_session' } }
   });
-  const invalidSession = await waitFor(6);
+  const invalidSession = await waitFor(8);
   if (!invalidSession.error || !invalidSession.error.message.includes('Invalid sessionId')) throw new Error('invalid session guard failed');
 
   child.stdin.end();

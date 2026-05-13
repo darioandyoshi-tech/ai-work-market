@@ -58,6 +58,28 @@ function safeSessionId(value) {
   return /^cs_(test|live)_[A-Za-z0-9_]+$/.test(String(value || '').trim());
 }
 
+function safeSlug(value) {
+  return /^[a-z0-9][a-z0-9-]{1,120}$/.test(String(value || '').trim());
+}
+
+function assertSlug(value) {
+  if (!safeSlug(value)) throw new Error('Invalid slug. Expected lowercase kebab-case product slug.');
+}
+
+function assertIntentId(value) {
+  if (!/^[0-9]+$/.test(String(value || '').trim())) throw new Error('Invalid intentId. Expected numeric escrow intent ID.');
+}
+
+function annotations(title, openWorld = true) {
+  return {
+    title,
+    readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: openWorld
+  };
+}
+
 async function fetchJson(url, options = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -184,11 +206,13 @@ function tools() {
     {
       name: 'awm_get_deployment',
       description: 'Return the current AI Work Market Base Sepolia deployment metadata.',
+      annotations: annotations('Get AI Work Market deployment metadata'),
       inputSchema: { type: 'object', properties: {}, additionalProperties: false }
     },
     {
       name: 'awm_build_work_spec',
       description: 'Build a canonical work specification template and hash for an escrowed AI-agent task.',
+      annotations: annotations('Build AI Work Market work spec', false),
       inputSchema: {
         type: 'object',
         additionalProperties: false,
@@ -204,36 +228,39 @@ function tools() {
     {
       name: 'awm_check_intent_status',
       description: 'Read an AI Work Market escrow intent status from Base Sepolia. Requires only an intentId.',
+      annotations: annotations('Check AI Work Market intent status'),
       inputSchema: {
         type: 'object',
         additionalProperties: false,
         required: ['intentId'],
         properties: {
-          intentId: { type: 'string', description: 'Escrow intent ID, e.g. 1 or 2.' }
+          intentId: { type: 'string', pattern: '^[0-9]+$', description: 'Escrow intent ID, e.g. 1 or 2.' }
         }
       }
     },
     {
       name: 'awm_get_agent_products',
       description: 'Fetch the live AI Work Market agent-readable product catalog. Does not move money.',
+      annotations: annotations('Get AI Work Market agent products'),
       inputSchema: {
         type: 'object',
         additionalProperties: false,
         properties: {
-          origin: { type: 'string', description: 'Optional AI Work Market origin for local/test deployments.' }
+          origin: { type: 'string', format: 'uri', default: AGENT_COMMERCE_ORIGIN, description: 'Optional AI Work Market origin for local/test deployments.' }
         }
       }
     },
     {
       name: 'awm_get_payment_challenge',
       description: 'Fetch a protected resource and summarize the expected HTTP 402 payment challenge. Does not open checkout or pay.',
+      annotations: annotations('Get AI Work Market payment challenge'),
       inputSchema: {
         type: 'object',
         additionalProperties: false,
         required: ['slug'],
         properties: {
-          slug: { type: 'string', description: 'Product slug, e.g. agent-commerce-market-map-2026.' },
-          origin: { type: 'string', description: 'Optional AI Work Market origin for local/test deployments.' },
+          slug: { type: 'string', pattern: '^[a-z0-9][a-z0-9-]{1,120}$', description: 'Product slug, e.g. agent-commerce-market-map-2026.' },
+          origin: { type: 'string', format: 'uri', default: AGENT_COMMERCE_ORIGIN, description: 'Optional AI Work Market origin for local/test deployments.' },
           accessToken: { type: 'string', description: 'Optional local/test bearer token. Redacted from output.' }
         }
       }
@@ -241,25 +268,27 @@ function tools() {
     {
       name: 'awm_get_payment_request',
       description: 'Fetch the standalone payment-request endpoint and normalize the HTTP 402 response. Does not open checkout or pay.',
+      annotations: annotations('Get AI Work Market payment request'),
       inputSchema: {
         type: 'object',
         additionalProperties: false,
         required: ['slug'],
         properties: {
-          slug: { type: 'string', description: 'Product slug, e.g. agent-commerce-market-map-2026.' },
-          origin: { type: 'string', description: 'Optional AI Work Market origin for local/test deployments.' }
+          slug: { type: 'string', pattern: '^[a-z0-9][a-z0-9-]{1,120}$', description: 'Product slug, e.g. agent-commerce-market-map-2026.' },
+          origin: { type: 'string', format: 'uri', default: AGENT_COMMERCE_ORIGIN, description: 'Optional AI Work Market origin for local/test deployments.' }
         }
       }
     },
     {
       name: 'awm_get_machine_payment_contract_preview',
       description: 'Generate a read-only machine-payment reservation envelope preview. Does not reserve, sign, open checkout, or move money.',
+      annotations: annotations('Preview AI Work Market machine payment contract', false),
       inputSchema: {
         type: 'object',
         additionalProperties: false,
         required: ['slug'],
         properties: {
-          slug: { type: 'string', description: 'Product or work slug.' },
+          slug: { type: 'string', pattern: '^[a-z0-9][a-z0-9-]{1,120}$', description: 'Product or work slug.' },
           rail: { type: 'string', description: 'Payment rail hint, e.g. stripe_payment_link or base_sepolia_usdc_escrow.' },
           amount: { type: 'object', description: 'Optional amount object, e.g. { currency, dollars }.' },
           buyer: { type: 'string', description: 'Optional buyer/operator identifier.' },
@@ -278,13 +307,14 @@ function tools() {
     {
       name: 'awm_verify_checkout_session',
       description: 'Verify Stripe checkout receipt and delivery status through AI Work Market public APIs. Does not expose customer PII or paid assets.',
+      annotations: annotations('Verify AI Work Market checkout session'),
       inputSchema: {
         type: 'object',
         additionalProperties: false,
         required: ['sessionId'],
         properties: {
-          sessionId: { type: 'string', description: 'Stripe Checkout Session ID, cs_test_... or cs_live_...' },
-          origin: { type: 'string', description: 'Optional AI Work Market origin for local/test deployments.' }
+          sessionId: { type: 'string', pattern: '^cs_(test|live)_[A-Za-z0-9_]+$', description: 'Stripe Checkout Session ID, cs_test_... or cs_live_...' },
+          origin: { type: 'string', format: 'uri', default: AGENT_COMMERCE_ORIGIN, description: 'Optional AI Work Market origin for local/test deployments.' }
         }
       }
     }
@@ -310,6 +340,7 @@ async function callTool(name, args = {}) {
   }
 
   if (name === 'awm_check_intent_status') {
+    assertIntentId(args.intentId);
     const deployment = loadDeployment();
     const provider = providerFromRpc(RPC_URL);
     const status = await getIntentStatus({ provider, deployment, intentId: args.intentId });
@@ -328,6 +359,7 @@ async function callTool(name, args = {}) {
   }
 
   if (name === 'awm_get_payment_challenge') {
+    assertSlug(args.slug);
     const origin = args.origin || AGENT_COMMERCE_ORIGIN;
     const headers = args.accessToken ? { authorization: `Bearer ${args.accessToken}` } : undefined;
     const url = urlFor(origin, '/api/protected-resource', { slug: args.slug });
@@ -336,6 +368,7 @@ async function callTool(name, args = {}) {
   }
 
   if (name === 'awm_get_payment_request') {
+    assertSlug(args.slug);
     const origin = args.origin || AGENT_COMMERCE_ORIGIN;
     const url = urlFor(origin, '/api/payment-request', { slug: args.slug });
     const response = await fetchJson(url);
@@ -343,6 +376,7 @@ async function callTool(name, args = {}) {
   }
 
   if (name === 'awm_get_machine_payment_contract_preview') {
+    assertSlug(args.slug);
     return textResult(jsonText(buildReservationPreview(args)));
   }
 

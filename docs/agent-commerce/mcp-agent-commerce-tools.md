@@ -32,6 +32,18 @@ GET /api/protected-resource?slug=<slug>
 
 It returns product terms, checkout URL, sample URL, proof hash metadata, fulfillment state, and safety notes. It does **not** open checkout or pay.
 
+### `awm_get_payment_request`
+
+Fetches the standalone payment terms endpoint and returns the expected HTTP `402` payment request summary:
+
+```text
+GET /api/payment-request?slug=<slug>
+```
+
+This is useful when a client wants payment terms without first requesting the protected resource. It returns payment terms only, treats HTTP `402` as expected output, and does **not** open checkout or pay.
+
+`awm_get_payment_challenge` and `awm_get_payment_request` should agree on product ID, amount, checkout URL, proof metadata, and fulfillment state for a given slug.
+
 ### `awm_get_machine_payment_contract_preview`
 
 Generates a read-only reservation envelope preview for machine-payment governance vocabulary.
@@ -57,3 +69,41 @@ Returns receipt and delivery status only. It does not return customer PII or pai
 - They do not expose paid files.
 - Stripe checkout is live for products/services.
 - AI Work Market protocol escrow remains Base Sepolia testnet-only and not production escrow.
+
+
+## MCP client config
+
+Use an absolute path in Claude Desktop, Cline, or another stdio MCP client:
+
+```json
+{
+  "mcpServers": {
+    "ai-work-market": {
+      "command": "node",
+      "args": ["/absolute/path/to/ai-work-market/examples/mcp/awm-mcp-server.js"],
+      "env": {
+        "AWM_RPC_URL": "https://sepolia.base.org",
+        "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.vercel.app"
+      }
+    }
+  }
+}
+```
+
+Try these prompts after install:
+
+```text
+Use ai-work-market to list agent products. Then get the payment challenge for agent-commerce-market-map-2026. Do not open checkout or pay.
+```
+
+```text
+Use ai-work-market to build a machine-payment reservation preview for agent-commerce-market-map-2026. Do not sign, reserve, open checkout, or pay.
+```
+
+## Smoke checks
+
+```bash
+npm run check:mcp
+python3 -m json.tool .well-known/ai-work-market.json >/tmp/awm-ai-work-market.json
+python3 -m json.tool .well-known/awm-mcp.json >/tmp/awm-mcp-discovery.json
+```
