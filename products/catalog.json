@@ -28,10 +28,14 @@
       "status": "draft_sellable",
       "priceUsd": 49,
       "url": "/products/awm-work-intake-n8n/sample.md",
-      "workflowUrl": "/products/awm-work-intake-n8n/workflow.json",
       "checkoutUrl": "https://checkout.dmeomaha.net/b/eVq8wO13Ga5i8tsdTs8so06",
       "sampleUrl": "/products/awm-work-intake-n8n/sample.md",
-      "delivery": "manual_after_stripe_purchase"
+      "delivery": "manual_after_stripe_purchase",
+      "paidContents": [
+        "workflow_json",
+        "setup_docs",
+        "test_payloads"
+      ]
     },
     {
       "slug": "x402-escrow-integration-sprint",

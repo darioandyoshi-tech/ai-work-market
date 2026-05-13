@@ -1,0 +1,44 @@
+{
+  "schema": "ai-work-market.machine-payment-receipt.v0.1",
+  "description": "Non-secret example of receipt metadata returned after a future verified MPP/x402 payment retry.",
+  "environment": "sandbox_or_preview_not_live",
+  "protectedResourceResponse": {
+    "httpStatus": 200,
+    "schema": "ai-work-market.protected-resource.v1",
+    "status": "authorized_machine_payment",
+    "product": {
+      "id": "agent-commerce-market-map-2026",
+      "name": "Agent Commerce Market Map 2026",
+      "type": "verified_research_packet",
+      "priceUsd": 79
+    },
+    "paymentReceipt": {
+      "schema": "ai-work-market.machine-payment-receipt.v1",
+      "protocol": "x402",
+      "method": "stripe_crypto_deposit",
+      "stripePaymentIntentId": "pi_example_non_secret",
+      "challengeId": "ch_preview_1234567890abcdef",
+      "network": "base",
+      "asset": "USDC",
+      "assetContract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "amount": "79.00",
+      "currency": "USD",
+      "paidAt": "2026-05-12T21:16:00-05:00",
+      "verification": {
+        "source": "x402_or_mpp_middleware_placeholder",
+        "stripeWebhookReconciled": false
+      }
+    },
+    "fulfillment": {
+      "mode": "manual_after_machine_payment",
+      "paidAssetsPublic": false,
+      "note": "Payment verified. Delivery remains manual until signed delivery links are implemented.",
+      "purchaseCompleteUrl": "https://ai-work-market.vercel.app/purchase-complete?paid=agent-commerce-market-map-2026"
+    }
+  },
+  "safety": {
+    "containsSecrets": false,
+    "movesMoney": false,
+    "isProofOfPayment": false
+  }
+}

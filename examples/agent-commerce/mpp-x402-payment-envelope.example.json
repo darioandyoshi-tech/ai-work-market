@@ -1,0 +1,91 @@
+{
+  "schema": "ai-work-market.machine-payment-envelope.v0.1",
+  "description": "Non-secret example of the future MPP/x402 payment challenge shape for a protected AI Work Market resource.",
+  "environment": "sandbox_or_preview_not_live",
+  "request": {
+    "method": "GET",
+    "url": "https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026",
+    "headers": {
+      "accept": "application/json"
+    }
+  },
+  "response": {
+    "httpStatus": 402,
+    "schema": "ai-work-market.payment-request.v1",
+    "paymentRequired": true,
+    "product": {
+      "id": "agent-commerce-market-map-2026",
+      "name": "Agent Commerce Market Map 2026",
+      "type": "verified_research_packet",
+      "priceUsd": 79
+    },
+    "resource": {
+      "id": "agent-commerce-market-map-2026:paid-resource",
+      "url": "https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026",
+      "mimeType": "application/json"
+    },
+    "payment": {
+      "currentRail": "stripe_payment_link",
+      "checkoutUrl": "https://checkout.example.invalid/non-secret-placeholder",
+      "amount": {
+        "currency": "USD",
+        "dollars": 79,
+        "stripeUnitAmount": 7900
+      }
+    },
+    "machinePayment": {
+      "status": "planned_not_live",
+      "challengeId": "ch_preview_1234567890abcdef",
+      "challengeExpiresAt": "2026-05-12T21:21:00-05:00",
+      "accepts": [
+        {
+          "protocol": "x402",
+          "scheme": "exact",
+          "network": "eip155:8453",
+          "networkName": "base",
+          "asset": "USDC",
+          "assetContract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "amount": "79.00",
+          "currency": "USD",
+          "payTo": "0x0000000000000000000000000000000000000000",
+          "payToSource": "stripe_payment_intent_deposit_address_placeholder",
+          "resource": "https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026",
+          "description": "Pay to access the protected resource. Fulfillment remains manual until signed delivery links are enabled.",
+          "mimeType": "application/json",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "protocol": "mpp",
+          "method": "stripe_spt",
+          "networkId": "profile_test_placeholder",
+          "paymentMethodTypes": [
+            "card",
+            "link"
+          ],
+          "amount": "79.00",
+          "currency": "usd",
+          "decimals": 2,
+          "resource": "https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026",
+          "description": "Shared Payment Token path for agents that can authorize card or Link-backed machine payments."
+        }
+      ]
+    },
+    "fulfillment": {
+      "mode": "manual_after_machine_payment_or_payment_link",
+      "paidAssetsPublic": false
+    }
+  },
+  "retryRequest": {
+    "method": "GET",
+    "url": "https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026",
+    "headers": {
+      "authorization": "Payment <mpp-or-x402-credential-placeholder>",
+      "x-payment": "<x402-payment-payload-placeholder-if-used>"
+    }
+  },
+  "safety": {
+    "containsSecrets": false,
+    "movesMoney": false,
+    "usesStaticPayToOnlyAsPlaceholder": true
+  }
+}
