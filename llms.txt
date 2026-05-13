@@ -63,6 +63,6 @@ Start here: https://ai-work-market.vercel.app/first-agents
 ## MCP agent commerce tools
 - MCP stdio server: examples/mcp/awm-mcp-server.js
 - Agent-commerce MCP docs: docs/agent-commerce/mcp-agent-commerce-tools.md
-- Tools: awm_get_agent_products, awm_get_payment_challenge, awm_get_payment_request, awm_verify_checkout_session
+- Tools: awm_get_agent_products, awm_get_payment_challenge, awm_get_payment_request, awm_get_machine_payment_contract_preview, awm_verify_checkout_session
 - Safety: read-only; does not open checkout, move money, expose paid files, or return customer PII.
 - Reservation vocabulary mapping: docs/agent-commerce/reservation-vocabulary-mapping.md

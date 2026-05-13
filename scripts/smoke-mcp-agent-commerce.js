@@ -66,7 +66,7 @@ async function main() {
   send({ jsonrpc: '2.0', id: 2, method: 'tools/list', params: {} });
   const listed = await waitFor(2);
   const names = listed.result.tools.map((tool) => tool.name);
-  for (const name of ['awm_get_agent_products', 'awm_get_payment_challenge', 'awm_get_payment_request', 'awm_verify_checkout_session']) {
+  for (const name of ['awm_get_agent_products', 'awm_get_payment_challenge', 'awm_get_payment_request', 'awm_get_machine_payment_contract_preview', 'awm_verify_checkout_session']) {
     if (!names.includes(name)) throw new Error(`missing tool ${name}`);
   }
 
@@ -96,9 +96,19 @@ async function main() {
     jsonrpc: '2.0',
     id: 5,
     method: 'tools/call',
+    params: { name: 'awm_get_machine_payment_contract_preview', arguments: { slug: 'agent-commerce-market-map-2026', workSpec: { title: 'Review market map', deliverable: 'Verified research packet' } } }
+  });
+  const preview = await waitFor(5);
+  const previewPayload = JSON.parse(preview.result.content[0].text);
+  if (previewPayload.safety.movesMoney !== false || previewPayload.state !== 'preview') throw new Error('unsafe reservation preview');
+
+  send({
+    jsonrpc: '2.0',
+    id: 6,
+    method: 'tools/call',
     params: { name: 'awm_verify_checkout_session', arguments: { sessionId: 'not_a_session' } }
   });
-  const invalidSession = await waitFor(5);
+  const invalidSession = await waitFor(6);
   if (!invalidSession.error || !invalidSession.error.message.includes('Invalid sessionId')) throw new Error('invalid session guard failed');
 
   child.stdin.end();

@@ -88,6 +88,63 @@ async function fetchJson(url, options = {}) {
   }
 }
 
+function reservationIdFor(slug, workSpec = {}) {
+  const seed = JSON.stringify({ slug, workSpec });
+  return `draft:${sha256Hex(seed).slice(2, 18)}`;
+}
+
+function buildReservationPreview(args = {}) {
+  const slug = args.slug;
+  const workSpec = args.workSpec || {};
+  const expiresAt = args.expiresAt || new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+  return {
+    schema: 'ai-work-market.reservation-envelope.v0.1',
+    reservationId: reservationIdFor(slug, workSpec),
+    source: 'mcp_preview_only',
+    productSlug: slug,
+    work: {
+      title: workSpec.title || `Purchase or fulfill ${slug}`,
+      deliverable: workSpec.deliverable || 'Paid digital work product or scoped integration deliverable.',
+      acceptanceCriteria: Array.isArray(workSpec.acceptanceCriteria) ? workSpec.acceptanceCriteria : []
+    },
+    commercialTerms: {
+      rail: args.rail || 'stripe_payment_link',
+      testnetEscrowOnly: args.rail === 'base_sepolia_usdc_escrow',
+      amount: args.amount || null
+    },
+    actors: {
+      buyer: args.buyer || 'operator_or_buyer_agent',
+      seller: args.seller || 'ai-work-market',
+      allowedReleasers: args.allowedReleasers || ['buyer', 'verifier'],
+      allowedRefunders: args.allowedRefunders || ['buyer', 'arbiter']
+    },
+    evidence: {
+      requiredProof: args.requiredProof || 'content-addressed artifact or signed action receipt',
+      uri: args.proofURI || '',
+      sha256: args.proofSha256 || ''
+    },
+    timeouts: {
+      expiresAt,
+      refundAfter: args.refundAfter || expiresAt
+    },
+    state: 'preview',
+    lifecycleMapping: {
+      reserve: 'payment challenge / work authorization envelope',
+      commit: 'proof URI, proof hash, or signed action receipt',
+      release: 'buyer/verifier release after accepted proof',
+      refund: 'refund/timeout/dispute path',
+      query_reservation: 'receipt, delivery status, or escrow intent status'
+    },
+    safety: {
+      previewOnly: true,
+      movesMoney: false,
+      signsTransaction: false,
+      opensCheckout: false,
+      paidAssetsReturned: false
+    }
+  };
+}
+
 function summarizePaymentChallenge(response, sourceUrl, sourceEndpoint) {
   const body = response.body || {};
   const checkoutUrl = body.payment && body.payment.checkoutUrl;
@@ -195,6 +252,30 @@ function tools() {
       }
     },
     {
+      name: 'awm_get_machine_payment_contract_preview',
+      description: 'Generate a read-only machine-payment reservation envelope preview. Does not reserve, sign, open checkout, or move money.',
+      inputSchema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['slug'],
+        properties: {
+          slug: { type: 'string', description: 'Product or work slug.' },
+          rail: { type: 'string', description: 'Payment rail hint, e.g. stripe_payment_link or base_sepolia_usdc_escrow.' },
+          amount: { type: 'object', description: 'Optional amount object, e.g. { currency, dollars }.' },
+          buyer: { type: 'string', description: 'Optional buyer/operator identifier.' },
+          seller: { type: 'string', description: 'Optional seller/agent identifier.' },
+          workSpec: { type: 'object', description: 'Optional title, deliverable, and acceptanceCriteria.' },
+          requiredProof: { type: 'string', description: 'Optional proof requirement.' },
+          proofURI: { type: 'string', description: 'Optional proof URI if already known.' },
+          proofSha256: { type: 'string', description: 'Optional proof hash if already known.' },
+          expiresAt: { type: 'string', description: 'Optional ISO timestamp.' },
+          refundAfter: { type: 'string', description: 'Optional ISO timestamp.' },
+          allowedReleasers: { type: 'array', items: { type: 'string' } },
+          allowedRefunders: { type: 'array', items: { type: 'string' } }
+        }
+      }
+    },
+    {
       name: 'awm_verify_checkout_session',
       description: 'Verify Stripe checkout receipt and delivery status through AI Work Market public APIs. Does not expose customer PII or paid assets.',
       inputSchema: {
@@ -259,6 +340,10 @@ async function callTool(name, args = {}) {
     const url = urlFor(origin, '/api/payment-request', { slug: args.slug });
     const response = await fetchJson(url);
     return textResult(jsonText(summarizePaymentChallenge(response, url, '/api/payment-request')));
+  }
+
+  if (name === 'awm_get_machine_payment_contract_preview') {
+    return textResult(jsonText(buildReservationPreview(args)));
   }
 
   if (name === 'awm_verify_checkout_session') {
