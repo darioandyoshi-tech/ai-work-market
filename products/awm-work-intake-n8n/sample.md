@@ -1,6 +1,6 @@
 # AI Work Intake → Escrow → Proof n8n Workflow — Public Sample
 
-This is the public sample for the paid workflow template.
+This is the public sample for the paid AI Work Market workflow template.
 
 ## What the full template contains
 
