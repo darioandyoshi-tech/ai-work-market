@@ -31,6 +31,10 @@
       "destination": "/products.html"
     },
     {
+      "source": "/agent-commerce",
+      "destination": "/agent-commerce.html"
+    },
+    {
       "source": "/products/agent-commerce-market-map",
       "destination": "/products/market-map-sample.md"
     },

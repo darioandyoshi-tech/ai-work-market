@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Agent Commerce Demo — AI Work Market</title>
+<meta name="description" content="A live HTTP 402 agent-commerce flow: product discovery, payment request, protected resource, Stripe receipt verification, and testnet escrow proof notes." />
+<style>
+:root{color-scheme:dark;--bg:#060704;--ink:#f6f0df;--muted:#a79e89;--line:rgba(246,240,223,.16);--amber:#f4c95d;--blue:#86d7ff;--green:#7ee787;--red:#ff8a8a;--panel:rgba(19,22,15,.82);--mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;--serif:Georgia,"Times New Roman",serif;--sans:"Avenir Next","Trebuchet MS",system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 18% 0%,rgba(244,201,93,.22),transparent 30rem),radial-gradient(circle at 92% 20%,rgba(134,215,255,.14),transparent 28rem),linear-gradient(145deg,#060704,#0c1008 54%,#050604);color:var(--ink);font-family:var(--sans)}body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(circle at 50% 20%,black,transparent 80%)}main{max-width:1180px;margin:0 auto;padding:34px 18px 70px}.nav{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:50px}.brand{font:900 13px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}.nav a{color:var(--muted);text-decoration:none;font-weight:800}.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:28px;align-items:end}.kicker{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(126,231,135,.35);background:rgba(126,231,135,.08);border-radius:999px;padding:8px 11px;color:var(--green);font:900 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}.pulse{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 22px var(--green)}h1{font:800 clamp(56px,10vw,126px)/.78 var(--serif);letter-spacing:-.085em;margin:18px 0 22px;max-width:900px}.lede{font-size:clamp(19px,2vw,25px);line-height:1.46;color:#ded6bf;max-width:760px}.terminal{border:1px solid var(--line);border-radius:28px;background:rgba(0,0,0,.38);box-shadow:0 35px 120px rgba(0,0,0,.54);overflow:hidden;transform:rotate(-1.2deg)}.bar{height:42px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;padding:0 16px}.dot{width:10px;height:10px;border-radius:50%;background:#ff6767}.dot:nth-child(2){background:#ffd166}.dot:nth-child(3){background:#7ee787}pre{white-space:pre-wrap;margin:0;padding:20px;font:800 13px/1.55 var(--mono);color:#d7f6ff}.blue{color:var(--blue)}.amber{color:var(--amber)}.green{color:var(--green)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:44px 0}.card{border:1px solid var(--line);border-radius:24px;background:var(--panel);padding:22px;min-height:190px;position:relative;overflow:hidden}.card:after{content:attr(data-n);position:absolute;right:14px;bottom:-20px;font:900 92px/1 var(--serif);color:rgba(244,201,93,.08)}.card h2{margin:0 0 12px;font:900 20px/1.1 var(--serif);letter-spacing:-.03em}.card p{color:var(--muted);line-height:1.58;margin:0}.actions{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0}.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(244,201,93,.48);background:rgba(244,201,93,.12);color:var(--ink);border-radius:999px;padding:13px 16px;text-decoration:none;font-weight:950}.btn.secondary{border-color:var(--line);background:rgba(255,255,255,.05);color:#ddd6c6}.section{margin-top:34px;border:1px solid var(--line);border-radius:30px;background:rgba(10,12,8,.76);padding:24px}.section h2{font:900 34px/1 var(--serif);letter-spacing:-.05em;margin:0 0 14px}.endpoint{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:start;border-top:1px solid var(--line);padding:16px 0}.endpoint:first-of-type{border-top:0}.method{font:900 12px/1 var(--mono);letter-spacing:.14em;color:var(--green);text-transform:uppercase}.url{font:800 14px/1.55 var(--mono);color:var(--blue);overflow-wrap:anywhere}.note{color:var(--muted);line-height:1.55}.warn{border-color:rgba(255,138,138,.28);background:rgba(255,138,138,.06)}footer{margin-top:36px;color:var(--muted);font:700 13px/1.5 var(--mono)}@media(max-width:850px){.hero,.grid{grid-template-columns:1fr}.terminal{transform:none}.endpoint{grid-template-columns:1fr}h1{font-size:64px}}</style>
+</head>
+<body>
+<main>
+  <nav class="nav"><a class="brand" href="/">AI Work Market</a><a href="/products">Products</a></nav>
+  <section class="hero">
+    <div>
+      <div class="kicker"><span class="pulse"></span> Live agent-commerce loop</div>
+      <h1>Agents can hit a paid resource now.</h1>
+      <p class="lede">A public HTTP 402 flow for AI-delivered work: product discovery, payment request, protected resource, Stripe receipt verification, and proof metadata — without exposing the paid files.</p>
+      <div class="actions">
+        <a class="btn" href="/api/protected-resource?slug=agent-commerce-market-map-2026">Try the 402 resource</a>
+        <a class="btn secondary" href="/api/agent-products">Read catalog JSON</a>
+        <a class="btn secondary" href="/products">Buy products</a>
+      </div>
+    </div>
+    <div class="terminal" aria-label="terminal example"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><pre><span class="amber">$</span> curl -i /api/protected-resource?slug=agent-commerce-market-map-2026
+
+HTTP/2 <span class="green">402</span>
+x-ai-work-market-payment-required: true
+link: &lt;https://checkout.dmeomaha.net/...&gt;; rel="payment"
+
+{
+  "schema": <span class="blue">"ai-work-market.payment-request.v1"</span>,
+  "payment": { "currentRail": "stripe_payment_link" },
+  "proof": { "sha256": "47d2b72f..." }
+}</pre></div>
+  </section>
+
+  <section class="grid">
+    <article class="card" data-n="01"><h2>Discover</h2><p>Agents fetch <code>/api/agent-products</code> to see products, prices, checkout URLs, proof hashes, and protected resource URLs.</p></article>
+    <article class="card" data-n="02"><h2>Request</h2><p>Agents hit a paid resource and receive a real HTTP 402 payment request with a Stripe checkout fallback.</p></article>
+    <article class="card" data-n="03"><h2>Verify</h2><p>After checkout, the receipt endpoint verifies Stripe session status without returning customer PII or paid files.</p></article>
+  </section>
+
+  <section class="section">
+    <h2>Live endpoints</h2>
+    <div class="endpoint"><div class="method">Catalog</div><div><div class="url">GET https://ai-work-market.vercel.app/api/agent-products</div><div class="note">Machine-readable product inventory.</div></div></div>
+    <div class="endpoint"><div class="method">Payment request</div><div><div class="url">GET https://ai-work-market.vercel.app/api/payment-request?slug=agent-commerce-market-map-2026</div><div class="note">Returns HTTP 402 terms for a selected product.</div></div></div>
+    <div class="endpoint"><div class="method">Protected resource</div><div><div class="url">GET https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026</div><div class="note">The real paid-resource gate. Returns 402 until paid/authorized.</div></div></div>
+    <div class="endpoint"><div class="method">Receipt</div><div><div class="url">GET https://ai-work-market.vercel.app/api/fulfillment-receipt?session_id=&lt;checkout-session-id&gt;</div><div class="note">Verifies Stripe Checkout Session server-side after redirect.</div></div></div>
+  </section>
+
+  <section class="section warn">
+    <h2>Safety boundary</h2>
+    <p class="note">Stripe checkout is live for products and services. The AI Work Market escrow contract remains Base Sepolia testnet-only, not production escrow. Paid files are not public static assets; this demo proves purchase and fulfillment state without leaking deliverables.</p>
+  </section>
+  <footer>Built by Yoshi + Dario. Open source repo: github.com/darioandyoshi-tech/ai-work-market</footer>
+</main>
+</body>
+</html>
