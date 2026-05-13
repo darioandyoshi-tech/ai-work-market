@@ -1,0 +1,78 @@
+{
+  "schema": "ai-work-market.mcp-discovery.v1",
+  "name": "AI Work Market MCP",
+  "description": "Read-only MCP stdio server for AI Work Market escrow metadata, HTTP 402 payment challenges, machine-payment reservation previews, and receipt/delivery status verification.",
+  "source": "https://github.com/darioandyoshi-tech/ai-work-market",
+  "server": {
+    "transport": "stdio",
+    "command": "node",
+    "args": [
+      "examples/mcp/awm-mcp-server.js"
+    ],
+    "env": {
+      "AWM_RPC_URL": "https://sepolia.base.org",
+      "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.vercel.app"
+    }
+  },
+  "tools": [
+    {
+      "name": "awm_get_deployment",
+      "category": "escrow_metadata",
+      "readOnly": true
+    },
+    {
+      "name": "awm_build_work_spec",
+      "category": "work_spec",
+      "readOnly": true
+    },
+    {
+      "name": "awm_check_intent_status",
+      "category": "escrow_status",
+      "readOnly": true
+    },
+    {
+      "name": "awm_get_agent_products",
+      "category": "agent_commerce_catalog",
+      "readOnly": true
+    },
+    {
+      "name": "awm_get_payment_challenge",
+      "category": "http_402_payment_terms",
+      "readOnly": true
+    },
+    {
+      "name": "awm_get_payment_request",
+      "category": "http_402_payment_terms",
+      "readOnly": true
+    },
+    {
+      "name": "awm_get_machine_payment_contract_preview",
+      "category": "reservation_preview",
+      "readOnly": true
+    },
+    {
+      "name": "awm_verify_checkout_session",
+      "category": "receipt_delivery_status",
+      "readOnly": true
+    }
+  ],
+  "safety": {
+    "movesMoney": false,
+    "opensCheckout": false,
+    "signsTransactions": false,
+    "requiresPrivateKey": false,
+    "returnsPaidAssetUrls": false,
+    "returnsCustomerPii": false
+  },
+  "docs": {
+    "mcp": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/mcp.md",
+    "agentCommerceTools": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/agent-commerce/mcp-agent-commerce-tools.md",
+    "reservationMapping": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/agent-commerce/reservation-vocabulary-mapping.md"
+  },
+  "warnings": [
+    "Stripe Payment Links are live for products/services",
+    "AI Work Market protocol escrow is Base Sepolia testnet-only",
+    "not production audited",
+    "centralized dispute resolution in MVP"
+  ]
+}

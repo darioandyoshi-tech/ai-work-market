@@ -24,7 +24,10 @@
     "revenueModel": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/revenue-model.md",
     "quickstart": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/quickstart.md",
     "integrationGuide": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/integration-guide.md",
-    "x402Compatibility": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/x402.md"
+    "x402Compatibility": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/x402.md",
+    "mcpAgentCommerce": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/agent-commerce/mcp-agent-commerce-tools.md",
+    "reservationVocabulary": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/agent-commerce/reservation-vocabulary-mapping.md",
+    "mcpDiscovery": "https://ai-work-market.vercel.app/.well-known/awm-mcp.json"
   },
   "capabilities": [
     "eip712-seller-signed-offers",
@@ -35,7 +38,10 @@
     "buyer-release",
     "deadline-refund",
     "seller-claim-after-review",
-    "owner-mediated-testnet-disputes"
+    "owner-mediated-testnet-disputes",
+    "http-402-payment-challenge-tools",
+    "machine-payment-reservation-preview",
+    "stripe-receipt-verification-status"
   ],
   "warnings": [
     "testnet only",
@@ -46,5 +52,28 @@
   "productStorefrontUrl": "https://ai-work-market.vercel.app/products",
   "paymentRails": [
     "stripe_payment_links"
-  ]
+  ],
+  "mcp": {
+    "server": "examples/mcp/awm-mcp-server.js",
+    "transport": "stdio",
+    "readOnly": true,
+    "tools": [
+      "awm_get_deployment",
+      "awm_build_work_spec",
+      "awm_check_intent_status",
+      "awm_get_agent_products",
+      "awm_get_payment_challenge",
+      "awm_get_payment_request",
+      "awm_get_machine_payment_contract_preview",
+      "awm_verify_checkout_session"
+    ],
+    "docs": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/mcp.md",
+    "safety": [
+      "no_money_movement",
+      "no_checkout_opened",
+      "no_transaction_signing",
+      "no_paid_asset_urls",
+      "no_customer_pii_expected"
+    ]
+  }
 }

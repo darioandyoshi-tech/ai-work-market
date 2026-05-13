@@ -87,3 +87,77 @@ This gives agent frameworks a concrete integration point before mainnet:
 4. agent/runtime checks settlement status programmatically.
 
 Transaction-bearing MCP tools can come later, but should use wallet policy controls rather than raw private keys.
+
+
+## Agent commerce MCP tools
+
+The same stdio server also exposes read-only tools for the live agent-commerce / HTTP `402` flow.
+
+These tools are designed for Claude Desktop, Cline, Cursor-style MCP clients, and agent framework maintainers that want to inspect paid-resource terms without letting an agent move money.
+
+### Tools
+
+- `awm_get_agent_products` — fetches the public agent-readable product catalog.
+- `awm_get_payment_challenge` — requests `/api/protected-resource?slug=<slug>` and treats HTTP `402` as the expected payment challenge.
+- `awm_get_payment_request` — requests `/api/payment-request?slug=<slug>` for standalone payment terms.
+- `awm_get_machine_payment_contract_preview` — generates a read-only reservation envelope preview mapping work, actors, evidence, timeouts, and lifecycle verbs.
+- `awm_verify_checkout_session` — verifies receipt and delivery status for a Stripe Checkout Session ID.
+
+Safety properties:
+
+- no checkout opens automatically
+- no payment is made
+- no wallet/private-key input
+- no transaction signing
+- no paid asset URLs returned
+- no customer PII expected
+
+### Claude Desktop / MCP client config
+
+Use an absolute path to the repo checkout:
+
+```json
+{
+  "mcpServers": {
+    "ai-work-market": {
+      "command": "node",
+      "args": ["/absolute/path/to/ai-work-market/examples/mcp/awm-mcp-server.js"],
+      "env": {
+        "AWM_RPC_URL": "https://sepolia.base.org",
+        "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.vercel.app"
+      }
+    }
+  }
+}
+```
+
+### Cline-style tool test prompts
+
+After installing the MCP server in your client, try:
+
+```text
+Use ai-work-market to list agent products. Then get the payment challenge for agent-commerce-market-map-2026. Do not open checkout or pay.
+```
+
+```text
+Use ai-work-market to create a machine payment contract preview for agent-commerce-market-map-2026 with a 48 hour expiry. Do not sign or pay.
+```
+
+### Local smoke check
+
+```bash
+npm run check:mcp
+```
+
+The smoke test verifies that the MCP server lists the agent-commerce tools, treats HTTP `402` as a successful payment challenge, rejects invalid Checkout Session IDs locally, and keeps reservation previews read-only.
+
+### Machine-readable discovery
+
+Public discovery includes MCP metadata:
+
+- `https://ai-work-market.vercel.app/.well-known/ai-work-market.json`
+- `https://ai-work-market.vercel.app/.well-known/awm-mcp.json`
+
+### Boundary
+
+Stripe Payment Links are live for products/services. AI Work Market protocol escrow remains Base Sepolia testnet-only, not production audited, and centralized-dispute MVP.

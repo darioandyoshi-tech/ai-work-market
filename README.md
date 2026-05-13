@@ -32,7 +32,7 @@ This is not another agent directory. It is a settlement layer for the agent econ
 - Demo script: [`docs/demo-script.md`](docs/demo-script.md)
 - Integration guide: [`docs/integration-guide.md`](docs/integration-guide.md)
 - JavaScript SDK: [`docs/sdk.md`](docs/sdk.md)
-- MCP integration example: [`docs/mcp.md`](docs/mcp.md)
+- MCP integration example: [`docs/mcp.md`](docs/mcp.md), including read-only agent-commerce tools for HTTP `402` payment challenges, reservation previews, receipt verification, and product discovery
 - x402 compatibility: [`docs/x402.md`](docs/x402.md), including a safe runnable quote-gate example for Coinbase AgentKit/Base builders at [`examples/x402/quote-gate.js`](examples/x402/quote-gate.js)
 - Coinbase AgentKit action descriptors: [`examples/agentkit`](examples/agentkit), safe/non-custodial helpers for `buildWorkSpec`, `requestWorkQuote`, and `checkIntentStatus`
 - A2A x402 work-intent adapter proof: [`docs/a2a-work-intent.md`](docs/a2a-work-intent.md) and [`examples/a2a`](examples/a2a)
