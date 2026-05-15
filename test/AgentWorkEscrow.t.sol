@@ -96,8 +96,14 @@ contract AgentWorkEscrowTest is Test {
         escrow.createIntent(seller, 0, workTimeout, reviewPeriod, workHash, workURI);
         vm.expectRevert(AgentWorkEscrow.InvalidWorkHash.selector);
         escrow.createIntent(seller, amount, workTimeout, reviewPeriod, bytes32(0), workURI);
+        
+        // URI Validations (Basic)
         vm.expectRevert(AgentWorkEscrow.InvalidURI.selector);
         escrow.createIntent(seller, amount, workTimeout, reviewPeriod, workHash, "");
+        
+        // Now explicitly allow non-IPFS for workURI (since _validateBasicURI is used)
+        escrow.createIntent(seller, amount, workTimeout, reviewPeriod, workHash, "https://github.com/dario/awm");
+        
         vm.expectRevert(AgentWorkEscrow.InvalidTimeout.selector);
         escrow.createIntent(seller, amount, 30 minutes, reviewPeriod, workHash, workURI);
         vm.expectRevert(AgentWorkEscrow.InvalidReviewPeriod.selector);
@@ -372,19 +378,62 @@ contract AgentWorkEscrowTest is Test {
         return _sign(seller, sellerPk, nonce, expiry);
     }
 
-    function _sign(address signingSeller, uint256 pk, uint256 nonce, uint256 expiry) internal view returns (bytes memory) {
-        bytes32 digest = escrow.getOfferDigest(
-            buyer,
-            signingSeller,
-            amount,
-            workHash,
-            keccak256(bytes(workURI)),
-            workTimeout,
-            reviewPeriod,
-            nonce,
-            expiry
-        );
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(pk, digest);
-        return abi.encodePacked(r, s, v);
+    function testURIValidationEdgeCases() public {
+        vm.prank(buyer);
+        
+        // Valid: Minimum length ipfs://
+        escrow.createIntent(seller, amount, workTimeout, reviewPeriod, workHash, "ipfs://");
+        
+        // Valid: Exact Max Length (512 bytes)
+        bytes memory maxBytes = new bytes(512);
+        for(uint i = 0; i < 512; i++) {
+            if (i < 7) {
+                maxBytes[i] = "ipfs://"[i];
+            } else {
+                maxBytes[i] = 'a';
+            }
+        }
+        string memory maxURI = string(maxBytes);
+        escrow.createIntent(seller, amount, workTimeout, reviewPeriod, workHash, maxURI);
+        
+        // Invalid: Too Long (513 bytes)
+        bytes memory longBytes = new bytes(513);
+        for(uint i = 0; i < 513; i++) {
+            if (i < 7) {
+                longBytes[i] = "ipfs://"[i];
+            } else {
+                longBytes[i] = 'a';
+            }
+        }
+        string memory tooLongURI = string(longBytes);
+        vm.expectRevert(AgentWorkEscrow.UriTooLong.selector);
+        escrow.createIntent(seller, amount, workTimeout, reviewPeriod, workHash, tooLongURI);
+
+        // Invalid: Wrong prefix/case/formatting
+        vm.expectRevert(AgentWorkEscrow.InvalidURI.selector);
+        escrow.createIntent(seller, amount, workTimeout, reviewPeriod, workHash, "IPFS://valid");
+        vm.expectRevert(AgentWorkEscrow.InvalidURI.selector);
+        escrow.createIntent(seller, amount, workTimeout, reviewPeriod, workHash, "ipfs:/valid");
+        vm.expectRevert(AgentWorkEscrow.InvalidURI.selector);
+        escrow.createIntent(seller, amount, workTimeout, reviewPeriod, workHash, " ipfs://valid");
     }
-}
+
+    function testProofAndDisputeURIValidation() public {
+        uint256 id = _createIntent();
+        
+        // Test proofURI
+        vm.prank(seller);
+        vm.expectRevert(AgentWorkEscrow.InvalidURI.selector);
+        escrow.submitProof(id, "http://proof.com");
+        
+        vm.prank(seller);
+        escrow.submitProof(id, "ipfs://valid-proof");
+        
+        // Test disputeURI (buyer side)
+        vm.prank(buyer);
+        vm.expectRevert(AgentWorkEscrow.InvalidURI.selector);
+        escrow.dispute(id, "not-ipfs");
+        
+        vm.prank(buyer);
+        escrow.dispute(id, "ipfs://valid-dispute");
+    }

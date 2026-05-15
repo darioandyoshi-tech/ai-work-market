@@ -200,7 +200,7 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
     }
 
     function submitProof(uint256 intentId, string calldata proofURI) external {
-        _validateURI(proofURI);
+        _validateIPFSURI(proofURI);
         Intent storage intent = intents[intentId];
         if (msg.sender != intent.seller) revert NotSeller();
         if (intent.status != Status.Funded) revert InvalidStatus();
@@ -254,7 +254,7 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
     }
 
     function dispute(uint256 intentId, string calldata disputeURI) external {
-        _validateURI(disputeURI);
+        _validateIPFSURI(disputeURI);
         Intent storage intent = intents[intentId];
         if (msg.sender != intent.buyer && msg.sender != intent.seller) revert NotParty();
         if (intent.status != Status.Funded && intent.status != Status.ProofSubmitted) revert InvalidStatus();
@@ -358,17 +358,24 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
         if (seller == buyer) revert SelfEscrow();
         if (amount == 0) revert InvalidAmount();
         if (workHash == bytes32(0)) revert InvalidWorkHash();
-        _validateURI(workURI);
+        _validateBasicURI(workURI);
         if (workTimeoutSeconds < MIN_WORK_TIMEOUT || workTimeoutSeconds > MAX_WORK_TIMEOUT) revert InvalidTimeout();
         if (reviewPeriodSeconds < MIN_REVIEW_PERIOD || reviewPeriodSeconds > MAX_REVIEW_PERIOD) {
             revert InvalidReviewPeriod();
         }
     }
 
-    function _validateURI(string calldata uri) internal pure {
+    function _validateBasicURI(string calldata uri) internal pure {
         bytes memory b = bytes(uri);
         uint256 len = b.length;
-        if (len < 7) revert InvalidURI();
+        if (len == 0) revert InvalidURI();
+        if (len > MAX_URI_BYTES) revert UriTooLong();
+    }
+
+    function _validateIPFSURI(string calldata uri) internal pure {
+        bytes memory b = bytes(uri);
+        uint256 len = b.length;
+        if (len < 53) revert InvalidURI(); // ipfs:// + min CIDv0 length (46)
         if (len > MAX_URI_BYTES) revert UriTooLong();
         if (
             b[0] != 'i' || b[1] != 'p' || b[2] != 'f' || b[3] != 's' || 
