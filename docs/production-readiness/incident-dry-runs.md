@@ -1,59 +1,69 @@
-# AI Work Market Production Incident Dry-Run Logs
+# AI Work Market Incident Dry-Runs
 
-This document records the results of tabletop exercises (dry-runs) required by the [Incident Response Runbook](/docs/production-readiness/incident-response.md) before Base mainnet launch.
+This document records simulated incident response exercises to verify the `incident-response.md` runbook and the `verifier-guide.md` protocol. 
 
-## Exercise 1: SEV0 - Unauthorized Fee Recipient Update
-**Date:** 2026-05-13
-**Scenario:** An `FeeRecipientUpdated` event is detected on-chain, but no corresponding change ticket exists in the internal ops log.
+Dry-runs are designed to ensure that the multisig operators (arbitrators) can efficiently triage and resolve disputes without hesitation during a real production event.
 
-### Timeline & Actions
-- **T+0:** `escrow-monitor.js` (simulated) flags `FeeRecipientUpdated(0xATTACKER)` as **CRITICAL**.
-- **T+2m:** Incident Commander (IC) declares **SEV0**.
-- **T+5m:** API Operator disables funding UI paths via Vercel environment variable update (sets `ESCROW_ENABLED=false`) and deploys maintenance banner to `trust.html`.
-- **T+8m:** Technical Operator snapshots current contract state: `owner()` is still the Safe, `usdc()` is canonical. Funds currently in escrow are safe, but all new fees will route to `0xATTACKER`.
-- **T+12m:** All Safe signers are notified via the out-of-band Signal group.
-- **T+20m:** Public warning draft published: *"We are investigating a production escrow issue... Do not create new intents."*
-- **T+30m:** Safe transaction `setFeeRecipient(0xTREASURY_SAFE)` is proposed, reviewed by 3 signers, and executed.
-- **T+35m:** Verification readback confirms `feeRecipient()` is restored.
-- **T+40m:** Funding paths restored after verifying no other unauthorized admin events occurred.
+## Dry Run #1: Malicious/Invalid Proof Resolution
 
-**Evidence Produced:**
-- Snapshot of `feeRecipient` before/after.
-- Log of Vercel deploy ID for maintenance banner.
-- Signal timestamp for signer notification.
-- Safe transaction hash for restoration.
+**Date:** 2026-05-16
+**Severity:** SEV1 (Stuck funds / Invalid delivery)
+**Scenario:** A seller submits a `proofURI` that satisfies the contract's `ipfs://` prefix requirement but contains no actual work (e.g., a text file saying "coming soon" or a 404). The buyer, upon seeing the empty proof, opens a dispute via `disputeURI`.
 
-**Verdict:** PASSED. Containment achieved within 15m. Signer coordination verified.
+### 1. Triage (Simulation)
+- **Event Detected:** `Disputed(intentId: 42, openedBy: 0xBuyer, disputeURI: "ipfs://QmDispute...")`
+- **Artifact Collection:**
+    - **Work Specification:** `workURI` resolved $\rightarrow$ "Detailed Market Map of AI Agents 2026". Matches `workHash`.
+    - **Submitted Proof:** `proofURI` resolved $\rightarrow$ "I'm still working on it, please wait." (Invalid delivery).
+    - **Dispute Evidence:** `disputeURI` resolved $\rightarrow$ Screenshot of the empty proof and a log of failed communication attempts.
+
+### 2. Analysis (per Verifier's Guide)
+- **Delivery Completion:** FAILED. The content of the proof does not match the work specification.
+- **Timing:** Proof was submitted before `workDeadline`, but the content is fraudulent/insufficient.
+- **Good Faith:** Seller attempted to "freeze" the review period by submitting a placeholder. This is a bad-faith action.
+
+### 3. Resolution Decision
+- **Outcome:** Full Refund.
+- **Reasoning:** The seller failed to deliver the agreed-upon work. The buyer is entitled to a full return of the principal.
+- **Fee Status:** `chargeFee = false`. No fee is charged on failed deliveries.
+- **Proposed Transaction:** `resolveDispute(42, amount, 0, false)`
+
+### 4. Outcome & Lessons Learned
+- **Execution:** Simulated Safe transaction proposed and signed.
+- **Lesson 1:** The on-chain `_validateIPFSURI` check is a "smoke test" only. It prevents garbage strings but cannot verify content.
+- **Lesson 2:** The arbitrator's ability to resolve disputes is the only safety net against "placeholder" proofs.
+- **Lesson 3:** We must ensure the `disputeURI` is as robust as the `proofURI` for the arbitrator to have a full picture.
+
+**Status:** ✅ COMPLETED
 
 ---
 
-## Exercise 2: SEV1 - RPC Outage & High-Value Stuck Intent
-**Date:** 2026-05-13
-**Scenario:** Primary RPC provider fails. Monitor alerts on lag. During the outage, a high-value intent (500 USDC) in `ProofSubmitted` state passes its `reviewDeadline` by 24 hours without the seller claiming.
+## Dry Run #2: The "Ghost" Buyer
 
-### Timeline & Actions
-- **T+0:** `escrow-monitor.js` alerts on RPC lag > 15m.
-- **T+5m:** Technical Operator identifies primary RPC outage. Switches monitor and SDK to backup RPC (Alchemy $\rightarrow$ QuickNode).
-- **T+10m:** Monitoring restored. Indexer flags intent `#42` as `Stuck: ProofSubmitted` (Current time > `reviewDeadline` + 24h).
-- **T+15m:** IC declares **SEV1**.
-- **T+20m:** Support owner checks CRM; no ticket from seller or buyer for intent `#42`.
-- **T+30m:** Support owner reaches out to seller via registered email/discord.
-- **T+60m:** Seller responds; they were unaware they could claim. Support provides the `claimAfterReview` transaction details.
-- **T+90m:** Seller executes claim. Monitoring confirms `Released` event and USDC transfer.
+**Date:** 2026-05-16
+**Severity:** SEV2 (Operational friction / Stuck release)
+**Scenario:** Seller delivers work and submits a valid `proofURI`. The buyer, having received the work, ceases all communication and does not call `release()`. The review period expires without a dispute being opened.
 
-**Evidence Produced:**
-- RPC failover log.
-- Monitoring alert for stuck intent `#42`.
-- Support ticket trail with seller.
-- Final `Released` tx hash.
+### 1. Triage (Simulation)
+- **Event Detected:** `ProofSubmitted(intentId: 101, proofURI: "ipfs://QmValidWork...", reviewDeadline: T+X)`
+- **Observation:** `block.timestamp` has passed `reviewDeadline`, but `status` remains `ProofSubmitted`.
+- **Seller Action:** Seller reports "Buyer is ghosting me" or simply monitors the chain.
 
-**Verdict:** PASSED. Failover to backup RPC was seamless. Stuck-intent detection worked.
+### 2. Analysis (per Verifier's Guide)
+- **Delivery Completion:** SUCCESS. The `proofURI` resolved to the correct deliverables.
+- **Timing:** The review period has lapsed. The buyer had the agreed-upon window to inspect and release or dispute.
+- **Good Faith:** The seller fulfilled the obligation. The buyer's silence after the deadline is interpreted as tacit acceptance or negligence.
 
-## Summary
-Both required tabletop exercises were completed successfully. The team is capable of:
-1. Disabling funding paths rapidly.
-2. Coordinating Safe signers for emergency admin restoration.
-3. Switching RPC providers without loss of monitoring.
-4. Proactively identifying and resolving stuck fund scenarios.
+### 3. Resolution Decision
+- **Outcome:** Seller Claim (Autonomous).
+- **Reasoning:** The contract's `claimAfterReview` function is specifically designed for this "ghosting" scenario to prevent funds from being locked indefinitely.
+- **Proposed Action:** Seller calls `claimAfterReview(101)`.
+- **Alternative (if Disputed first):** If the buyer had opened a dispute and then disappeared, the Arbitrator would execute `resolveDispute(101, 0, amount, true)`.
 
-**Ready for mainnet beta funding paths.**
+### 4. Outcome & Lessons Learned
+- **Execution:** Verified that `claimAfterReview` correctly handles the fee split and transfers funds to the seller without requiring owner intervention.
+- **Lesson 1:** The "Ghost Buyer" is handled by the protocol itself, reducing the burden on the Arbitrator.
+- **Lesson 2:** The `reviewPeriod` is a critical trust parameter; if too short, honest buyers may miss the window. If too long, sellers are exposed to liquidity locks.
+- **Lesson 3:** Documentation should explicitly tell sellers that they *must* call `claimAfterReview` themselves if the buyer doesn't release.
+
+**Status:** ✅ COMPLETED

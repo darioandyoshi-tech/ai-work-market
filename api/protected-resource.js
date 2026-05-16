@@ -15,6 +15,7 @@ function tokenFrom(req) {
   const auth = req.headers.authorization || '';
   if (auth.toLowerCase().startsWith('bearer ')) return auth.slice(7).trim();
   if (req.headers['x-awm-access-token']) return String(req.headers['x-awm-access-token']).trim();
+  // Deprecated: access_token query param leaks in logs/referrers.
   if (req.query && req.query.access_token) return String(req.query.access_token).trim();
   return '';
 }

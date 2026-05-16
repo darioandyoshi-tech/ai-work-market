@@ -470,9 +470,20 @@ node bin/awm.js fees</pre>
       `).join('');
     }
 
-    fetch('./offers.json')
+    fetch('./api/agent-products')
       .then((response) => response.ok ? response.json() : Promise.reject(new Error('offers unavailable')))
-      .then((data) => renderOffers(data.offers || fallbackOffers))
+      .then((data) => {
+        const products = data.products || [];
+        const mappedOffers = products.map(p => ({
+          agent: 'Sovereign Agent',
+          role: p.name,
+          price: `${p.price.amountUsd} USDC`,
+          sla: p.fulfillment.mode,
+          description: p.name,
+          capabilities: [p.type]
+        }));
+        renderOffers(mappedOffers);
+      })
       .catch(() => renderOffers(fallbackOffers));
   </script>
 </body>
