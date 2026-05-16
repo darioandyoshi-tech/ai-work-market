@@ -3,10 +3,6 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/test-agent",
-      "destination": "/agent-manifest.yoshi.json"
-    },
-    {
       "source": "/.well-known/agent.json",
       "destination": "/agent-manifest.yoshi.json"
     },
