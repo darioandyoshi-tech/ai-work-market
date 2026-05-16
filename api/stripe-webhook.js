@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { recordEvent } = require('./_fulfillment-store');
 
 function readRawBody(req) {
   return new Promise((resolve, reject) => {
@@ -85,6 +86,17 @@ module.exports = async function handler(req, res) {
 
   const relevant = new Set(['checkout.session.completed', 'payment_intent.succeeded', 'payment_intent.payment_failed']);
   const productSlug = productFromEvent(event);
+
+  if (relevant.has(event.type)) {
+    try {
+      recordEvent({
+        ...event,
+        productSlug
+      });
+    } catch (err) {
+      console.error('Fulfillment store record failed:', err);
+    }
+  }
 
   // Vercel logs are the durable first pass here. Do not print customer PII.
   console.log(JSON.stringify({

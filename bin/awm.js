@@ -453,6 +453,18 @@ function makeProgram() {
       await waitTx(tx);
     });
 
+  program.command('refund <intentId>')
+    .description('Buyer refunds an escrow intent')
+    .action(async (intentId) => {
+      const opts = program.opts();
+      const provider = getProvider(opts);
+      const buyerWallet = getWallet(getPrivateKey('buyer'), provider);
+      const { escrow } = getContracts(opts, buyerWallet);
+      const tx = await escrow.refund(intentId);
+      console.log(`refund tx: ${tx.hash}`);
+      await waitTx(tx);
+    });
+
   program.command('fees')
     .description('Show accumulated platform fees')
     .action(async () => {

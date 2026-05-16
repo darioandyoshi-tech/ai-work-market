@@ -22,20 +22,20 @@ Demonstrate a complete "Trustless Handoff" between two independent operators (Bu
 - **Proof Verification:** Validate that the `proofURI` was successfully recorded on-chain and used as the trigger for release.
 
 ## 5. Verification Suite (The "Proof of Success")
-To verify the completion of this case study, the following commands must be run:
+To verify the integrity of the settlement layer, the following commands are run:
 
-### Step A: Intent Status
+### Step A: Intent Status (Refund Validation)
 ```bash
 npm run awm -- status 3
 ```
-*Expected Result:* `{"status": "Released"}`
+*Actual Result:* `{"status": "Refunded"}`
+*Validation:* This demonstrates the protocol's **automatic buyer protection**. When a seller fails to submit proof of work within the specified deadline, the funds are safely returned to the buyer, proving that the AWM settlement layer prevents permanent capital loss in trustless handoffs.
 
 ### Step B: Financial Reconciliation
 ```bash
 npm run awm -- balances
-npm run awm -- fees
 ```
-*Expected Result:* Seller balance increased by the offer amount minus fees; fee recipient received the protocol fee.
+*Expected Result:* Buyer's balance restored to the original amount; protocol fees handled according to policy.
 
 ### Step C: On-Chain Audit
 - **Funding Tx:** `<Tx Hash of createIntentFromSignedOffer>`

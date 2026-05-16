@@ -151,6 +151,52 @@ async function main() {
     assert.equal(bundleOut.res.statusCode, 503, 'Wrong bundle ID must result in 503');
     assert.strictEqual(bundleOut.json.error, 'private_storage_not_configured');
 
+    // 7. Test Secret Length Guard
+    console.log('Testing: Secret length guard...');
+    const originalSecret = process.env.AWM_DELIVERY_SIGNING_SECRET;
+    process.env.AWM_DELIVERY_SIGNING_SECRET = 'too-short';
+    const shortSecretOut = await call(linkHandler, { 
+      method: 'POST', 
+      query: { session_id: 'cs_test_paid' } 
+    });
+    assert.equal(shortSecretOut.res.statusCode, 503, 'Should reject secret < 32 bytes');
+    assert.strictEqual(shortSecretOut.json.error, 'delivery_signing_secret_missing');
+    process.env.AWM_DELIVERY_SIGNING_SECRET = originalSecret;
+
+    // 8. Test TTL Clipping (Low)
+    console.log('Testing: TTL clipping (low)...');
+    process.env.AWM_DELIVERY_TOKEN_TTL_SECONDS = '10'; // Below 60
+    const lowTtlOut = await call(linkHandler, { 
+      method: 'POST', 
+      query: { session_id: 'cs_test_paid' } 
+    });
+    const lowToken = new URL(lowTtlOut.json.delivery.url).searchParams.get('token');
+    const lowPayload = JSON.parse(Buffer.from(lowToken.split('.')[0], 'base64url').toString('utf8'));
+    assert.equal(lowPayload.exp - lowPayload.iat, 60, 'TTL should be clipped to 60s minimum');
+
+    // 9. Test TTL Clipping (High)
+    console.log('Testing: TTL clipping (high)...');
+    process.env.AWM_DELIVERY_TOKEN_TTL_SECONDS = '99999'; // Above 3600
+    const highTtlOut = await call(linkHandler, { 
+      method: 'POST', 
+      query: { session_id: 'cs_test_paid' } 
+    });
+    const highToken = new URL(highTtlOut.json.delivery.url).searchParams.get('token');
+    const highPayload = JSON.parse(Buffer.from(highToken.split('.')[0], 'base64url').toString('utf8'));
+    assert.equal(highPayload.exp - highPayload.iat, 3600, 'TTL should be clipped to 3600s maximum');
+    process.env.AWM_DELIVERY_TOKEN_TTL_SECONDS = '600';
+
+    // 10. Test Custom Origin
+    console.log('Testing: Custom origin...');
+    const originalOrigin = process.env.AWM_PUBLIC_ORIGIN;
+    process.env.AWM_PUBLIC_ORIGIN = 'https://custom.example.com';
+    const customOriginOut = await call(linkHandler, { 
+      method: 'POST', 
+      query: { session_id: 'cs_test_paid' } 
+    });
+    assert.ok(customOriginOut.json.delivery.url.includes('https://custom.example.com'), 'URL should use custom origin');
+    process.env.AWM_PUBLIC_ORIGIN = originalOrigin;
+
     console.log('✓ All signed private delivery full-lifecycle tests passed');
   } finally {
     process.env = oldEnv;

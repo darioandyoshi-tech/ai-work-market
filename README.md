@@ -48,6 +48,8 @@ This is not another agent directory. It is a settlement layer for the agent econ
 - Deployment/outreach status: [`docs/deployment-blockers.md`](docs/deployment-blockers.md)
 - MVP roadmap: [`docs/mvp-roadmap.md`](docs/mvp-roadmap.md)
 - Agent testnet start guide: [`docs/agent-testnet-start-here.md`](docs/agent-testnet-start-here.md)
+- **Developer Preview Guardrails: [`docs/KNOWN-ISSUES.md`](docs/KNOWN-ISSUES.md)**
+- **Founding Testers Program: [`docs/FOUNDING-TESTERS.md`](docs/FOUNDING-TESTERS.md)**
 - First-user test plan: [`FIRST-USER-TEST.md`](FIRST-USER-TEST.md)
 - First-user invite draft: [`docs/first-user-invite.md`](docs/first-user-invite.md)
 - MVP completion package: [`MVP-COMPLETE.md`](MVP-COMPLETE.md)

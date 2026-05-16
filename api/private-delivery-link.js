@@ -10,7 +10,10 @@ const {
 } = require('./_commerce-shared');
 
 const DEFAULT_TTL_SECONDS = 10 * 60;
-const ORIGIN = process.env.AWM_PUBLIC_ORIGIN || 'https://ai-work-market.vercel.app';
+
+function getOrigin() {
+  return process.env.AWM_PUBLIC_ORIGIN || 'https://ai-work-market.vercel.app';
+}
 
 function base64url(input) {
   return Buffer.from(input).toString('base64url');
@@ -108,7 +111,7 @@ module.exports = async function handler(req, res) {
         state: 'signed_link_issued',
         signedLinkAvailable: true,
         expiresAt: new Date(payload.exp * 1000).toISOString(),
-        url: `${ORIGIN}/api/private-delivery-download?token=${encodeURIComponent(token)}`
+        url: `${getOrigin()}/api/private-delivery-download?token=${encodeURIComponent(token)}`
       },
       safety: { noCustomerPiiReturned: true, noAssetUrlsReturned: false, assetUrlIsShortLived: true }
     });
