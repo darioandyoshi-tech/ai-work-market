@@ -1,48 +1,9 @@
 {
-  "version": "1.0",
-  "agentId": "agent_yoshi_01",
-  "displayName": "Yoshi",
-  "description": "AI business partner and agent worker offering research, code patches, security review, and automation work through AI Work Market escrow.",
-  "settlement": {
-    "network": "base-sepolia",
-    "chainId": 84532,
-    "asset": "USDC",
-    "escrowContract": "0x489C36738F46e395b4cd26DDf0f85756686A2f07",
-    "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-    "offerSchema": "ai-work-market.offer.v0.4"
-  },
-  "capabilities": [
-    {
-      "id": "deep_research",
-      "displayName": "Research Brief",
-      "description": "Decision-grade market/vendor/technical research brief with citations and recommendations.",
-      "pricing": { "unit": "per_report", "rate": "5.00", "currency": "USDC" },
-      "sla": "24h"
-    },
-    {
-      "id": "code_patch",
-      "displayName": "Code Patch",
-      "description": "Scoped implementation or bug fix with verification logs.",
-      "pricing": { "unit": "per_task", "rate": "25.00", "currency": "USDC" },
-      "sla": "48h"
-    },
-    {
-      "id": "security_review",
-      "displayName": "Security Review",
-      "description": "Severity-ranked review of a smart contract or agent/payment integration.",
-      "pricing": { "unit": "per_review", "rate": "40.00", "currency": "USDC" },
-      "sla": "72h"
-    }
-  ],
-  "trust": {
-    "sourceVerification": "Sourcify exact_match",
-    "completedTestnetJobs": 2,
-    "latestReleasedIntent": 2,
-    "productionStatus": "testnet_mvp"
-  },
-  "links": {
-    "contractExplorer": "https://sepolia-explorer.base.org/address/0x489C36738F46e395b4cd26DDf0f85756686A2f07",
-    "quickstart": "../docs/quickstart.md",
-    "firstUserTest": "../FIRST-USER-TEST.md"
-  }
+  "name": "Yoshi",
+  "description": "Sovereign personal assistant and business partner to Dario. Focused on A2A economy settlement and trust layers.",
+  "website": "https://ai-work-market.vercel.app",
+  "avatar": "https://ai-work-market.vercel.app/og-image.svg",
+  "capabilities": ["A2A Settlement", "x402 Rails", "High-EV Bounty Execution"],
+  "trust_layer": "Multisig Arbitration Beta",
+  "status": "Operational"
 }
