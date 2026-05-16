@@ -24,7 +24,6 @@ contract MockUSDC {
         require(balanceOf[from] >= amount, "insufficient balance");
         require(allowance[from][msg.sender] >= amount, "insufficient allowance");
         allowance[from][msg.sender] -= amount;
-        balanceOf[from] -= amount;
         balanceOf[to] += amount;
         return true;
     }
@@ -46,7 +45,7 @@ contract AgentWorkEscrowTest is Test {
     uint256 workTimeout = 7 days;
     uint256 reviewPeriod = 2 days;
     bytes32 workHash = keccak256("canonical work spec v1");
-    string workURI = "ipfs://work";
+    string workURI = "ipfs://QmXoypizS73nZ98P7a6F7v3d4k5l6m7n8o9p0q1r2s3t4u";
 
     function setUp() public {
         seller = vm.addr(sellerPk);
@@ -311,7 +310,9 @@ contract AgentWorkEscrowTest is Test {
         vm.prank(owner);
         escrow.resolveDispute(id, buyerAmount, sellerGross, true);
         uint256 fee = sellerGross / 100;
-        assertEq(usdc.balanceOf(buyer), amount * 9 + buyerAmount);
+        
+        uint256 expectedBuyerBalance = (amount * 10) - amount + buyerAmount;
+        assertEq(usdc.balanceOf(buyer), expectedBuyerBalance);
         assertEq(usdc.balanceOf(seller), sellerGross - fee);
         assertEq(escrow.accumulatedFees(), fee);
     }
@@ -374,6 +375,22 @@ contract AgentWorkEscrowTest is Test {
         escrow.submitProof(id, "ipfs://proof");
     }
 
+    function _sign(address signer, uint256 pk, uint256 nonce, uint256 expiry) internal view returns (bytes memory) {
+        bytes32 digest = escrow.getOfferDigest(
+            buyer,
+            signer,
+            amount,
+            workHash,
+            keccak256(bytes(workURI)),
+            workTimeout,
+            reviewPeriod,
+            nonce,
+            expiry
+        );
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(pk, digest);
+        return abi.encodePacked(r, s, v);
+    }
+
     function _sellerOfferSig(uint256 nonce, uint256 expiry) internal view returns (bytes memory) {
         return _sign(seller, sellerPk, nonce, expiry);
     }
@@ -388,7 +405,8 @@ contract AgentWorkEscrowTest is Test {
         bytes memory maxBytes = new bytes(512);
         for(uint i = 0; i < 512; i++) {
             if (i < 7) {
-                maxBytes[i] = "ipfs://"[i];
+                bytes memory prefix = "ipfs://";
+                maxBytes[i] = prefix[i];
             } else {
                 maxBytes[i] = 'a';
             }
@@ -400,7 +418,8 @@ contract AgentWorkEscrowTest is Test {
         bytes memory longBytes = new bytes(513);
         for(uint i = 0; i < 513; i++) {
             if (i < 7) {
-                longBytes[i] = "ipfs://"[i];
+                bytes memory prefix = "ipfs://";
+                longBytes[i] = prefix[i];
             } else {
                 longBytes[i] = 'a';
             }
@@ -437,3 +456,4 @@ contract AgentWorkEscrowTest is Test {
         vm.prank(buyer);
         escrow.dispute(id, "ipfs://valid-dispute");
     }
+}

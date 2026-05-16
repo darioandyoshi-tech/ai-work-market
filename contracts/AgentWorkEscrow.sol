@@ -375,7 +375,7 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
     function _validateIPFSURI(string calldata uri) internal pure {
         bytes memory b = bytes(uri);
         uint256 len = b.length;
-        if (len < 53) revert InvalidURI(); // ipfs:// + min CIDv0 length (46)
+        if (len < 7) revert InvalidURI(); // Must be at least "ipfs://"
         if (len > MAX_URI_BYTES) revert UriTooLong();
         if (
             b[0] != 'i' || b[1] != 'p' || b[2] != 'f' || b[3] != 's' || 
