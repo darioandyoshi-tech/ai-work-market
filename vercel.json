@@ -3,6 +3,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/.well-known/agent.json",
+      "destination": "/public/.well-known/agent.json"
+    },
+    {
       "source": "/manifesto",
       "destination": "/manifesto.html"
     },
