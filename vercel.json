@@ -4,7 +4,7 @@
   "rewrites": [
     {
       "source": "/.well-known/agent.json",
-      "destination": "/well-known/agent.json"
+      "destination": "/.well-known/agent.json"
     },
     {
       "source": "/manifesto",
