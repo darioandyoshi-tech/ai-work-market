@@ -111,6 +111,7 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
     error OfferUsed();
     error OfferCancelled();
     error InvalidSignature();
+    error CannotRescueUSDC();
 
     constructor(address usdc_, address feeRecipient_) EIP712("AI Work Market", "0.4") Ownable(msg.sender) {
         if (usdc_ == address(0) || feeRecipient_ == address(0)) revert ZeroAddress();
@@ -296,6 +297,12 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
         accumulatedFees = 0;
         usdc.safeTransfer(feeRecipient, amount);
         emit FeesWithdrawn(feeRecipient, amount);
+    }
+
+    /// @notice Rescue tokens accidentally sent to the contract. USDC cannot be rescued.
+    function rescueTokens(address token, uint256 amount) external onlyOwner nonReentrant {
+        if (token == address(usdc)) revert CannotRescueUSDC();
+        IERC20(token).safeTransfer(owner(), amount);
     }
 
     function setFeeRecipient(address feeRecipient_) external onlyOwner {

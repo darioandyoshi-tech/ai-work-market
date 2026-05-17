@@ -395,6 +395,12 @@ contract AgentWorkEscrowTest is Test {
         return _sign(seller, sellerPk, nonce, expiry);
     }
 
+    function testRescueTokens() public {
+        vm.prank(owner);
+        vm.expectRevert(AgentWorkEscrow.CannotRescueUSDC.selector);
+        escrow.rescueTokens(address(usdc), 100);
+    }
+
     function testURIValidationEdgeCases() public {
         vm.prank(buyer);
         
