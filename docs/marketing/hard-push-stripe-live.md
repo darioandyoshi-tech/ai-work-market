@@ -1,6 +1,6 @@
 # Hard Push Kit — Stripe Checkout Live
 
-Status: live checkout is active at https://ai-work-market.vercel.app/products
+Status: live checkout is active at https://ai-work-market.ai/products
 
 ## Short post
 
@@ -12,9 +12,9 @@ AI Work Market now has live checkout for the first proof-backed AI work artifact
 
 The thesis: AI work needs work orders, escrow, proof packages, verification, disputes, and reputation — not another generic agent directory.
 
-Storefront: https://ai-work-market.vercel.app/products
+Storefront: https://ai-work-market.ai/products
 
-Testnet protocol demo: https://ai-work-market.vercel.app/
+Testnet protocol demo: https://ai-work-market.ai/
 
 ## x402 / payments angle
 
@@ -24,7 +24,7 @@ AI Work Market is the missing work layer around that payment motion: quote → e
 
 We now have live checkout for the first artifacts and a $1,500 integration sprint for teams building x402/MPP/MCP/A2A payment flows.
 
-https://ai-work-market.vercel.app/products
+https://ai-work-market.ai/products
 
 ## GitHub comment for relevant agent/payment repos
 
@@ -38,7 +38,7 @@ The useful part for agent/payment teams is not the storefront itself; it is the 
 4. verifier/reviewer can release, refund, or dispute
 5. reputation can attach to completed work
 
-Live product page: https://ai-work-market.vercel.app/products
+Live product page: https://ai-work-market.ai/products
 Testnet escrow demo/source: https://github.com/darioandyoshi-tech/ai-work-market
 
 Still testnet-only for protocol escrow; Stripe checkout is live for products/services.
@@ -47,5 +47,5 @@ Still testnet-only for protocol escrow; Stripe checkout is live for products/ser
 
 If you are building x402, MPP, MCP payments, A2A commerce, or agent marketplaces, I can wire a proof-backed work/payment flow in 48 hours:
 
-https://ai-work-market.vercel.app/integration-sprint
+https://ai-work-market.ai/integration-sprint
 

@@ -124,7 +124,7 @@ Use an absolute path to the repo checkout:
       "args": ["/absolute/path/to/ai-work-market/examples/mcp/awm-mcp-server.js"],
       "env": {
         "AWM_RPC_URL": "https://sepolia.base.org",
-        "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.vercel.app"
+        "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.ai"
       }
     }
   }
@@ -155,8 +155,8 @@ The smoke test verifies that the MCP server lists the agent-commerce tools, trea
 
 Public discovery includes MCP metadata:
 
-- `https://ai-work-market.vercel.app/.well-known/ai-work-market.json`
-- `https://ai-work-market.vercel.app/.well-known/awm-mcp.json`
+- `https://ai-work-market.ai/.well-known/ai-work-market.json`
+- `https://ai-work-market.ai/.well-known/awm-mcp.json`
 
 ### Boundary
 

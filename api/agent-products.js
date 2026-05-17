@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const origin = 'https://ai-work-market.vercel.app';
+  const origin = 'https://ai-work-market.ai';
   const linkBySlug = new Map((paymentLinks.products || []).map((p) => [p.slug, p]));
   const products = (catalog.products || []).map((product) => {
     const link = linkBySlug.get(product.slug) || {};

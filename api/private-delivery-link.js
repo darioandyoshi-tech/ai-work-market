@@ -12,7 +12,7 @@ const {
 const DEFAULT_TTL_SECONDS = 10 * 60;
 
 function getOrigin() {
-  return process.env.AWM_PUBLIC_ORIGIN || 'https://ai-work-market.vercel.app';
+  return process.env.AWM_PUBLIC_ORIGIN || 'https://ai-work-market.ai';
 }
 
 function base64url(input) {

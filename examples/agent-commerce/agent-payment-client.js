@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-const DEFAULT_ORIGIN = 'https://ai-work-market.vercel.app';
+const DEFAULT_ORIGIN = 'https://ai-work-market.ai';
 const DEFAULT_SLUG = 'agent-commerce-market-map-2026';
 const REQUEST_TIMEOUT_MS = Number(process.env.AWM_CLIENT_TIMEOUT_MS || 15_000);
 

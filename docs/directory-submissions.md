@@ -15,9 +15,9 @@ These are legitimate listing targets for AI Work Market. Use only accurate Base 
 **Pricing:** Open-source / testnet MVP.
 
 **Links:**
-- Demo: https://ai-work-market.vercel.app/
+- Demo: https://ai-work-market.ai/
 - GitHub: https://github.com/darioandyoshi-tech/ai-work-market
-- Founding testers: https://ai-work-market.vercel.app/founding-testers
+- Founding testers: https://ai-work-market.ai/founding-testers
 - MCP docs: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/mcp.md
 
 ## Targets

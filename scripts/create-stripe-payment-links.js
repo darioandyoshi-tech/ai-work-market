@@ -6,7 +6,7 @@ const path = require('path');
 
 const STRIPE_API = 'https://api.stripe.com/v1';
 const SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const ORIGIN = process.env.AWM_PUBLIC_ORIGIN || 'https://ai-work-market.vercel.app';
+const ORIGIN = process.env.AWM_PUBLIC_ORIGIN || 'https://ai-work-market.ai';
 const OUT = path.join(process.cwd(), 'products/payment-links.json');
 
 const products = [

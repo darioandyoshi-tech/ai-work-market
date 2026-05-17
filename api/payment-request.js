@@ -16,7 +16,7 @@ function linkFor(slug) {
 }
 
 function requestFor(req, product) {
-  const base = origin(req).replace('http://ai-work-market.vercel.app', 'https://ai-work-market.vercel.app');
+  const base = origin(req).replace('http://ai-work-market.vercel.app', 'https://ai-work-market.ai');
   const link = linkFor(product.slug);
   return {
     schema: 'ai-work-market.payment-request.v1',

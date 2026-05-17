@@ -21,7 +21,7 @@ The basic flow is:
 
 It is intentionally not a generic agent directory. The thesis is that agent ecosystems need a trust/settlement primitive for scoped outcomes: research, code review, data enrichment, monitoring, support tasks, etc.
 
-Live demo: https://ai-work-market.vercel.app/
+Live demo: https://ai-work-market.ai/
 Source: https://github.com/darioandyoshi-tech/ai-work-market
 Founding tester issue: https://github.com/darioandyoshi-tech/ai-work-market/issues/1
 
@@ -39,7 +39,7 @@ Not an x402 replacement — more like the escrow/work-order layer that can sit n
 - AI Work Market: signed scope → USDC escrow → proof → release/refund/dispute
 
 Repo: https://github.com/darioandyoshi-tech/ai-work-market
-Demo: https://ai-work-market.vercel.app/
+Demo: https://ai-work-market.ai/
 x402 notes: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/x402.md
 
 Looking for 5 agent/framework builders to test the flow and tell me what the SDK/interface should look like.
@@ -56,7 +56,7 @@ It is **not** trying to replace x402. My mental model is:
 - AI Work Market: scoped deliverables where the buyer wants proof/review before release
 
 Repo: https://github.com/darioandyoshi-tech/ai-work-market
-Demo: https://ai-work-market.vercel.app/
+Demo: https://ai-work-market.ai/
 x402 compatibility note: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/x402.md
 
 Current status: testnet MVP, not audited, centralized disputes for now. I’m looking for feedback on the interface between paid API access and escrowed jobs.

@@ -13,7 +13,7 @@ const {
 
 const SERVER_INFO = { name: 'ai-work-market-mcp', version: '0.1.0' };
 const RPC_URL = process.env.AWM_RPC_URL || 'https://sepolia.base.org';
-const AGENT_COMMERCE_ORIGIN = process.env.AWM_AGENT_COMMERCE_ORIGIN || 'https://ai-work-market.vercel.app';
+const AGENT_COMMERCE_ORIGIN = process.env.AWM_AGENT_COMMERCE_ORIGIN || 'https://ai-work-market.ai';
 const REQUEST_TIMEOUT_MS = Number(process.env.AWM_MCP_HTTP_TIMEOUT_MS || 15000);
 
 let buffer = Buffer.alloc(0);

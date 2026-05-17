@@ -3,7 +3,7 @@
 Endpoint:
 
 ```text
-GET https://ai-work-market.vercel.app/api/protected-resource?slug=<product-slug>
+GET https://ai-work-market.ai/api/protected-resource?slug=<product-slug>
 ```
 
 This is the first production-safe protected-resource flow for agent commerce.

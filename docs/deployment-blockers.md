@@ -6,7 +6,7 @@ Current goal: keep the public demo live, publish the source package, and recruit
 
 Status: **live**
 
-- Root demo: <https://ai-work-market.vercel.app/>
+- Root demo: <https://ai-work-market.ai/>
 - Demo assets verified:
   - `/offers.json` returns valid JSON
   - `/agent-manifest.yoshi.json` returns valid JSON

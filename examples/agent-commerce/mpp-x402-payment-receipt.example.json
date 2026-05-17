@@ -33,7 +33,7 @@
       "mode": "manual_after_machine_payment",
       "paidAssetsPublic": false,
       "note": "Payment verified. Delivery remains manual until signed delivery links are implemented.",
-      "purchaseCompleteUrl": "https://ai-work-market.vercel.app/purchase-complete?paid=agent-commerce-market-map-2026"
+      "purchaseCompleteUrl": "https://ai-work-market.ai/purchase-complete?paid=agent-commerce-market-map-2026"
     }
   },
   "safety": {

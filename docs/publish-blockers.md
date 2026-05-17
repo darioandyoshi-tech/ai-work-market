@@ -61,9 +61,9 @@ Need one of:
 ```bash
 git push origin main
 npx vercel deploy . --prod --yes --no-wait --token "$VERCEL_TOKEN"
-curl -L -s -o /tmp/awm-home.html -w '%{http_code}\n' https://ai-work-market.vercel.app/
-curl -L -s -o /tmp/awm-manifesto.html -w '%{http_code}\n' https://ai-work-market.vercel.app/manifesto
-curl -L -s -o /tmp/awm-testers.html -w '%{http_code}\n' https://ai-work-market.vercel.app/founding-testers
+curl -L -s -o /tmp/awm-home.html -w '%{http_code}\n' https://ai-work-market.ai/
+curl -L -s -o /tmp/awm-manifesto.html -w '%{http_code}\n' https://ai-work-market.ai/manifesto
+curl -L -s -o /tmp/awm-testers.html -w '%{http_code}\n' https://ai-work-market.ai/founding-testers
 ```
 
 Expected: HTTP 200 and page contains AI Work Market / founding tester copy.

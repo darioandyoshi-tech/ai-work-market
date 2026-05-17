@@ -11,7 +11,7 @@
     ],
     "env": {
       "AWM_RPC_URL": "https://sepolia.base.org",
-      "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.vercel.app"
+      "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.ai"
     }
   },
   "tools": [

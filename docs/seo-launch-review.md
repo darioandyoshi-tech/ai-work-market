@@ -11,7 +11,7 @@ Priority: add discoverability metadata without weakening the boundary: **Stripe 
 ## SEO quick wins
 
 1. **Add canonical URLs to every public page**
-   - `/` → `https://ai-work-market.vercel.app/`
+   - `/` → `https://ai-work-market.ai/`
    - `/products`, `/agent-commerce`, `/integration-sprint`, `/first-agents`, `/trust`, `/manifesto`, `/founding-testers`, `/purchase-complete`
    - Also canonicalize sample/product markdown URLs if indexed.
 
@@ -49,7 +49,7 @@ Priority: add discoverability metadata without weakening the boundary: **Stripe 
 ### Global defaults
 
 - Site name: `AI Work Market`
-- Canonical origin: `https://ai-work-market.vercel.app`
+- Canonical origin: `https://ai-work-market.ai`
 - Primary keywords:
   - `AI agent payments`
   - `AI labor escrow`
@@ -141,7 +141,7 @@ Meta keywords are not important for Google, but this keyword set is useful for c
   "name": "AI Work Market",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web, CLI, SDK",
-  "url": "https://ai-work-market.vercel.app/",
+  "url": "https://ai-work-market.ai/",
   "codeRepository": "https://github.com/darioandyoshi-tech/ai-work-market",
   "description": "Escrow rails for humans and AI agents to buy proof-backed AI work with signed offers, USDC escrow, proof submission, and programmable release.",
   "offers": {
@@ -160,7 +160,7 @@ Meta keywords are not important for Google, but this keyword set is useful for c
   "@context": "https://schema.org",
   "@type": "ItemList",
   "name": "AI Work Market Products",
-  "url": "https://ai-work-market.vercel.app/products",
+  "url": "https://ai-work-market.ai/products",
   "itemListElement": [
     {
       "@type": "ListItem",
@@ -208,7 +208,7 @@ Allow: /
 Disallow: /api/fulfillment-receipt
 Disallow: /api/delivery-status
 Disallow: /purchase-complete
-Sitemap: https://ai-work-market.vercel.app/sitemap.xml
+Sitemap: https://ai-work-market.ai/sitemap.xml
 ```
 
 Notes:
@@ -221,18 +221,18 @@ Recommended URLs:
 
 ```xml
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://ai-work-market.vercel.app/</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/products</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/agent-commerce</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/integration-sprint</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/first-agents</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/founding-testers</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/trust</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/manifesto</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/llms.txt</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/.well-known/ai-work-market.json</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/.well-known/agent-products.json</loc></url>
-  <url><loc>https://ai-work-market.vercel.app/.well-known/awm-mcp.json</loc></url>
+  <url><loc>https://ai-work-market.ai/</loc></url>
+  <url><loc>https://ai-work-market.ai/products</loc></url>
+  <url><loc>https://ai-work-market.ai/agent-commerce</loc></url>
+  <url><loc>https://ai-work-market.ai/integration-sprint</loc></url>
+  <url><loc>https://ai-work-market.ai/first-agents</loc></url>
+  <url><loc>https://ai-work-market.ai/founding-testers</loc></url>
+  <url><loc>https://ai-work-market.ai/trust</loc></url>
+  <url><loc>https://ai-work-market.ai/manifesto</loc></url>
+  <url><loc>https://ai-work-market.ai/llms.txt</loc></url>
+  <url><loc>https://ai-work-market.ai/.well-known/ai-work-market.json</loc></url>
+  <url><loc>https://ai-work-market.ai/.well-known/agent-products.json</loc></url>
+  <url><loc>https://ai-work-market.ai/.well-known/awm-mcp.json</loc></url>
 </urlset>
 ```
 
@@ -241,7 +241,7 @@ Recommended URLs:
 Because Vercel `cleanUrls` is enabled, canonical links should use clean routes, not `.html` paths:
 
 ```html
-<link rel="canonical" href="https://ai-work-market.vercel.app/products">
+<link rel="canonical" href="https://ai-work-market.ai/products">
 ```
 
 Add a redirect or canonical for direct `.html` access if search engines discover both `/products` and `/products.html`.

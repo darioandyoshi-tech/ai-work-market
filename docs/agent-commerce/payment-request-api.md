@@ -3,8 +3,8 @@
 Endpoint:
 
 ```text
-GET https://ai-work-market.vercel.app/api/payment-request?slug=<product-slug>
-POST https://ai-work-market.vercel.app/api/payment-request
+GET https://ai-work-market.ai/api/payment-request?slug=<product-slug>
+POST https://ai-work-market.ai/api/payment-request
 ```
 
 POST body:
@@ -18,7 +18,7 @@ The endpoint returns HTTP `402` with a structured JSON payment request. Today th
 ## Example
 
 ```bash
-curl -i 'https://ai-work-market.vercel.app/api/payment-request?slug=agent-commerce-market-map-2026'
+curl -i 'https://ai-work-market.ai/api/payment-request?slug=agent-commerce-market-map-2026'
 ```
 
 Response includes:

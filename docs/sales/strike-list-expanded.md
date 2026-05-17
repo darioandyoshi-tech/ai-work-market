@@ -6,9 +6,9 @@ Scope: additional high-fit targets for the **$1,500 / 48h x402 → escrow/proof 
 
 Current proof assets:
 
-- Agent-commerce demo: https://ai-work-market.vercel.app/agent-commerce
-- Products: https://ai-work-market.vercel.app/products
-- Sprint page: https://ai-work-market.vercel.app/integration-sprint
+- Agent-commerce demo: https://ai-work-market.ai/agent-commerce
+- Products: https://ai-work-market.ai/products
+- Sprint page: https://ai-work-market.ai/integration-sprint
 - Boundary to preserve in every message: **Stripe checkout is live; AI Work Market escrow is Base Sepolia testnet-only, not audited, and not production escrow.**
 
 Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam unless there is a concrete PR or existing relationship**.
@@ -24,7 +24,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 2/5 — highly relevant, but thread is in x402 Foundation repo, so stay technical and brief.
 - **Suggested copy:**
 
-> Agiotage looks like a strong fit for the “paid call vs scoped job” split we’re testing at AI Work Market. x402 can handle request payment/listing access; AWM adds a work-order layer: terms, proof URI/hash, receipt verification, and release/refund/dispute notes. Live 402/receipt demo: https://ai-work-market.vercel.app/agent-commerce. If useful, I can sketch a small Agiotage job-flow adapter or do a fixed 48h sprint around one Base/Solana job type. Boundary: Stripe checkout is live; AWM escrow is Base Sepolia testnet-only/not audited.
+> Agiotage looks like a strong fit for the “paid call vs scoped job” split we’re testing at AI Work Market. x402 can handle request payment/listing access; AWM adds a work-order layer: terms, proof URI/hash, receipt verification, and release/refund/dispute notes. Live 402/receipt demo: https://ai-work-market.ai/agent-commerce. If useful, I can sketch a small Agiotage job-flow adapter or do a fixed 48h sprint around one Base/Solana job type. Boundary: Stripe checkout is live; AWM escrow is Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -37,7 +37,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 1/5 — direct problem/solution match.
 - **Suggested copy:**
 
-> +1 on the gap between x402 per-message payments and multi-step work settlement. I’m building AI Work Market around that seam: signed work terms → proof URI/hash → receipt verification → release/refund/dispute notes. Live protected-resource/receipt demo: https://ai-work-market.vercel.app/agent-commerce. Happy to contribute a neutral settlement receipt/work-order schema that could sit beside AIBTC + PACT rather than replacing either. Boundary: Stripe checkout is live; AWM escrow remains Base Sepolia testnet-only/not audited.
+> +1 on the gap between x402 per-message payments and multi-step work settlement. I’m building AI Work Market around that seam: signed work terms → proof URI/hash → receipt verification → release/refund/dispute notes. Live protected-resource/receipt demo: https://ai-work-market.ai/agent-commerce. Happy to contribute a neutral settlement receipt/work-order schema that could sit beside AIBTC + PACT rather than replacing either. Boundary: Stripe checkout is live; AWM escrow remains Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -50,7 +50,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 1/5 — very high fit.
 - **Suggested copy:**
 
-> This maps closely to what AI Work Market is testing: scoped work terms, escrow status, proof package, approval/reject, and dispute notes for agent-delivered work. Live demo: https://ai-work-market.vercel.app/agent-commerce. If helpful, I can draft a MoltMarkets bounty receipt shape: `bounty_terms`, `proof_uri`, `proof_hash`, `acceptance_checklist`, `release/refund/dispute_note`. Also available as a fixed 48h integration sprint. Boundary: Stripe checkout is live; AWM escrow is Base Sepolia testnet-only/not audited.
+> This maps closely to what AI Work Market is testing: scoped work terms, escrow status, proof package, approval/reject, and dispute notes for agent-delivered work. Live demo: https://ai-work-market.ai/agent-commerce. If helpful, I can draft a MoltMarkets bounty receipt shape: `bounty_terms`, `proof_uri`, `proof_hash`, `acceptance_checklist`, `release/refund/dispute_note`. Also available as a fixed 48h integration sprint. Boundary: Stripe checkout is live; AWM escrow is Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -63,7 +63,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 2/5 — relevant, but their chain/architecture may differ.
 - **Suggested copy:**
 
-> For the “RFP + escrow/payment handling” part, one pattern worth separating early is: marketplace discovery/pricing vs scoped-work settlement. AI Work Market is a small testnet reference for terms → escrow status → proof URI/hash → review/release/dispute. Demo: https://ai-work-market.vercel.app/agent-commerce. I can contribute a short spec PR for `AgentWorkOrder` / `ProofReceipt` objects if that helps the RAXION marketplace design. Boundary: Stripe checkout is live; AWM escrow is Base Sepolia testnet-only/not audited.
+> For the “RFP + escrow/payment handling” part, one pattern worth separating early is: marketplace discovery/pricing vs scoped-work settlement. AI Work Market is a small testnet reference for terms → escrow status → proof URI/hash → review/release/dispute. Demo: https://ai-work-market.ai/agent-commerce. I can contribute a short spec PR for `AgentWorkOrder` / `ProofReceipt` objects if that helps the RAXION marketplace design. Boundary: Stripe checkout is live; AWM escrow is Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -76,7 +76,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 2/5 — terse issue; needs very short, useful comment.
 - **Suggested copy:**
 
-> A useful split for marketplace integrations: x402 Bazaar-style discovery/payment gets an agent hired; a work-order/proof layer records what was promised and delivered. AI Work Market is testing that second half: terms, proof URI/hash, receipt, release/refund/dispute notes. Demo: https://ai-work-market.vercel.app/agent-commerce. Happy to draft a small Observer marketplace integration note if useful. Boundary: AWM escrow is Base Sepolia testnet-only/not audited; Stripe checkout is live only for products/services.
+> A useful split for marketplace integrations: x402 Bazaar-style discovery/payment gets an agent hired; a work-order/proof layer records what was promised and delivered. AI Work Market is testing that second half: terms, proof URI/hash, receipt, release/refund/dispute notes. Demo: https://ai-work-market.ai/agent-commerce. Happy to draft a small Observer marketplace integration note if useful. Boundary: AWM escrow is Base Sepolia testnet-only/not audited; Stripe checkout is live only for products/services.
 
 ---
 
@@ -89,7 +89,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 1/5 — exact feature match.
 - **Suggested copy:**
 
-> This is a strong fit for the x402 → proof/receipt pattern we’re testing in AI Work Market. The demo exposes a protected resource that returns 402, then verifies a receipt without leaking the paid artifact: https://ai-work-market.vercel.app/agent-commerce. For ClawQL, the same envelope could be: payment challenge → proxy/tool execution → proof hash/receipt → release/refund/dispute note. Happy to draft a small architecture-doc PR. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> This is a strong fit for the x402 → proof/receipt pattern we’re testing in AI Work Market. The demo exposes a protected resource that returns 402, then verifies a receipt without leaking the paid artifact: https://ai-work-market.ai/agent-commerce. For ClawQL, the same envelope could be: payment challenge → proxy/tool execution → proof hash/receipt → release/refund/dispute note. Happy to draft a small architecture-doc PR. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -102,7 +102,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 3/5 — relevant, but repo appears agent-generated/noisy; comment only if Dario wants ecosystem reach.
 - **Suggested copy:**
 
-> For headless-markets, I’d split x402 into two layers: (1) paid access/per-call requests, and (2) scoped work settlement for jobs that need delivery/review. AI Work Market is testing layer 2: work terms, proof URI/hash, receipt verification, release/refund/dispute notes. Demo: https://ai-work-market.vercel.app/agent-commerce. Could contribute a small adapter/spec for “paid call becomes escrowed job” if helpful. Boundary: AWM escrow is Base Sepolia testnet-only/not audited; Stripe checkout is live for products/services.
+> For headless-markets, I’d split x402 into two layers: (1) paid access/per-call requests, and (2) scoped work settlement for jobs that need delivery/review. AI Work Market is testing layer 2: work terms, proof URI/hash, receipt verification, release/refund/dispute notes. Demo: https://ai-work-market.ai/agent-commerce. Could contribute a small adapter/spec for “paid call becomes escrowed job” if helpful. Boundary: AWM escrow is Base Sepolia testnet-only/not audited; Stripe checkout is live for products/services.
 
 ---
 
@@ -115,7 +115,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 2/5 — relevant existing integration conversation.
 - **Suggested copy:**
 
-> This looks like a natural three-layer stack: AxYZ for payment-native agents/identity, MCP Billing Gateway for access and usage enforcement, and a work-settlement layer for scoped deliverables. AI Work Market is testing that third piece: terms, proof URI/hash, receipt verification, release/refund/dispute notes. Demo: https://ai-work-market.vercel.app/agent-commerce. Happy to contribute a tiny interop note if useful. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> This looks like a natural three-layer stack: AxYZ for payment-native agents/identity, MCP Billing Gateway for access and usage enforcement, and a work-settlement layer for scoped deliverables. AI Work Market is testing that third piece: terms, proof URI/hash, receipt verification, release/refund/dispute notes. Demo: https://ai-work-market.ai/agent-commerce. Happy to contribute a tiny interop note if useful. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -128,7 +128,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 3/5 — decent fit, but thread is about NetIntel integration; be careful not to hijack.
 - **Suggested copy:**
 
-> For NetIntel-style paid calls, the next useful primitive may be proof-backed reports: the agent pays per lookup via x402, then packages the result as a verifiable deliverable with a proof hash/receipt. AI Work Market has a small live 402 + receipt demo here: https://ai-work-market.vercel.app/agent-commerce. If useful, I can sketch how an OSINT report receipt could work with AxYZ. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> For NetIntel-style paid calls, the next useful primitive may be proof-backed reports: the agent pays per lookup via x402, then packages the result as a verifiable deliverable with a proof hash/receipt. AI Work Market has a small live 402 + receipt demo here: https://ai-work-market.ai/agent-commerce. If useful, I can sketch how an OSINT report receipt could work with AxYZ. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -141,7 +141,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 2/5 — good technical complement, but official plugin repo requires care.
 - **Suggested copy:**
 
-> AgentPay handles the “agent can pay safely” side. A complementary test case is “agent pays for scoped work, then stores a receipt/proof before accepting delivery.” AI Work Market exposes a live 402 protected-resource + receipt verification demo: https://ai-work-market.vercel.app/agent-commerce. Happy to help build a tiny AgentPay → protected resource → receipt/proof example. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> AgentPay handles the “agent can pay safely” side. A complementary test case is “agent pays for scoped work, then stores a receipt/proof before accepting delivery.” AI Work Market exposes a live 402 protected-resource + receipt verification demo: https://ai-work-market.ai/agent-commerce. Happy to help build a tiny AgentPay → protected resource → receipt/proof example. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -154,7 +154,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 2/5 — relevant and concrete.
 - **Suggested copy:**
 
-> PayBot could use a good end-to-end test target: an agent hits a 402 protected resource, pays/records receipt, then verifies proof metadata. AI Work Market has a live demo for that pattern: https://ai-work-market.vercel.app/agent-commerce. I can provide a small Cline/PayBot smoke-test snippet if useful. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> PayBot could use a good end-to-end test target: an agent hits a 402 protected resource, pays/records receipt, then verifies proof metadata. AI Work Market has a live demo for that pattern: https://ai-work-market.ai/agent-commerce. I can provide a small Cline/PayBot smoke-test snippet if useful. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -167,7 +167,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 3/5 on directory issue; 1/5 if contacting Pyrimid repo directly.
 - **Suggested copy:**
 
-> Pyrimid’s paid MCP/API discovery looks like a good distribution channel for proof-backed work artifacts. AI Work Market has live Stripe-backed products and a 402/receipt demo: https://ai-work-market.vercel.app/agent-commerce plus https://ai-work-market.vercel.app/products. Interested in listing AWM products or wiring a sample purchase → receipt/proof flow? Boundary: AWM escrow is Base Sepolia testnet-only/not audited; Stripe checkout is live for products/services.
+> Pyrimid’s paid MCP/API discovery looks like a good distribution channel for proof-backed work artifacts. AI Work Market has live Stripe-backed products and a 402/receipt demo: https://ai-work-market.ai/agent-commerce plus https://ai-work-market.ai/products. Interested in listing AWM products or wiring a sample purchase → receipt/proof flow? Boundary: AWM escrow is Base Sepolia testnet-only/not audited; Stripe checkout is live for products/services.
 
 ---
 
@@ -180,7 +180,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 4/5 on directory; 2/5 direct to author.
 - **Suggested copy:**
 
-> NEXUS looks like a natural input layer for proof-backed paid research: x402 financial data calls → generated analysis → proof hash/receipt → buyer acceptance. AI Work Market is testing the receipt/proof side: https://ai-work-market.vercel.app/agent-commerce. If useful, I can sketch a 48h prototype where a NEXUS-backed report becomes a paid AWM deliverable. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> NEXUS looks like a natural input layer for proof-backed paid research: x402 financial data calls → generated analysis → proof hash/receipt → buyer acceptance. AI Work Market is testing the receipt/proof side: https://ai-work-market.ai/agent-commerce. If useful, I can sketch a 48h prototype where a NEXUS-backed report becomes a paid AWM deliverable. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -193,7 +193,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 3/5 — directory issue is not ideal; direct outreach better.
 - **Suggested copy:**
 
-> AiPayGen already covers paid tool access. AI Work Market is focused on the next step: proof-backed deliverables after tool execution. Demo: https://ai-work-market.vercel.app/agent-commerce. A useful pilot could be one AiPayGen workflow packaged as a paid artifact with receipt, proof hash, and acceptance checklist. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> AiPayGen already covers paid tool access. AI Work Market is focused on the next step: proof-backed deliverables after tool execution. Demo: https://ai-work-market.ai/agent-commerce. A useful pilot could be one AiPayGen workflow packaged as a paid artifact with receipt, proof hash, and acceptance checklist. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -206,7 +206,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 4/5 on listing issue; 2/5 if repo-level interop.
 - **Suggested copy:**
 
-> PayCrow and AI Work Market seem to be attacking adjacent pieces of agent commerce. Rather than duplicating, I’d be interested in proof/receipt interop: `work_terms`, `proof_uri`, `proof_hash`, `acceptance_checklist`, `release/refund/dispute_note`. AWM live demo: https://ai-work-market.vercel.app/agent-commerce. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> PayCrow and AI Work Market seem to be attacking adjacent pieces of agent commerce. Rather than duplicating, I’d be interested in proof/receipt interop: `work_terms`, `proof_uri`, `proof_hash`, `acceptance_checklist`, `release/refund/dispute_note`. AWM live demo: https://ai-work-market.ai/agent-commerce. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -219,7 +219,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 4/5 on listing issue; 2/5 direct technical interop.
 - **Suggested copy:**
 
-> agora402’s “x402 payment + escrow + verification” framing is very close to AI Work Market’s thesis. I’m especially interested in whether we can share a proof/receipt convention so buyers can compare settlement records across tools. AWM demo: https://ai-work-market.vercel.app/agent-commerce. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> agora402’s “x402 payment + escrow + verification” framing is very close to AI Work Market’s thesis. I’m especially interested in whether we can share a proof/receipt convention so buyers can compare settlement records across tools. AWM demo: https://ai-work-market.ai/agent-commerce. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -232,7 +232,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 3/5 — direct fit, but directory issue is not the best surface.
 - **Suggested copy:**
 
-> Insurance/dispute tools need good evidence. AI Work Market is testing a proof package for agent work: work terms, proof URI/hash, receipt verification, and release/refund/dispute notes. Demo: https://ai-work-market.vercel.app/agent-commerce. There may be a clean integration where your claim/dispute flow consumes AWM-style proof receipts. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> Insurance/dispute tools need good evidence. AI Work Market is testing a proof package for agent work: work terms, proof URI/hash, receipt verification, and release/refund/dispute notes. Demo: https://ai-work-market.ai/agent-commerce. There may be a clean integration where your claim/dispute flow consumes AWM-style proof receipts. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -245,7 +245,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 2/5 — issue requests partners.
 - **Suggested copy:**
 
-> Daimon’s job data + Base agent network could pair well with AI Work Market’s scoped-work settlement/proof layer. A concrete pilot: Daimon surfaces a job/request, AWM wraps it as a work order with proof URI/hash, receipt, and release/refund/dispute notes. Demo: https://ai-work-market.vercel.app/agent-commerce. Happy to compare notes or do a tiny integration spec. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> Daimon’s job data + Base agent network could pair well with AI Work Market’s scoped-work settlement/proof layer. A concrete pilot: Daimon surfaces a job/request, AWM wraps it as a work order with proof URI/hash, receipt, and release/refund/dispute notes. Demo: https://ai-work-market.ai/agent-commerce. Happy to compare notes or do a tiny integration spec. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -258,7 +258,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 4/5 — existing issue already looks spammy; needs extra restraint.
 - **Suggested copy:**
 
-> I’m building AI Work Market, a small proof-backed work layer for x402/MCP commerce. If this marketplace is accepting providers/examples, AWM can serve as a sample protected resource: 402 payment request, protected resource, receipt verification, and proof hash. Demo: https://ai-work-market.vercel.app/agent-commerce. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> I’m building AI Work Market, a small proof-backed work layer for x402/MCP commerce. If this marketplace is accepting providers/examples, AWM can serve as a sample protected resource: 402 payment request, protected resource, receipt verification, and proof hash. Demo: https://ai-work-market.ai/agent-commerce. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 
@@ -271,7 +271,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 - **Risk/spam score:** 4/5 now; 1/5 with working code.
 - **Suggested copy:**
 
-> This would make a useful end-to-end AgentKit commerce example: an agent pays an x402 oracle, stores the attestation receipt, then submits a proof-backed deliverable/work receipt. AI Work Market has a live 402/receipt demo that could provide the final settlement/proof step: https://ai-work-market.vercel.app/agent-commerce. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
+> This would make a useful end-to-end AgentKit commerce example: an agent pays an x402 oracle, stores the attestation receipt, then submits a proof-backed deliverable/work receipt. AI Work Market has a live 402/receipt demo that could provide the final settlement/proof step: https://ai-work-market.ai/agent-commerce. Boundary: Stripe checkout live; AWM escrow Base Sepolia testnet-only/not audited.
 
 ---
 

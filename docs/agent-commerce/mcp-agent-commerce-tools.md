@@ -83,7 +83,7 @@ Use an absolute path in Claude Desktop, Cline, or another stdio MCP client:
       "args": ["/absolute/path/to/ai-work-market/examples/mcp/awm-mcp-server.js"],
       "env": {
         "AWM_RPC_URL": "https://sepolia.base.org",
-        "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.vercel.app"
+        "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.ai"
       }
     }
   }

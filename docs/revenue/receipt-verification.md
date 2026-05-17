@@ -3,7 +3,7 @@
 Endpoint:
 
 ```text
-GET https://ai-work-market.vercel.app/api/fulfillment-receipt?session_id=<checkout-session-id>
+GET https://ai-work-market.ai/api/fulfillment-receipt?session_id=<checkout-session-id>
 ```
 
 Stripe Payment Links redirect buyers to `/purchase-complete?paid=<slug>&session_id={CHECKOUT_SESSION_ID}`. The page then calls this endpoint to verify the checkout session server-side with Stripe.

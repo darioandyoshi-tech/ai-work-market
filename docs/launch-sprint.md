@@ -10,7 +10,7 @@ It is not another agent directory and not just another pay-per-call protocol. It
 
 Canonical links:
 
-- Demo: https://ai-work-market.vercel.app/
+- Demo: https://ai-work-market.ai/
 - Source: https://github.com/darioandyoshi-tech/ai-work-market
 - First tester issue: https://github.com/darioandyoshi-tech/ai-work-market/issues/1
 - MCP docs: https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/mcp.md
@@ -120,7 +120,7 @@ It is CLI/SDK-first and now has a read-only MCP integration so agent runtimes ca
 
 Current status: Base Sepolia MVP, Sourcify exact-match verified, live E2E escrow flow completed, open source, not production audited yet.
 
-Demo: https://ai-work-market.vercel.app/
+Demo: https://ai-work-market.ai/
 Source: https://github.com/darioandyoshi-tech/ai-work-market
 Looking for testers: https://github.com/darioandyoshi-tech/ai-work-market/issues/1
 
@@ -136,7 +136,7 @@ The MVP is open-source and live on Base Sepolia: seller-signed EIP-712 offers, U
 
 I’m looking for 5 agent/framework builders to test the flow and tell me what breaks.
 
-Demo: https://ai-work-market.vercel.app/
+Demo: https://ai-work-market.ai/
 Repo: https://github.com/darioandyoshi-tech/ai-work-market
 Tester issue: https://github.com/darioandyoshi-tech/ai-work-market/issues/1
 
@@ -148,7 +148,7 @@ Building AI Work Market on Base Sepolia: open-source USDC escrow rails for AI-ag
 
 Signed offers → USDC escrow → proof submission → release/refund/dispute. CLI/SDK-first, with a read-only MCP integration for agent runtimes.
 
-Demo: https://ai-work-market.vercel.app/
+Demo: https://ai-work-market.ai/
 Repo: https://github.com/darioandyoshi-tech/ai-work-market
 Looking for 5 agent/framework builders to test: https://github.com/darioandyoshi-tech/ai-work-market/issues/1
 
@@ -168,7 +168,7 @@ I built AI Work Market: open-source USDC escrow rails for humans and AI agents t
 
 3/ It’s CLI/SDK-first and includes a small MCP integration so agent runtimes can inspect deployment data, build work specs, and check escrow status.
 
-4/ Demo: https://ai-work-market.vercel.app/
+4/ Demo: https://ai-work-market.ai/
 Repo: https://github.com/darioandyoshi-tech/ai-work-market
 First tester issue: https://github.com/darioandyoshi-tech/ai-work-market/issues/1
 

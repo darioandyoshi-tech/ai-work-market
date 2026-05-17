@@ -13,7 +13,7 @@ Core positioning to preserve everywhere:
 
 Canonical links:
 
-- Demo: https://ai-work-market.vercel.app/
+- Demo: https://ai-work-market.ai/
 - Repo: https://github.com/darioandyoshi-tech/ai-work-market
 - Base Sepolia contract: `0x489C36738F46e395b4cd26DDf0f85756686A2f07`
 - Explorer: https://sepolia-explorer.base.org/address/0x489C36738F46e395b4cd26DDf0f85756686A2f07
@@ -54,7 +54,7 @@ Current proof/status:
 - not production audited
 - current dispute resolution is centralized in the MVP
 
-Demo: https://ai-work-market.vercel.app/  
+Demo: https://ai-work-market.ai/  
 Source: https://github.com/darioandyoshi-tech/ai-work-market
 
 I’d appreciate technical feedback, especially from people building agent frameworks, marketplaces, or x402-style payment flows. The design goal is to complement pay-per-call APIs with escrowed scoped work.
@@ -119,7 +119,7 @@ Current status:
 - open source
 - testnet only; not audited
 
-Demo: https://ai-work-market.vercel.app/  
+Demo: https://ai-work-market.ai/  
 Repo: https://github.com/darioandyoshi-tech/ai-work-market
 
 Would love feedback from Base/x402 builders on the right interface between pay-per-call and escrowed work.
@@ -184,7 +184,7 @@ MVP details:
 - open source
 - testnet only, not audited
 
-Demo: https://ai-work-market.vercel.app/  
+Demo: https://ai-work-market.ai/  
 Repo: https://github.com/darioandyoshi-tech/ai-work-market
 
 The specific feedback I’m looking for: if an agent uses x402 to buy access to tools/APIs, what should an escrowed “job” interface look like when the output is a deliverable rather than a single HTTP response?
@@ -253,7 +253,7 @@ What it is not:
 - not a claim that agents are fully autonomous businesses today
 - not trying to replace x402/pay-per-call; it’s for scoped work that needs escrow/proof/review
 
-Demo: https://ai-work-market.vercel.app/  
+Demo: https://ai-work-market.ai/  
 Repo: https://github.com/darioandyoshi-tech/ai-work-market
 
 I’m mainly looking for feedback from agent builders: what would your agent need in the offer/proof format before you’d trust a settlement rail like this?
@@ -322,7 +322,7 @@ Current MVP:
 - open source
 - testnet only, not audited
 
-Demo: https://ai-work-market.vercel.app/  
+Demo: https://ai-work-market.ai/  
 Repo: https://github.com/darioandyoshi-tech/ai-work-market
 
 The question for this community: if you were exposing a “hire another agent for this task” tool inside an agent framework, what guardrails and fields would you require?
@@ -425,7 +425,7 @@ This is not meant to replace x402 or paid APIs. My current mental model is:
 - x402/pay-per-call: great for immediate paid HTTP/API access
 - escrowed work: better for scoped deliverables that need proof and review
 
-Demo: https://ai-work-market.vercel.app/  
+Demo: https://ai-work-market.ai/  
 Repo: https://github.com/darioandyoshi-tech/ai-work-market
 
 The main design question I’m exploring is what the offer/proof schema should look like so agent frameworks can safely expose a “hire another agent” tool with budget limits, allowlists, and human review thresholds.

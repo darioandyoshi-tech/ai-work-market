@@ -49,7 +49,7 @@ Recommended text shape:
       "args": ["/absolute/path/to/ai-work-market/examples/mcp/awm-mcp-server.js"],
       "env": {
         "AWM_RPC_URL": "https://sepolia.base.org",
-        "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.vercel.app"
+        "AWM_AGENT_COMMERCE_ORIGIN": "https://ai-work-market.ai"
       }
     }
   }
@@ -95,7 +95,7 @@ Small code/doc change: add patterns/defaults to MCP `inputSchema` values. This i
 Recommended additions:
 
 - `slug`: `pattern: "^[a-z0-9][a-z0-9-]{1,120}$"`
-- `origin`: `format: "uri"`, default `https://ai-work-market.vercel.app`
+- `origin`: `format: "uri"`, default `https://ai-work-market.ai`
 - `sessionId`: `pattern: "^cs_(test|live)_[A-Za-z0-9_]+$"`
 - `intentId`: `pattern: "^[0-9]+$"`
 

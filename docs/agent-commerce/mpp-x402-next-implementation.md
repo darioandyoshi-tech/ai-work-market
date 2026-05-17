@@ -109,7 +109,7 @@ Continue returning `ai-work-market.payment-request.v1`, and add `machinePayment`
   },
   "resource": {
     "id": "agent-commerce-market-map-2026:paid-resource",
-    "url": "https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026",
+    "url": "https://ai-work-market.ai/api/protected-resource?slug=agent-commerce-market-map-2026",
     "paidAssetsPublic": false
   },
   "payment": {
@@ -135,7 +135,7 @@ Continue returning `ai-work-market.payment-request.v1`, and add `machinePayment`
         "amount": "79.00",
         "currency": "USD",
         "payTo": "0xStripeDepositAddressFromPaymentIntent",
-        "resource": "https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026",
+        "resource": "https://ai-work-market.ai/api/protected-resource?slug=agent-commerce-market-map-2026",
         "mimeType": "application/json",
         "maxTimeoutSeconds": 300
       },
@@ -146,7 +146,7 @@ Continue returning `ai-work-market.payment-request.v1`, and add `machinePayment`
         "amount": "79.00",
         "currency": "usd",
         "decimals": 2,
-        "resource": "https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026"
+        "resource": "https://ai-work-market.ai/api/protected-resource?slug=agent-commerce-market-map-2026"
       }
     ]
   },
@@ -192,7 +192,7 @@ Notes:
   "fulfillment": {
     "mode": "manual_after_machine_payment",
     "note": "Payment verified. Delivery remains manual until signed delivery links are implemented.",
-    "purchaseCompleteUrl": "https://ai-work-market.vercel.app/purchase-complete?paid=agent-commerce-market-map-2026"
+    "purchaseCompleteUrl": "https://ai-work-market.ai/purchase-complete?paid=agent-commerce-market-map-2026"
   },
   "paidAssetsPublic": false
 }

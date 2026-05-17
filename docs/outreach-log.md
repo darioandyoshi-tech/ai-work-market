@@ -11,8 +11,8 @@
 - Public tester issue opened: looking for 5 agent/framework builders.
   - URL: https://github.com/darioandyoshi-tech/ai-work-market/issues/1
 - AI-readable discovery assets published and verified.
-  - https://ai-work-market.vercel.app/llms.txt
-  - https://ai-work-market.vercel.app/.well-known/ai-work-market.json
+  - https://ai-work-market.ai/llms.txt
+  - https://ai-work-market.ai/.well-known/ai-work-market.json
 - Awesome AI Agents 2026 PR opened.
   - URL: https://github.com/caramaschiHG/awesome-ai-agents-2026/pull/245
   - Rationale: listed as protocol/tooling infrastructure for AI-agent work settlement.
@@ -123,7 +123,7 @@ Proof asset: `examples/agentkit` at commit `99fd70c Add AgentKit action descript
 
 ### Full-power revenue strike wave — live 402/receipt demo
 
-Dario said “do it all.” Posted high-signal comments only on open issues directly about x402, MPP, 402 handling, agent payments, or agent commerce. Lead asset: live demo `https://ai-work-market.vercel.app/agent-commerce`.
+Dario said “do it all.” Posted high-signal comments only on open issues directly about x402, MPP, 402 handling, agent payments, or agent commerce. Lead asset: live demo `https://ai-work-market.ai/agent-commerce`.
 
 - Stripe AI / MCP x402+MPP payment gating:
   - https://github.com/stripe/ai/issues/347#issuecomment-4436558670
@@ -171,7 +171,7 @@ Skipped/comment constraints:
   - https://github.com/darioandyoshi-tech/ai-work-market/issues/1#issuecomment-4440568339
 - CTA now points agents/framework builders to:
   - `docs/agent-testnet-start-here.md`
-  - live demo `https://ai-work-market.vercel.app/`
+  - live demo `https://ai-work-market.ai/`
 - Boundary preserved: Base Sepolia/testnet-only, not audited, centralized-dispute MVP.
 
 Next revenue moves:

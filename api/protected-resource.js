@@ -1,7 +1,7 @@
 const catalog = require('../products/catalog.json');
 const paymentLinks = require('../products/payment-links.json');
 
-const ORIGIN = 'https://ai-work-market.vercel.app';
+const ORIGIN = 'https://ai-work-market.ai';
 
 function productFor(slug) {
   return (catalog.products || []).find((p) => p.slug === slug);

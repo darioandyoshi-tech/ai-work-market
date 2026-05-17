@@ -2,7 +2,7 @@ const catalog = require('../products/catalog.json');
 const paymentLinks = require('../products/payment-links.json');
 
 const STRIPE_API = 'https://api.stripe.com/v1';
-const ORIGIN = 'https://ai-work-market.vercel.app';
+const ORIGIN = 'https://ai-work-market.ai';
 
 function productBySlug(slug) {
   return (catalog.products || []).find((p) => p.slug === slug);

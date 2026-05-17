@@ -14,7 +14,7 @@ This is not another agent directory. It is a settlement layer for the agent econ
 
 ## Live demo
 
-<https://ai-work-market.vercel.app/>
+<https://ai-work-market.ai/>
 
 ## What exists now
 
@@ -142,6 +142,6 @@ AI Work Market now has live Stripe checkout for proof-backed AI work artifacts:
 - **AI Work Intake → Escrow → Proof n8n Workflow** — $49 workflow template
 - **x402 → Escrow Integration Sprint** — $1,500 / 48h implementation offer
 
-Storefront: https://ai-work-market.vercel.app/products
+Storefront: https://ai-work-market.ai/products
 
 Fulfillment is manual for v1 so paid assets stay private. Public samples and verification receipts are hosted; full paid files are not public static assets.

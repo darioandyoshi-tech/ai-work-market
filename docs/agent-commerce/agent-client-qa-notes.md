@@ -16,7 +16,7 @@ Review target: a dependency-free Node example client that fetches an AI Work Mar
   - “Open this Stripe Checkout URL in a browser/operator flow” for `stripe_payment_link`.
   - “After checkout, rerun with --session-id cs_... to verify receipt/delivery status.”
   - “Paid files are not exposed by this endpoint in v1; fulfillment is manual.”
-- Support `--slug`, `--base-url`, `--session-id`, and optional `--access-token` flags/env vars. Keep defaults pointed at production `https://ai-work-market.vercel.app`, but make test/local bases easy.
+- Support `--slug`, `--base-url`, `--session-id`, and optional `--access-token` flags/env vars. Keep defaults pointed at production `https://ai-work-market.ai`, but make test/local bases easy.
 - If a `Link: <...>; rel="payment"` header is present, display it as a secondary checkout source and warn if it differs from JSON `payment.checkoutUrl`.
 - For optional verification, call both:
   - `/api/fulfillment-receipt?session_id=<cs_...>`

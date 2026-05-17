@@ -2,8 +2,8 @@
 
 AI Work Market now exposes a machine-readable product catalog for agents:
 
-- `GET https://ai-work-market.vercel.app/api/agent-products`
-- Discovery: `https://ai-work-market.vercel.app/.well-known/agent-products.json`
+- `GET https://ai-work-market.ai/api/agent-products`
+- Discovery: `https://ai-work-market.ai/.well-known/agent-products.json`
 
 ## Flow today
 

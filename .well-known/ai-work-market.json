@@ -8,7 +8,7 @@
     "human-operators",
     "marketplaces"
   ],
-  "demo": "https://ai-work-market.vercel.app/",
+  "demo": "https://ai-work-market.ai/",
   "source": "https://github.com/darioandyoshi-tech/ai-work-market",
   "chain": {
     "name": "Base Sepolia",
@@ -27,7 +27,7 @@
     "x402Compatibility": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/x402.md",
     "mcpAgentCommerce": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/agent-commerce/mcp-agent-commerce-tools.md",
     "reservationVocabulary": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/agent-commerce/reservation-vocabulary-mapping.md",
-    "mcpDiscovery": "https://ai-work-market.vercel.app/.well-known/awm-mcp.json"
+    "mcpDiscovery": "https://ai-work-market.ai/.well-known/awm-mcp.json"
   },
   "capabilities": [
     "eip712-seller-signed-offers",
@@ -48,8 +48,8 @@
     "not production audited",
     "centralized dispute resolution in MVP"
   ],
-  "agentProductsUrl": "https://ai-work-market.vercel.app/api/agent-products",
-  "productStorefrontUrl": "https://ai-work-market.vercel.app/products",
+  "agentProductsUrl": "https://ai-work-market.ai/api/agent-products",
+  "productStorefrontUrl": "https://ai-work-market.ai/products",
   "paymentRails": [
     "stripe_payment_links"
   ],

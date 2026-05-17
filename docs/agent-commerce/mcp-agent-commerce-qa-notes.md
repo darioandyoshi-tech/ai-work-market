@@ -24,7 +24,7 @@ Discover agent-readable catalog entries.
     "origin": {
       "type": "string",
       "format": "uri",
-      "default": "https://ai-work-market.vercel.app",
+      "default": "https://ai-work-market.ai",
       "description": "AI Work Market origin. Override only for local/test deployments."
     }
   }
@@ -36,9 +36,9 @@ Discover agent-readable catalog entries.
 ```json
 {
   "schema": "ai-work-market.mcp.agent-products-result.v1",
-  "origin": "https://ai-work-market.vercel.app",
-  "productsUrl": "https://ai-work-market.vercel.app/api/agent-products",
-  "wellKnownUrl": "https://ai-work-market.vercel.app/.well-known/agent-products.json",
+  "origin": "https://ai-work-market.ai",
+  "productsUrl": "https://ai-work-market.ai/api/agent-products",
+  "wellKnownUrl": "https://ai-work-market.ai/.well-known/agent-products.json",
   "httpStatus": 200,
   "products": [
     {
@@ -78,7 +78,7 @@ Fetch the live protected resource and normalize the unpaid HTTP `402` response f
     "origin": {
       "type": "string",
       "format": "uri",
-      "default": "https://ai-work-market.vercel.app",
+      "default": "https://ai-work-market.ai",
       "description": "AI Work Market origin. Override only for local/test deployments."
     },
     "includeHeaders": {
@@ -95,7 +95,7 @@ Fetch the live protected resource and normalize the unpaid HTTP `402` response f
 ```json
 {
   "schema": "ai-work-market.mcp.payment-challenge-result.v1",
-  "protectedResourceUrl": "https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026",
+  "protectedResourceUrl": "https://ai-work-market.ai/api/protected-resource?slug=agent-commerce-market-map-2026",
   "httpStatus": 402,
   "paymentRequired": true,
   "product": {
@@ -108,7 +108,7 @@ Fetch the live protected resource and normalize the unpaid HTTP `402` response f
   "payment": {
     "currentRail": "stripe_payment_link",
     "checkoutUrl": "https://checkout.stripe.com/...",
-    "afterCompletionUrl": "https://ai-work-market.vercel.app/purchase-complete?paid=agent-commerce-market-map-2026",
+    "afterCompletionUrl": "https://ai-work-market.ai/purchase-complete?paid=agent-commerce-market-map-2026",
     "amount": {
       "currency": "USD",
       "dollars": 79,
@@ -116,7 +116,7 @@ Fetch the live protected resource and normalize the unpaid HTTP `402` response f
     }
   },
   "resource": {
-    "url": "https://ai-work-market.vercel.app/api/protected-resource?slug=agent-commerce-market-map-2026",
+    "url": "https://ai-work-market.ai/api/protected-resource?slug=agent-commerce-market-map-2026",
     "sampleUrl": "https://...",
     "paidAssetsPublic": false
   },
@@ -169,7 +169,7 @@ Optional parity tool for `/api/payment-request`. Useful for asserting that the s
   "required": ["slug"],
   "properties": {
     "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,120}$" },
-    "origin": { "type": "string", "format": "uri", "default": "https://ai-work-market.vercel.app" }
+    "origin": { "type": "string", "format": "uri", "default": "https://ai-work-market.ai" }
   }
 }
 ```
@@ -198,7 +198,7 @@ Verify a Stripe Checkout Session against AI Work Market's receipt and delivery-s
     "origin": {
       "type": "string",
       "format": "uri",
-      "default": "https://ai-work-market.vercel.app"
+      "default": "https://ai-work-market.ai"
     }
   }
 }

@@ -6,14 +6,14 @@ Updated: 2026-05-12 21:18 CDT
 
 Primary offer: **$1,500 / 48h x402 → escrow/proof integration sprint**
 
-Live proof asset: https://ai-work-market.vercel.app/agent-commerce
+Live proof asset: https://ai-work-market.ai/agent-commerce
 
 Positioning: AI Work Market is not a generic agent directory. It is a work-order, proof, receipt, verification, release/refund/dispute layer for agent-delivered work.
 
 ## Current live artifacts
 
-- Storefront: https://ai-work-market.vercel.app/products
-- Agent commerce demo: https://ai-work-market.vercel.app/agent-commerce
+- Storefront: https://ai-work-market.ai/products
+- Agent commerce demo: https://ai-work-market.ai/agent-commerce
 - Catalog: `GET /api/agent-products`
 - Payment request: `GET /api/payment-request?slug=agent-commerce-market-map-2026`
 - Protected resource: `GET /api/protected-resource?slug=agent-commerce-market-map-2026`

@@ -37,7 +37,7 @@ AWM_DELIVERY_SIGNING_SECRET="at-least-32-random-bytes"
 AWM_DELIVERY_TOKEN_TTL_SECONDS="600"
 
 # Optional; defaults to production origin
-AWM_PUBLIC_ORIGIN="https://ai-work-market.vercel.app"
+AWM_PUBLIC_ORIGIN="https://ai-work-market.ai"
 
 # Required before paid digital assets can be downloaded automatically
 AWM_PRIVATE_DELIVERY_MANIFEST='{
