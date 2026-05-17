@@ -41,11 +41,15 @@ The goal is to **stop the bleeding** and prevent further loss.
 
 1.  **Fund Rescue (If applicable):**
     - Execute `resolveDispute` transactions via the Safe multisig to return funds to rightful owners (Buyer or Seller) based on evidence.
-2.  **Parameter Correction:**
+2.  **Fulfillment Recovery (For Paid Products):**
+    - If the ephemeral `fulfillment-log.json` is lost, use the **Stripe Dashboard** as the primary source of truth.
+    - Filter by `checkout.session.completed` events and product slugs.
+    - Manually issue delivery links or fulfill assets for any missing sessions.
+3.  **Parameter Correction:**
     - Use `setFeeRecipient` or `setDefaultFeeBps` if the incident involved incorrect administrative settings.
-3.  **Verification:**
+4.  **Verification:**
     - Run a smoke test on a fresh deployment or a small-value mainnet intent to verify the fix.
-4.  **Gradual Re-enablement:**
+5.  **Gradual Re-enablement:**
     - Remove UI blockers.
     - Enable funding for a limited set of allowlisted users first.
     - Monitor the first 10-20 transactions closely before open relaunch.

@@ -2,11 +2,14 @@ const fs = require('fs');
 const path = require('path');
 
 // In a real Vercel production environment, this would be replaced by Vercel KV, 
-// Redis, or a PostgreSQL database. For the current prototype and local testing, 
-// we use a durable JSON file in the artifacts directory.
+// Redis, or a PostgreSQL database. 
+// WARNING: Vercel's filesystem is ephemeral. files in /artifacts will be lost on deployment.
 const STORE_PATH = path.join(process.cwd(), 'artifacts', 'fulfillment-log.json');
 
 function ensureStore() {
+  if (process.env.NODE_ENV === 'production') {
+    console.warn('[AWM-WARN] Production mode detected. Local JSON store is EPHEMERAL. Use Stripe Dashboard as source of truth for fulfillment until Vercel KV is configured.');
+  }
   if (!fs.existsSync(path.dirname(STORE_PATH))) {
     fs.mkdirSync(path.dirname(STORE_PATH), { recursive: true });
   }
