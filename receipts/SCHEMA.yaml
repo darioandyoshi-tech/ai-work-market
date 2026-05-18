@@ -1,0 +1,16 @@
+# AWM Sovereign Work Receipt Map
+# Schema v1.0.0
+# map: offer_hash -> fund_tx -> artifact_hash -> release_tx
+
+version: 1.0.0
+description: "Work Receipt Map for AWM Sovereign Standard"
+
+# Map Entry Template:
+# - offer_hash: bytes32 (keccak256 of the signed offer)
+# - fund_tx: string (transaction hash of USDC funding)
+# - artifact_hash: bytes32 (keccak256 of the delivered artifact/proof)
+# - release_tx: string (transaction hash of the release transaction)
+# - timestamp: iso8601 (completion time)
+# - metadata: object (additional context)
+
+receipts: []
