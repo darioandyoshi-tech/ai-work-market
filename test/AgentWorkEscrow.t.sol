@@ -30,6 +30,23 @@ contract MockUSDC {
     function setFailTransfers(bool value) external { failTransfers = value; }
 }
 
+contract MockEIP1271 {
+    bytes public lastSignature;
+    bytes32 public lastHash;
+
+    function setSignature(bytes32 hash, bytes memory sig) external {
+        lastHash = hash;
+        lastSignature = sig;
+    }
+
+    function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4) {
+        if (hash == lastHash && signature == lastSignature) {
+            return abi.encodeWithSignature("isValidSignature(bytes32,bytes)");
+        }
+        return 0x00000000;
+    }
+}
+
 contract AgentWorkEscrowTest is Test {
     MockUSDC usdc;
     AgentWorkEscrow escrow;

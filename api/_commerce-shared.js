@@ -33,32 +33,62 @@ function hmacValue(secret, value) {
   return crypto.createHmac('sha256', secret).update(String(value)).digest('hex');
 }
 
-async function stripeGet(path) {
+async function stripeGet(path, retries = 3) {
   if (!process.env.STRIPE_SECRET_KEY) {
     const err = new Error('stripe_secret_missing');
     err.statusCode = 503;
     throw err;
   }
-  const res = await fetch(`${STRIPE_API}${path}`, {
-    headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` }
-  });
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const err = new Error(json?.error?.message || `stripe_${res.status}`);
-    err.statusCode = res.status;
-    throw err;
+
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(`${STRIPE_API}${path}`, {
+        headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` }
+      });
+      const json = await res.json().catch(() => ({}));
+
+      if (res.ok) return json;
+
+      // Only retry on 5xx errors or network timeouts
+      if (res.status < 500) {
+        const err = new Error(json?.error?.message || `stripe_${res.status}`);
+        err.statusCode = res.status;
+        throw err;
+      }
+
+      if (i === retries - 1) {
+        const err = new Error(json?.error?.message || `stripe_${res.status}`);
+        err.statusCode = res.status;
+        throw err;
+      }
+
+      // Exponential backoff: 100ms, 400ms, 1600ms...
+      await new Promise(resolve => setTimeout(resolve, Math.pow(4, i) * 100));
+
+    } catch (err) {
+      // If it's a 4xx error, don't retry
+      if (err.statusCode && err.statusCode < 500) throw err;
+      if (i === retries - 1) throw err;
+      await new Promise(resolve => setTimeout(resolve, Math.pow(4, i) * 100));
+    }
   }
-  return json;
 }
 
 function paidSession(session) {
   return session?.payment_status === 'paid' || session?.status === 'complete';
 }
 
+let cachedManifest = null;
+
 function loadDeliveryManifest() {
-  if (!process.env.AWM_PRIVATE_DELIVERY_MANIFEST) return {};
+  if (cachedManifest) return cachedManifest;
+  if (!process.env.AWM_PRIVATE_DELIVERY_MANIFEST) {
+    cachedManifest = {};
+    return cachedManifest;
+  }
   try {
-    return JSON.parse(process.env.AWM_PRIVATE_DELIVERY_MANIFEST);
+    cachedManifest = JSON.parse(process.env.AWM_PRIVATE_DELIVERY_MANIFEST);
+    return cachedManifest;
   } catch (err) {
     err.statusCode = 500;
     err.publicMessage = 'private_delivery_manifest_invalid';
@@ -67,6 +97,7 @@ function loadDeliveryManifest() {
 }
 
 function bundleForProduct(product) {
+  if (!product || typeof product.slug !== 'string') return null;
   const manifest = loadDeliveryManifest();
   return manifest[product.slug] || null;
 }

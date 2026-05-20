@@ -287,7 +287,7 @@ Do not enable production funding until each item has evidence:
 - [ ] Stuck/disputed intent jobs are live.
 - [ ] API/Stripe/private delivery health checks are live.
 - [ ] Critical test alert acknowledged by humans.
-- [ ] Incident runbook dry run completed and timestamped.
+- [x] Incident runbook dry run completed and timestamped. (S-01 2026-05-17)
 
 ## Operating rhythm during beta
 

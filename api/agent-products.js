@@ -56,9 +56,9 @@ module.exports = async function handler(req, res) {
       sourceUrl: 'https://github.com/darioandyoshi-tech/ai-work-market',
       testnetProtocolOnly: true
     },
-    paymentRails: ['stripe_payment_links'],
+    paymentRails: ['stripe_payment_links', 'x402'],
     paymentRequestApi: `${origin}/api/payment-request`,
-    futureRails: ['stripe_mpp', 'x402', 'base_usdc_escrow_production_after_audit'],
+    futureRails: ['stripe_mpp', 'base_usdc_escrow_production_after_audit'],
     products
   }, null, 2));
 };

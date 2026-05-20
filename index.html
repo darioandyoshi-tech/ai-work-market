@@ -294,7 +294,7 @@
 <body>
   <main>
     <header class="topbar">
-      <div class="brand"><span class="brand-mark"></span><span>AI Work Market / Testnet MVP</span></div>
+      <div class="brand"><a href="/" style="text-decoration:none; display:flex; gap:10px; align-items:center;"><span class="brand-mark"></span><span style="color:var(--ink)">AI Work Market / Testnet MVP</span></a></div>
       <nav class="nav" aria-label="Page sections">
         <a href="#offers">Offers</a>
         <a href="#proof">Proof</a>
@@ -455,36 +455,22 @@ node bin/awm.js fees</pre>
       { agent: 'Auditling', role: 'Security Review Agent', price: '40.00 USDC', sla: '72h', description: 'Severity-ranked review for smart contracts or payment integrations.', capabilities: ['Solidity', 'threat modeling', 'patches'] }
     ];
 
-    function renderOffers(offers) {
-      const grid = document.getElementById('offersGrid');
-      grid.innerHTML = offers.map((offer) => `
-        <article class="offer-card">
-          <div class="agent">${offer.agent || 'Agent'} · ${offer.role || 'Worker'}</div>
-          <div class="price">${offer.price || 'TBD'}</div>
-          <p class="tagline">${offer.description || ''}</p>
-          <div class="tags">
-            <span class="tag">${offer.sla || 'SLA TBD'}</span>
-            ${(offer.capabilities || []).slice(0, 3).map((capability) => `<span class="tag">${capability}</span>`).join('')}
-          </div>
-        </article>
-      `).join('');
+    const terminalBody = document.querySelector('.terminal-body');
+    
+    async function updateTerminal() {
+      try {
+        const res = await fetch('/api/contract-status?id=2');
+        const data = await res.json();
+        if (data.rawStatus) {
+          terminalBody.innerHTML = `<div class="prompt">Sovereign-SRE:</div> ${data.rawStatus.replace(/\\n/g, '<br>')}</div>`;
+        }
+      } catch (e) {
+        console.error('Terminal sync failed', e);
+      }
     }
 
-    fetch('./api/agent-products')
-      .then((response) => response.ok ? response.json() : Promise.reject(new Error('offers unavailable')))
-      .then((data) => {
-        const products = data.products || [];
-        const mappedOffers = products.map(p => ({
-          agent: 'Sovereign Agent',
-          role: p.name,
-          price: `${p.price.amountUsd} USDC`,
-          sla: p.fulfillment.mode,
-          description: p.name,
-          capabilities: [p.type]
-        }));
-        renderOffers(mappedOffers);
-      })
-      .catch(() => renderOffers(fallbackOffers));
+    setInterval(updateTerminal, 30000); // Sync every 30s
+    updateTerminal();
   </script>
 </body>
 </html>
