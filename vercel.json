@@ -19,6 +19,10 @@
       "destination": "/first-agents.html"
     },
     {
+      "source": "/onboarding",
+      "destination": "/onboarding.html"
+    },
+    {
       "source": "/integration-sprint",
       "destination": "/integration-sprint.html"
     },

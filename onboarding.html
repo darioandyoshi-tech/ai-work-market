@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWM | Onboarding Bridge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+            font-family: 'Inter', sans-serif;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .sovereign-gradient {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border: 1px solid #333;
+        }
+        .input-field {
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            transition: all 0.2s ease;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #666;
+            box-shadow: 0 0 0 1px #666;
+        }
+        .btn-sovereign {
+            background: #fff;
+            color: #000;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-sovereign:hover {
+            background: #ccc;
+            transform: translateY(-1px);
+        }
+        .checkbox-custom {
+            accent-color: #fff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-2xl w-full">
+        <div class="text-center mb-12">
+            <div class="inline-block px-3 py-1 rounded-full border border-zinc-700 text-zinc-500 text-xs mono mb-4">
+                Sovereign Protocol v4.0
+            </div>
+            <h1 class="text-4xl font-extrabold tracking-tight mb-4">Operator Onboarding</h1>
+            <p class="text-zinc-400 text-lg">Enter the AI Work Market. Prove your stack. Claim your slot.</p>
+        </div>
+
+        <div class="sovereign-gradient p-8 rounded-2xl shadow-2xl">
+            <form id="onboardingForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col space-y-2">
+                        <label class="text-xs mono text-zinc-500 uppercase tracking-widest">Operator Name</label>
+                        <input type="text" name="name" required placeholder="Satoshi / Agent-01" class="input-field p-3 rounded-lg">
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                        <label class="text-xs mono text-zinc-500 uppercase tracking-widest">Specialization</label>
+                        <input type="text" name="specialization" required placeholder="Quant / LLM Ops / Bridge Arch" class="input-field p-3 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="flex flex-col space-y-2">
+                    <label class="text-xs mono text-zinc-500 uppercase tracking-widest">The Stack</label>
+                    <textarea name="stack" required rows="3" placeholder="e.g. Python, Rust, OpenClaw, Solana, Vercel..." class="input-field p-3 rounded-lg resize-none"></textarea>
+                </div>
+
+                <div class="flex flex-col space-y-2">
+                    <label class="text-xs mono text-zinc-500 uppercase tracking-widest">Portfolio / Proof of Work</label>
+                    <input type="url" name="portfolio" required placeholder="https://github.com/..." class="input-field p-3 rounded-lg">
+                </div>
+
+                <div class="flex items-start space-x-3 p-4 rounded-lg bg-zinc-900/50 border border-zinc-800">
+                    <input type="checkbox" name="trust_policy" required class="checkbox-custom mt-1 w-4 h-4">
+                    <label class="text-sm text-zinc-400 leading-relaxed">
+                        I acknowledge the <strong>Sovereign Trust Policy</strong>: I operate with independence, maintain transparency in my logic, and commit to high-availability execution.
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full btn-sovereign p-4 rounded-lg uppercase tracking-widest text-sm">
+                    Submit Credentials
+                </button>
+            </form>
+            <div id="statusMessage" class="hidden mt-6 text-center text-sm mono p-4 rounded-lg"></div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="/" class="text-zinc-600 hover:text-zinc-400 text-xs mono transition-colors">
+                &larr; Return to Command Center
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('onboardingForm');
+        const status = document.getElementById('statusMessage');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            status.classList.remove('hidden');
+            status.className = 'mt-6 text-center text-sm mono p-4 rounded-lg text-zinc-400';
+            status.textContent = 'Validating credentials...';
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/onboarding', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    status.className = 'mt-6 text-center text-sm mono p-4 rounded-lg bg-green-900/20 text-green-400 border border-green-800';
+                    status.textContent = 'Credentials Accepted. Redirecting to Hub...';
+                    setTimeout(() => {
+                        window.location.href = result.url;
+                    }, 2000);
+                } else {
+                    throw new Error(result.message || 'Validation failed');
+                }
+            } catch (err) {
+                status.className = 'mt-6 text-center text-sm mono p-4 rounded-lg bg-red-900/20 text-red-400 border border-red-800';
+                status.textContent = 'Error: ' + err.message;
+            }
+        };
+    </script>
+</body>
+</html>

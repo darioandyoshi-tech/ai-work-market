@@ -1,15 +1,52 @@
 const crypto = require('crypto');
-const catalog = require('../products/catalog.json');
-const paymentLinks = require('../products/payment-links.json');
+const fs = require('fs');
+const path = require('path');
+
+// Use absolute paths for resilience on Vercel/different environments
+const CATALOG_PATH = path.join(process.cwd(), 'products', 'catalog.json');
+const PAYMENT_LINKS_PATH = path.join(process.cwd(), 'products', 'payment-links.json');
+
+let cachedCatalog = null;
+let cachedPaymentLinks = null;
+
+/**
+ * Safe JSON loader with fallback.
+ * Ensures the API doesn't crash if JSON files are malformed or missing.
+ */
+function safeLoadJson(filePath, fallbackValue = { products: [] }) {
+  try {
+    if (!fs.existsSync(filePath)) {
+      console.warn(`[AWM_Sovereign] File not found: ${filePath}. Using safe mode fallback.`);
+      return fallbackValue;
+    }
+    const content = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(content);
+  } catch (err) {
+    console.error(`[AWM_Sovereign] JSON Parse Error in ${filePath}:`, err);
+    return fallbackValue;
+  }
+}
+
+function getCatalog() {
+  if (cachedCatalog) return cachedCatalog;
+  cachedCatalog = safeLoadJson(CATALOG_PATH);
+  return cachedCatalog;
+}
+
+function getPaymentLinks() {
+  if (cachedPaymentLinks) return cachedPaymentLinks;
+  cachedPaymentLinks = safeLoadJson(PAYMENT_LINKS_PATH);
+  return cachedPaymentLinks;
+}
 
 const STRIPE_API = 'https://api.stripe.com/v1';
 
 function productBySlug(slug) {
-  return (catalog.products || []).find((p) => p.slug === slug);
+  return (getCatalog().products || []).find((p) => p.slug === slug);
 }
 
 function linkByPaymentLinkId(id) {
-  return (paymentLinks.products || []).find((p) => p.paymentLinkId === id);
+  return (getPaymentLinks().products || []).find((p) => p.paymentLinkId === id);
 }
 
 function productForSession(session) {
@@ -109,6 +146,14 @@ function json(res, status, body) {
   res.end(JSON.stringify(body, null, 2));
 }
 
+function errorResponse(res, code, message, status = 500) {
+  return json(res, status, {
+    error: code,
+    message: message,
+    timestamp: new Date().toISOString()
+  });
+}
+
 module.exports = {
   productBySlug,
   productForSession,
@@ -118,5 +163,8 @@ module.exports = {
   stripeGet,
   paidSession,
   bundleForProduct,
-  json
+  json,
+  errorResponse,
+  getCatalog,
+  getPaymentLinks
 };
