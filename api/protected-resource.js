@@ -1,5 +1,6 @@
 const catalog = require('../products/catalog.json');
 const paymentLinks = require('../products/payment-links.json');
+const { x402RailForProduct } = require('./_commerce-shared');
 
 const ORIGIN = 'https://ai-work-market.ai';
 
@@ -58,13 +59,15 @@ function paymentRequest(product) {
     },
     payment: {
       currentRail: 'stripe_payment_link',
+      acceptedRails: ['stripe_payment_link', 'x402_base_usdc_receipt'],
       checkoutUrl: product.checkoutUrl || link.paymentLinkUrl,
       afterCompletionUrl: link.afterCompletionUrl || `${ORIGIN}/purchase-complete?paid=${encodeURIComponent(product.slug)}`,
       amount: {
         currency: 'USD',
         dollars: product.priceUsd,
         stripeUnitAmount: link.unitAmount || Math.round(Number(product.priceUsd || 0) * 100)
-      }
+      },
+      x402: x402RailForProduct(product, ORIGIN)
     },
     fulfillment: {
       mode: product.delivery || (product.type === 'service' ? 'manual_scope_kickoff' : 'manual_after_stripe_purchase'),

@@ -5,6 +5,12 @@ const path = require('path');
 // Use absolute paths for resilience on Vercel/different environments
 const CATALOG_PATH = path.join(process.cwd(), 'products', 'catalog.json');
 const PAYMENT_LINKS_PATH = path.join(process.cwd(), 'products', 'payment-links.json');
+const BASE_USDC_CONTRACT =
+  process.env.BASE_USDC_CONTRACT || '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+const AWM_X402_TREASURY =
+  process.env.AWM_X402_TREASURY ||
+  process.env.X402_TREASURY ||
+  '0x8d32448cbad55a3d3B12DE901e57782C409399B7';
 
 let cachedCatalog = null;
 let cachedPaymentLinks = null;
@@ -139,6 +145,36 @@ function bundleForProduct(product) {
   return manifest[product.slug] || null;
 }
 
+function productPriceRawUsdc(product) {
+  const value = String(product?.priceUsd ?? 0).trim();
+  const [whole = '0', fraction = ''] = value.split('.');
+  return (
+    BigInt(whole || '0') * 1_000_000n +
+    BigInt((fraction + '000000').slice(0, 6))
+  ).toString();
+}
+
+function x402RailForProduct(product, origin) {
+  const base = String(origin || 'https://ai-work-market.ai').replace(/\/$/, '');
+  return {
+    provider: 'x402',
+    status: 'verification_only_v1',
+    network: 'Base',
+    networkCaip2: 'eip155:8453',
+    asset: 'native USDC',
+    assetContract: BASE_USDC_CONTRACT,
+    payTo: AWM_X402_TREASURY,
+    amount: {
+      currency: 'USDC',
+      dollars: product?.priceUsd ?? 0,
+      raw: productPriceRawUsdc(product)
+    },
+    verifierUrl: `${base}/api/x402-verify-receipt?slug=${encodeURIComponent(product.slug)}`,
+    instructions:
+      'Transfer exact native Base USDC to payTo, then call verifierUrl with tx=<base-tx-hash>. Fulfillment remains manual until product-specific access issuance is enabled.'
+  };
+}
+
 function json(res, status, body) {
   res.statusCode = status;
   res.setHeader('content-type', 'application/json; charset=utf-8');
@@ -166,5 +202,6 @@ module.exports = {
   json,
   errorResponse,
   getCatalog,
-  getPaymentLinks
+  getPaymentLinks,
+  x402RailForProduct
 };

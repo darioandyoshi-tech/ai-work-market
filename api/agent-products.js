@@ -1,4 +1,4 @@
-const { getCatalog, getPaymentLinks, errorResponse } = require('./_commerce-shared');
+const { getCatalog, getPaymentLinks, errorResponse, x402RailForProduct } = require('./_commerce-shared');
 
 module.exports = async function handler(req, res) {
   try {
@@ -34,6 +34,14 @@ module.exports = async function handler(req, res) {
           url: product.checkoutUrl || link.paymentLinkUrl || null,
           afterCompletionUrl: link.afterCompletionUrl || `${origin}/purchase-complete?paid=${encodeURIComponent(product.slug)}`
         },
+        paymentRails: [
+          {
+            provider: 'stripe_payment_link',
+            status: 'live',
+            checkoutUrl: product.checkoutUrl || link.paymentLinkUrl || null
+          },
+          x402RailForProduct(product, origin)
+        ],
         fulfillment: {
           mode: product.delivery || (product.type === 'service' ? 'manual_scope_kickoff' : 'manual_after_stripe_purchase'),
           publicSampleUrl: product.sampleUrl ? `${origin}${product.sampleUrl}` : null,
