@@ -98,11 +98,53 @@ async function testAgentProductsExposeX402Rail() {
   assert.match(x402Rail.verifierUrl, /\/api\/x402-verify-receipt\?slug=agent-commerce-market-map-2026$/);
 }
 
+function testReceiptBindingIsStableAndScoped() {
+  const tx = `0x${'a'.repeat(64)}`;
+  const transfer = {
+    from: '0x1111111111111111111111111111111111111111',
+    to: '0x8d32448cbad55a3d3B12DE901e57782C409399B7',
+    value: 79000000n,
+    logIndex: 12
+  };
+  const common = {
+    tx,
+    transfer,
+    recipient: transfer.to,
+    productSlug: 'agent-commerce-market-map-2026',
+    expectedRaw: 79000000n,
+    quoteId: 'quote-123',
+    customerRef: 'buyer-abc',
+    requestId: 'req-456'
+  };
+
+  const binding = x402VerifyReceipt._test.buildReceiptBinding(common);
+  const repeated = x402VerifyReceipt._test.buildReceiptBinding(common);
+  const differentQuote = x402VerifyReceipt._test.buildReceiptBinding({
+    ...common,
+    quoteId: 'quote-124'
+  });
+
+  assert.deepStrictEqual(binding, repeated);
+  assert.strictEqual(
+    binding.paymentRef,
+    `eip155:8453:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913:${tx}:12`
+  );
+  assert.match(binding.fulfillmentRef, /^x402r_[a-f0-9]{32}$/);
+  assert.strictEqual(binding.scope.quoteId, 'quote-123');
+  assert.strictEqual(binding.scope.customerRef, 'buyer-abc');
+  assert.strictEqual(binding.scope.requestId, 'req-456');
+  assert.strictEqual(binding.replayGuard.requiredBeforeFulfillment, true);
+  assert.strictEqual(binding.replayGuard.consumeBeforeDelivery, true);
+  assert.strictEqual(differentQuote.paymentRef, binding.paymentRef);
+  assert.notStrictEqual(differentQuote.fulfillmentRef, binding.fulfillmentRef);
+}
+
 async function main() {
   await testRejectsInvalidTxHash();
   await testRejectsUnknownProductBeforeRpc();
   await testPaymentRequestExposesX402Rail();
   await testAgentProductsExposeX402Rail();
+  testReceiptBindingIsStableAndScoped();
 
   console.log('x402 receipt verifier smoke tests passed');
 }

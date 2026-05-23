@@ -1,7 +1,9 @@
+const crypto = require('crypto');
 const { ethers } = require('ethers');
 const { productBySlug, json } = require('./_commerce-shared');
 
 const BASE_CHAIN_ID = 8453;
+const NETWORK_CAIP2 = 'eip155:8453';
 const BASE_RPC_URL = process.env.BASE_RPC_URL || process.env.BASE_RPC || 'https://mainnet.base.org';
 const USDC_CONTRACT =
   process.env.BASE_USDC_CONTRACT || '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
@@ -77,6 +79,21 @@ function expectedAmountRaw(query) {
   return parseUsdcAmount(product.priceUsd, 'product_priceUsd');
 }
 
+function optionalBindingRef(query, names, fieldName) {
+  for (const name of names) {
+    if (query[name] === undefined) continue;
+    const value = String(first(query[name]) || '').trim();
+    if (!value) return null;
+    if (value.length > 160 || !/^[A-Za-z0-9._:@/-]+$/.test(value)) {
+      const err = new Error(`${fieldName}_invalid`);
+      err.statusCode = 400;
+      throw err;
+    }
+    return value;
+  }
+  return null;
+}
+
 function amountToJson(value) {
   return {
     raw: value.toString(),
@@ -108,7 +125,49 @@ function publicTransfer(transfer) {
   };
 }
 
-module.exports = async function handler(req, res) {
+function shortHash(value) {
+  return crypto.createHash('sha256').update(value).digest('hex').slice(0, 32);
+}
+
+function buildReceiptBinding({ tx, transfer, recipient, productSlug, expectedRaw, quoteId, customerRef, requestId }) {
+  const normalizedTx = tx.toLowerCase();
+  const token = USDC_CONTRACT.toLowerCase();
+  const paymentRef = `${NETWORK_CAIP2}:${token}:${normalizedTx}:${transfer.logIndex}`;
+  const fulfillmentScope = {
+    standard: 'x402-sovereign-receipt-v1',
+    network: NETWORK_CAIP2,
+    token,
+    txHash: normalizedTx,
+    logIndex: transfer.logIndex,
+    recipient: recipient.toLowerCase(),
+    amountRaw: transfer.value.toString(),
+    expectedAmountRaw: expectedRaw === null ? null : expectedRaw.toString(),
+    productSlug,
+    quoteId,
+    customerRef,
+    requestId
+  };
+  const canonicalScope = JSON.stringify(fulfillmentScope);
+  const fulfillmentRef = `x402r_${shortHash(canonicalScope)}`;
+
+  return {
+    paymentRef,
+    fulfillmentRef,
+    scope: fulfillmentScope,
+    replayGuard: {
+      requiredBeforeFulfillment: true,
+      consumeBeforeDelivery: true,
+      storageKeys: {
+        payment: `x402-payment:${shortHash(paymentRef)}`,
+        fulfillment: `x402-fulfillment:${fulfillmentRef}`
+      },
+      rule:
+        'Persist paymentRef as single-use before issuing product access; reject repeats or a different fulfillmentRef for the same paymentRef.'
+    }
+  };
+}
+
+async function handler(req, res) {
   if (req.method !== 'GET') {
     res.statusCode = 405;
     res.setHeader('allow', 'GET');
@@ -127,6 +186,10 @@ module.exports = async function handler(req, res) {
       'recipient'
     );
     const expectedRaw = expectedAmountRaw(req.query || {});
+    const productSlug = String(first(req.query && req.query.slug) || '').trim() || null;
+    const quoteId = optionalBindingRef(req.query || {}, ['quoteId', 'quote_id'], 'quoteId');
+    const customerRef = optionalBindingRef(req.query || {}, ['customerRef', 'customer_ref'], 'customerRef');
+    const requestId = optionalBindingRef(req.query || {}, ['requestId', 'request_id'], 'requestId');
     const provider = new ethers.JsonRpcProvider(BASE_RPC_URL, BASE_CHAIN_ID);
     const receipt = await provider.getTransactionReceipt(tx);
 
@@ -134,7 +197,7 @@ module.exports = async function handler(req, res) {
       return json(res, 404, {
         status: 'pending_or_not_found',
         tx,
-        network: 'eip155:8453',
+        network: NETWORK_CAIP2,
         message: 'Transaction receipt is not available on Base mainnet yet.'
       });
     }
@@ -144,7 +207,7 @@ module.exports = async function handler(req, res) {
         status: 'invalid',
         reason: 'transaction_reverted',
         tx,
-        network: 'eip155:8453'
+        network: NETWORK_CAIP2
       });
     }
 
@@ -160,7 +223,7 @@ module.exports = async function handler(req, res) {
         status: 'invalid',
         reason: 'matching_usdc_transfer_not_found',
         tx,
-        network: 'eip155:8453',
+        network: NETWORK_CAIP2,
         expected: {
           token: USDC_CONTRACT,
           recipient,
@@ -175,7 +238,7 @@ module.exports = async function handler(req, res) {
       status: 'verified',
       tx,
       blockNumber: Number(receipt.blockNumber),
-      network: 'eip155:8453',
+      network: NETWORK_CAIP2,
       token: {
         symbol: 'USDC',
         contract: USDC_CONTRACT,
@@ -183,6 +246,16 @@ module.exports = async function handler(req, res) {
       },
       recipient,
       matchedTransfer: publicTransfer(matchedTransfer),
+      binding: buildReceiptBinding({
+        tx,
+        transfer: matchedTransfer,
+        recipient,
+        productSlug,
+        expectedRaw,
+        quoteId,
+        customerRef,
+        requestId
+      }),
       verifiedAt: new Date().toISOString(),
       standard: 'x402-sovereign-receipt-v1',
       receipt: {
@@ -196,4 +269,10 @@ module.exports = async function handler(req, res) {
       status: 'error'
     });
   }
+}
+
+module.exports = handler;
+module.exports._test = {
+  buildReceiptBinding,
+  optionalBindingRef
 };
