@@ -101,6 +101,29 @@ function expectedAmountRaw(query) {
   return parseUsdcAmount(product.priceUsd, 'product_priceUsd');
 }
 
+function hasConfiguredTreasury() {
+  return Boolean(process.env.AWM_X402_TREASURY || process.env.X402_TREASURY);
+}
+
+function requireConsumeFulfillmentGuards(params, expectedRaw) {
+  if (expectedRaw === null || expectedRaw <= 0n) {
+    const err = new Error('consume_requires_positive_expected_amount');
+    err.statusCode = 400;
+    err.publicMessage =
+      'POST consume requests must include slug, amountUsd, or amountRaw with a positive exact amount.';
+    throw err;
+  }
+
+  const hasSignedRecipient = params.recipient !== undefined || params.payTo !== undefined;
+  if (process.env.NODE_ENV === 'production' && !hasSignedRecipient && !hasConfiguredTreasury()) {
+    const err = new Error('production_treasury_required');
+    err.statusCode = 503;
+    err.publicMessage =
+      'Configure AWM_X402_TREASURY or include recipient/payTo in the signed consume body before production fulfillment.';
+    throw err;
+  }
+}
+
 function optionalBindingRef(query, names, fieldName) {
   for (const name of names) {
     if (query[name] === undefined) continue;
@@ -345,6 +368,7 @@ async function handler(req, res) {
     const quoteId = optionalBindingRef(params || {}, ['quoteId', 'quote_id'], 'quoteId');
     const customerRef = optionalBindingRef(params || {}, ['customerRef', 'customer_ref'], 'customerRef');
     const requestId = optionalBindingRef(params || {}, ['requestId', 'request_id'], 'requestId');
+    if (consume) requireConsumeFulfillmentGuards(params || {}, expectedRaw);
     const provider = new ethers.JsonRpcProvider(BASE_RPC_URL, BASE_CHAIN_ID);
     const receipt = await provider.getTransactionReceipt(tx);
 
@@ -443,5 +467,6 @@ module.exports._test = {
   checkRateLimit,
   optionalBindingRef,
   rateBuckets,
+  requireConsumeFulfillmentGuards,
   verifyConsumeSignature
 };

@@ -52,6 +52,19 @@ function jsonPost(query, body, headers = {}) {
   return req;
 }
 
+function signedConsumeHeaders(body, timestamp = String(Math.floor(Date.now() / 1000))) {
+  const rawBody = Buffer.from(JSON.stringify(body));
+  const signature = crypto
+    .createHmac('sha256', process.env.AWM_X402_CONSUME_SECRET)
+    .update(Buffer.concat([Buffer.from(`${timestamp}.`), rawBody]))
+    .digest('hex');
+
+  return {
+    'x-awm-timestamp': timestamp,
+    'x-awm-signature': `sha256=${signature}`
+  };
+}
+
 async function testRejectsInvalidTxHash() {
   const response = await call(x402VerifyReceipt, {
     method: 'GET',
@@ -293,6 +306,68 @@ async function testConsumeRejectsUnsignedQueryParams() {
   assert.deepStrictEqual(response.json().rejectedQueryParams, ['slug']);
 }
 
+async function testConsumeRequiresPositiveExpectedAmount() {
+  x402VerifyReceipt._test.rateBuckets.clear();
+  const previousSecret = process.env.AWM_X402_CONSUME_SECRET;
+  process.env.AWM_X402_CONSUME_SECRET = 'test-consume-secret';
+
+  try {
+    const body = {
+      tx: `0x${'f'.repeat(64)}`,
+      amountRaw: '0',
+      recipient: '0x8d32448cbad55a3d3B12DE901e57782C409399B7',
+      consume: true
+    };
+    const response = await call(
+      x402VerifyReceipt,
+      jsonPost({}, body, signedConsumeHeaders(body))
+    );
+
+    assert.strictEqual(response.res.statusCode, 400);
+    assert.strictEqual(response.json().error, 'consume_requires_positive_expected_amount');
+  } finally {
+    if (previousSecret === undefined) delete process.env.AWM_X402_CONSUME_SECRET;
+    else process.env.AWM_X402_CONSUME_SECRET = previousSecret;
+  }
+}
+
+async function testProductionConsumeRequiresTreasuryOrSignedRecipient() {
+  x402VerifyReceipt._test.rateBuckets.clear();
+  const previousNodeEnv = process.env.NODE_ENV;
+  const previousSecret = process.env.AWM_X402_CONSUME_SECRET;
+  const previousTreasury = process.env.AWM_X402_TREASURY;
+  const previousX402Treasury = process.env.X402_TREASURY;
+
+  process.env.NODE_ENV = 'production';
+  process.env.AWM_X402_CONSUME_SECRET = 'test-consume-secret';
+  delete process.env.AWM_X402_TREASURY;
+  delete process.env.X402_TREASURY;
+
+  try {
+    const body = {
+      tx: `0x${'f'.repeat(64)}`,
+      amountRaw: '1',
+      consume: true
+    };
+    const response = await call(
+      x402VerifyReceipt,
+      jsonPost({}, body, signedConsumeHeaders(body))
+    );
+
+    assert.strictEqual(response.res.statusCode, 503);
+    assert.strictEqual(response.json().error, 'production_treasury_required');
+  } finally {
+    if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = previousNodeEnv;
+    if (previousSecret === undefined) delete process.env.AWM_X402_CONSUME_SECRET;
+    else process.env.AWM_X402_CONSUME_SECRET = previousSecret;
+    if (previousTreasury === undefined) delete process.env.AWM_X402_TREASURY;
+    else process.env.AWM_X402_TREASURY = previousTreasury;
+    if (previousX402Treasury === undefined) delete process.env.X402_TREASURY;
+    else process.env.X402_TREASURY = previousX402Treasury;
+  }
+}
+
 function makeBinding(overrides = {}) {
   const tx = `0x${'e'.repeat(64)}`;
   const transfer = {
@@ -413,6 +488,8 @@ async function main() {
   testRateLimitRejectsBurst();
   testConsumeSignatureVerification();
   await testConsumeRejectsUnsignedQueryParams();
+  await testConsumeRequiresPositiveExpectedAmount();
+  await testProductionConsumeRequiresTreasuryOrSignedRecipient();
   await testUpstashReceiptConsumptionUsesSetNx();
   await testProductionRejectsEphemeralReceiptStore();
 
