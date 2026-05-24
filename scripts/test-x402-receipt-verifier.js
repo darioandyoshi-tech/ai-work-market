@@ -368,6 +368,48 @@ async function testProductionConsumeRequiresTreasuryOrSignedRecipient() {
   }
 }
 
+function testConsumeFinalityPolicy() {
+  const previousMinConfirmations = process.env.AWM_X402_MIN_CONFIRMATIONS;
+
+  try {
+    delete process.env.AWM_X402_MIN_CONFIRMATIONS;
+    assert.deepStrictEqual(
+      x402VerifyReceipt._test.requireConsumeFinality(100, 100),
+      { confirmations: 1, minConfirmations: 1 }
+    );
+
+    process.env.AWM_X402_MIN_CONFIRMATIONS = '3';
+    let pending;
+    assert.throws(
+      () => {
+        try {
+          x402VerifyReceipt._test.requireConsumeFinality(100, 101);
+        } catch (err) {
+          pending = err;
+          throw err;
+        }
+      },
+      /receipt_confirmations_pending/
+    );
+    assert.strictEqual(pending.statusCode, 425);
+    assert.strictEqual(pending.confirmations, 2);
+    assert.strictEqual(pending.minConfirmations, 3);
+    assert.deepStrictEqual(
+      x402VerifyReceipt._test.requireConsumeFinality(100, 102),
+      { confirmations: 3, minConfirmations: 3 }
+    );
+
+    process.env.AWM_X402_MIN_CONFIRMATIONS = '0';
+    assert.throws(
+      () => x402VerifyReceipt._test.parseMinConfirmations(),
+      /minConfirmations_invalid/
+    );
+  } finally {
+    if (previousMinConfirmations === undefined) delete process.env.AWM_X402_MIN_CONFIRMATIONS;
+    else process.env.AWM_X402_MIN_CONFIRMATIONS = previousMinConfirmations;
+  }
+}
+
 function makeBinding(overrides = {}) {
   const tx = `0x${'e'.repeat(64)}`;
   const transfer = {
@@ -490,6 +532,7 @@ async function main() {
   await testConsumeRejectsUnsignedQueryParams();
   await testConsumeRequiresPositiveExpectedAmount();
   await testProductionConsumeRequiresTreasuryOrSignedRecipient();
+  testConsumeFinalityPolicy();
   await testUpstashReceiptConsumptionUsesSetNx();
   await testProductionRejectsEphemeralReceiptStore();
 

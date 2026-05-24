@@ -124,6 +124,39 @@ function requireConsumeFulfillmentGuards(params, expectedRaw) {
   }
 }
 
+function parseMinConfirmations(value = process.env.AWM_X402_MIN_CONFIRMATIONS) {
+  const raw = value === undefined || value === null || value === '' ? '1' : String(value);
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 1 || String(parsed) !== raw.trim()) {
+    const err = new Error('minConfirmations_invalid');
+    err.statusCode = 500;
+    err.publicMessage = 'AWM_X402_MIN_CONFIRMATIONS must be a positive integer.';
+    throw err;
+  }
+  return parsed;
+}
+
+function receiptConfirmations(receiptBlockNumber, currentBlockNumber) {
+  const receiptBlock = Number(receiptBlockNumber);
+  const currentBlock = Number(currentBlockNumber);
+  if (!Number.isFinite(receiptBlock) || !Number.isFinite(currentBlock)) return 0;
+  return Math.max(0, currentBlock - receiptBlock + 1);
+}
+
+function requireConsumeFinality(receiptBlockNumber, currentBlockNumber) {
+  const minConfirmations = parseMinConfirmations();
+  const confirmations = receiptConfirmations(receiptBlockNumber, currentBlockNumber);
+  if (confirmations < minConfirmations) {
+    const err = new Error('receipt_confirmations_pending');
+    err.statusCode = 425;
+    err.publicMessage = 'Wait for the configured Base confirmation threshold before consuming this receipt.';
+    err.confirmations = confirmations;
+    err.minConfirmations = minConfirmations;
+    throw err;
+  }
+  return { confirmations, minConfirmations };
+}
+
 function optionalBindingRef(query, names, fieldName) {
   for (const name of names) {
     if (query[name] === undefined) continue;
@@ -390,6 +423,9 @@ async function handler(req, res) {
       });
     }
 
+    const finality = consume
+      ? requireConsumeFinality(receipt.blockNumber, await provider.getBlockNumber())
+      : null;
     const transfers = parseUsdcTransfers(receipt);
     const matches = transfers.filter((transfer) => {
       const recipientMatches = transfer.to.toLowerCase() === recipient.toLowerCase();
@@ -446,6 +482,7 @@ async function handler(req, res) {
       matchedTransfer: publicTransfer(matchedTransfer),
       binding,
       consumption,
+      finality,
       verifiedAt: new Date().toISOString(),
       standard: 'x402-sovereign-receipt-v1',
       receipt: {
@@ -454,10 +491,14 @@ async function handler(req, res) {
       }
     });
   } catch (err) {
-    return json(res, err.statusCode || 500, {
+    const body = {
       error: err.message || 'verification_failed',
       status: 'error'
-    });
+    };
+    if (err.publicMessage) body.message = err.publicMessage;
+    if (err.confirmations !== undefined) body.confirmations = err.confirmations;
+    if (err.minConfirmations !== undefined) body.minConfirmations = err.minConfirmations;
+    return json(res, err.statusCode || 500, body);
   }
 }
 
@@ -466,7 +507,10 @@ module.exports._test = {
   buildReceiptBinding,
   checkRateLimit,
   optionalBindingRef,
+  parseMinConfirmations,
   rateBuckets,
+  receiptConfirmations,
+  requireConsumeFinality,
   requireConsumeFulfillmentGuards,
   verifyConsumeSignature
 };
