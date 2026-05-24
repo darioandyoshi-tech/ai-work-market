@@ -20,6 +20,7 @@ const TRANSFER_ABI = [
 ];
 const TRANSFER_TOPIC = ethers.id('Transfer(address,address,uint256)');
 const USDC_IFACE = new ethers.Interface(TRANSFER_ABI);
+const rateBuckets = new Map();
 
 function first(value) {
   return Array.isArray(value) ? value[0] : value;
@@ -27,15 +28,16 @@ function first(value) {
 
 async function requestParams(req) {
   const query = { ...(req.query || {}) };
-  if (req.method !== 'POST') return query;
+  if (req.method !== 'POST') return { params: query, rawBody: Buffer.alloc(0) };
 
   const chunks = [];
   for await (const chunk of req) chunks.push(Buffer.from(chunk));
-  if (chunks.length === 0) return query;
+  const rawBody = Buffer.concat(chunks);
+  if (rawBody.length === 0) return { params: query, rawBody };
 
   try {
-    const body = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
-    return { ...query, ...body };
+    const body = JSON.parse(rawBody.toString('utf8') || '{}');
+    return { params: { ...query, ...body }, rawBody };
   } catch {
     const err = new Error('json_body_invalid');
     err.statusCode = 400;
@@ -120,6 +122,43 @@ function wantsConsumption(query) {
   });
 }
 
+function parsePositiveInt(value, fallback) {
+  const parsed = Number.parseInt(String(value || ''), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function requestIp(req) {
+  const forwarded = String(first(req.headers?.['x-forwarded-for']) || '').split(',')[0].trim();
+  return forwarded || req.socket?.remoteAddress || 'unknown';
+}
+
+function checkRateLimit(req, now = Date.now()) {
+  const windowMs = parsePositiveInt(process.env.AWM_X402_RATE_LIMIT_WINDOW_MS, 60_000);
+  const maxRequests = parsePositiveInt(process.env.AWM_X402_RATE_LIMIT_MAX, 60);
+  const key = `${requestIp(req)}:${req.method || 'GET'}:${String(req.url || '/api/x402-verify-receipt').split('?')[0]}`;
+  const existing = rateBuckets.get(key) || [];
+  const recent = existing.filter((timestamp) => now - timestamp < windowMs);
+
+  if (recent.length >= maxRequests) {
+    const retryAfterMs = Math.max(1, windowMs - (now - recent[0]));
+    return {
+      limited: true,
+      retryAfterSeconds: Math.ceil(retryAfterMs / 1000),
+      limit: maxRequests,
+      windowMs
+    };
+  }
+
+  recent.push(now);
+  rateBuckets.set(key, recent);
+  return {
+    limited: false,
+    remaining: maxRequests - recent.length,
+    limit: maxRequests,
+    windowMs
+  };
+}
+
 function amountToJson(value) {
   return {
     raw: value.toString(),
@@ -193,6 +232,66 @@ function buildReceiptBinding({ tx, transfer, recipient, productSlug, expectedRaw
   };
 }
 
+function headerValue(req, name) {
+  return String(first(req.headers?.[name]) || '').trim();
+}
+
+function consumeSignatureSecret() {
+  return process.env.AWM_X402_CONSUME_SECRET || process.env.X402_WEBHOOK_SECRET || '';
+}
+
+function timingSafeHexEqual(candidate, expected) {
+  if (!/^[a-fA-F0-9]{64}$/.test(candidate)) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(candidate, 'hex'), Buffer.from(expected, 'hex'));
+  } catch {
+    return false;
+  }
+}
+
+function verifyConsumeSignature(req, rawBody, now = Date.now()) {
+  const secret = consumeSignatureSecret();
+  if (!secret) {
+    const err = new Error('consume_signature_secret_missing');
+    err.statusCode = 503;
+    throw err;
+  }
+
+  const signatureHeader = headerValue(req, 'x-awm-signature') || headerValue(req, 'x-x402-signature');
+  const timestamp = headerValue(req, 'x-awm-timestamp') || headerValue(req, 'x-x402-timestamp');
+  const toleranceMs = parsePositiveInt(process.env.AWM_X402_SIGNATURE_TOLERANCE_MS, 300_000);
+  const timestampMs = Number(timestamp) * 1000;
+
+  if (!signatureHeader || !timestamp || !Number.isFinite(timestampMs)) {
+    const err = new Error('consume_signature_missing');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  if (Math.abs(now - timestampMs) > toleranceMs) {
+    const err = new Error('consume_signature_stale');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  const candidate = signatureHeader.startsWith('sha256=')
+    ? signatureHeader.slice('sha256='.length)
+    : signatureHeader;
+  const body = Buffer.isBuffer(rawBody) ? rawBody : Buffer.from(String(rawBody || ''), 'utf8');
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(Buffer.concat([Buffer.from(`${timestamp}.`), body]))
+    .digest('hex');
+
+  if (!timingSafeHexEqual(candidate, expected)) {
+    const err = new Error('consume_signature_invalid');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  return true;
+}
+
 async function handler(req, res) {
   if (!['GET', 'POST'].includes(req.method)) {
     res.statusCode = 405;
@@ -202,7 +301,19 @@ async function handler(req, res) {
   }
 
   try {
-    const params = await requestParams(req);
+    const rateLimit = checkRateLimit(req);
+    if (rateLimit.limited) {
+      res.setHeader('retry-after', String(rateLimit.retryAfterSeconds));
+      return json(res, 429, {
+        error: 'rate_limited',
+        status: 'error',
+        retryAfterSeconds: rateLimit.retryAfterSeconds,
+        limit: rateLimit.limit,
+        windowMs: rateLimit.windowMs
+      });
+    }
+
+    const { params, rawBody } = await requestParams(req);
     const consume = wantsConsumption(params);
     if (consume && req.method !== 'POST') {
       return json(res, 405, {
@@ -210,6 +321,7 @@ async function handler(req, res) {
         message: 'Use POST with consume=true to mark a verified x402 receipt as consumed.'
       });
     }
+    if (consume) verifyConsumeSignature(req, rawBody);
 
     const tx = normalizeTxHash(params && params.tx);
     if (!tx) {
@@ -320,5 +432,8 @@ async function handler(req, res) {
 module.exports = handler;
 module.exports._test = {
   buildReceiptBinding,
-  optionalBindingRef
+  checkRateLimit,
+  optionalBindingRef,
+  rateBuckets,
+  verifyConsumeSignature
 };

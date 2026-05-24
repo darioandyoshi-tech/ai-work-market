@@ -2,6 +2,7 @@
 'use strict';
 
 const assert = require('assert');
+const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -188,6 +189,79 @@ function testReceiptConsumptionRejectsReplayAndScopeConflict() {
   }
 }
 
+function testRateLimitRejectsBurst() {
+  const buckets = x402VerifyReceipt._test.rateBuckets;
+  buckets.clear();
+
+  const previousMax = process.env.AWM_X402_RATE_LIMIT_MAX;
+  const previousWindow = process.env.AWM_X402_RATE_LIMIT_WINDOW_MS;
+  process.env.AWM_X402_RATE_LIMIT_MAX = '2';
+  process.env.AWM_X402_RATE_LIMIT_WINDOW_MS = '1000';
+
+  try {
+    const req = {
+      method: 'GET',
+      url: '/api/x402-verify-receipt',
+      headers: { 'x-forwarded-for': '203.0.113.9' },
+      socket: {}
+    };
+
+    assert.strictEqual(x402VerifyReceipt._test.checkRateLimit(req, 1000).limited, false);
+    assert.strictEqual(x402VerifyReceipt._test.checkRateLimit(req, 1100).limited, false);
+    const rejected = x402VerifyReceipt._test.checkRateLimit(req, 1200);
+    assert.strictEqual(rejected.limited, true);
+    assert.strictEqual(rejected.retryAfterSeconds, 1);
+    assert.strictEqual(x402VerifyReceipt._test.checkRateLimit(req, 2101).limited, false);
+  } finally {
+    buckets.clear();
+    if (previousMax === undefined) delete process.env.AWM_X402_RATE_LIMIT_MAX;
+    else process.env.AWM_X402_RATE_LIMIT_MAX = previousMax;
+    if (previousWindow === undefined) delete process.env.AWM_X402_RATE_LIMIT_WINDOW_MS;
+    else process.env.AWM_X402_RATE_LIMIT_WINDOW_MS = previousWindow;
+  }
+}
+
+function testConsumeSignatureVerification() {
+  const previousSecret = process.env.AWM_X402_CONSUME_SECRET;
+  process.env.AWM_X402_CONSUME_SECRET = 'test-consume-secret';
+
+  try {
+    const body = Buffer.from(JSON.stringify({
+      tx: `0x${'c'.repeat(64)}`,
+      slug: 'agent-commerce-market-map-2026',
+      consume: true
+    }));
+    const timestamp = '1779552000';
+    const signature = crypto
+      .createHmac('sha256', process.env.AWM_X402_CONSUME_SECRET)
+      .update(Buffer.concat([Buffer.from(`${timestamp}.`), body]))
+      .digest('hex');
+
+    assert.strictEqual(
+      x402VerifyReceipt._test.verifyConsumeSignature({
+        headers: {
+          'x-awm-timestamp': timestamp,
+          'x-awm-signature': `sha256=${signature}`
+        }
+      }, body, Number(timestamp) * 1000),
+      true
+    );
+
+    assert.throws(
+      () => x402VerifyReceipt._test.verifyConsumeSignature({
+        headers: {
+          'x-awm-timestamp': timestamp,
+          'x-awm-signature': `sha256=${'0'.repeat(64)}`
+        }
+      }, body, Number(timestamp) * 1000),
+      /consume_signature_invalid/
+    );
+  } finally {
+    if (previousSecret === undefined) delete process.env.AWM_X402_CONSUME_SECRET;
+    else process.env.AWM_X402_CONSUME_SECRET = previousSecret;
+  }
+}
+
 async function main() {
   await testRejectsInvalidTxHash();
   await testRejectsUnknownProductBeforeRpc();
@@ -195,6 +269,8 @@ async function main() {
   await testAgentProductsExposeX402Rail();
   testReceiptBindingIsStableAndScoped();
   testReceiptConsumptionRejectsReplayAndScopeConflict();
+  testRateLimitRejectsBurst();
+  testConsumeSignatureVerification();
 
   console.log('x402 receipt verifier smoke tests passed');
 }
