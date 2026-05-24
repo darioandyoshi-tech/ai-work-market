@@ -28,16 +28,17 @@ function first(value) {
 
 async function requestParams(req) {
   const query = { ...(req.query || {}) };
-  if (req.method !== 'POST') return { params: query, rawBody: Buffer.alloc(0) };
+  const queryKeys = Object.keys(query);
+  if (req.method !== 'POST') return { params: query, rawBody: Buffer.alloc(0), queryKeys };
 
   const chunks = [];
   for await (const chunk of req) chunks.push(Buffer.from(chunk));
   const rawBody = Buffer.concat(chunks);
-  if (rawBody.length === 0) return { params: query, rawBody };
+  if (rawBody.length === 0) return { params: query, rawBody, queryKeys };
 
   try {
     const body = JSON.parse(rawBody.toString('utf8') || '{}');
-    return { params: { ...query, ...body }, rawBody };
+    return { params: { ...query, ...body }, rawBody, queryKeys };
   } catch {
     const err = new Error('json_body_invalid');
     err.statusCode = 400;
@@ -313,12 +314,19 @@ async function handler(req, res) {
       });
     }
 
-    const { params, rawBody } = await requestParams(req);
+    const { params, rawBody, queryKeys } = await requestParams(req);
     const consume = wantsConsumption(params);
     if (consume && req.method !== 'POST') {
       return json(res, 405, {
         error: 'consume_requires_post',
         message: 'Use POST with consume=true to mark a verified x402 receipt as consumed.'
+      });
+    }
+    if (consume && queryKeys.length > 0) {
+      return json(res, 400, {
+        error: 'consume_query_params_forbidden',
+        message: 'POST consume requests must put every verification and binding field in the signed JSON body, not the query string.',
+        rejectedQueryParams: queryKeys
       });
     }
     if (consume) verifyConsumeSignature(req, rawBody);

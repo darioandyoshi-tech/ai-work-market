@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { Readable } = require('stream');
 const agentProducts = require('../api/agent-products');
 const paymentRequest = require('../api/payment-request');
 const x402VerifyReceipt = require('../api/x402-verify-receipt');
@@ -38,6 +39,17 @@ async function call(handler, req) {
   const response = makeResponse();
   await handler(req, response.res);
   return response;
+}
+
+function jsonPost(query, body, headers = {}) {
+  const rawBody = Buffer.from(JSON.stringify(body));
+  const req = Readable.from([rawBody]);
+  req.method = 'POST';
+  req.query = query;
+  req.url = '/api/x402-verify-receipt';
+  req.headers = headers;
+  req.socket = { remoteAddress: '127.0.0.1' };
+  return req;
 }
 
 async function testRejectsInvalidTxHash() {
@@ -262,6 +274,21 @@ function testConsumeSignatureVerification() {
   }
 }
 
+async function testConsumeRejectsUnsignedQueryParams() {
+  x402VerifyReceipt._test.rateBuckets.clear();
+  const response = await call(x402VerifyReceipt, jsonPost(
+    { slug: 'agent-commerce-market-map-2026' },
+    {
+      tx: `0x${'d'.repeat(64)}`,
+      consume: true
+    }
+  ));
+
+  assert.strictEqual(response.res.statusCode, 400);
+  assert.strictEqual(response.json().error, 'consume_query_params_forbidden');
+  assert.deepStrictEqual(response.json().rejectedQueryParams, ['slug']);
+}
+
 async function main() {
   await testRejectsInvalidTxHash();
   await testRejectsUnknownProductBeforeRpc();
@@ -271,6 +298,7 @@ async function main() {
   testReceiptConsumptionRejectsReplayAndScopeConflict();
   testRateLimitRejectsBurst();
   testConsumeSignatureVerification();
+  await testConsumeRejectsUnsignedQueryParams();
 
   console.log('x402 receipt verifier smoke tests passed');
 }
