@@ -156,10 +156,12 @@ function testReceiptBindingIsStableAndScoped() {
   assert.notStrictEqual(differentQuote.fulfillmentRef, binding.fulfillmentRef);
 }
 
-function testReceiptConsumptionRejectsReplayAndScopeConflict() {
+async function testReceiptConsumptionRejectsReplayAndScopeConflict() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'awm-x402-receipts-'));
   const previousStore = process.env.AWM_X402_RECEIPT_STORE_PATH;
+  const previousBackend = process.env.AWM_X402_RECEIPT_STORE_BACKEND;
   process.env.AWM_X402_RECEIPT_STORE_PATH = path.join(tmpDir, 'receipts.json');
+  process.env.AWM_X402_RECEIPT_STORE_BACKEND = 'local-json';
   try {
     const tx = `0x${'b'.repeat(64)}`;
     const transfer = {
@@ -180,9 +182,9 @@ function testReceiptConsumptionRejectsReplayAndScopeConflict() {
     };
 
     const binding = x402VerifyReceipt._test.buildReceiptBinding(base);
-    const first = consumeReceipt(binding, { source: 'test' });
-    const replay = consumeReceipt(binding, { source: 'test' });
-    const changedScope = consumeReceipt(
+    const first = await consumeReceipt(binding, { source: 'test' });
+    const replay = await consumeReceipt(binding, { source: 'test' });
+    const changedScope = await consumeReceipt(
       x402VerifyReceipt._test.buildReceiptBinding({ ...base, quoteId: 'quote-def' }),
       { source: 'test' }
     );
@@ -197,6 +199,8 @@ function testReceiptConsumptionRejectsReplayAndScopeConflict() {
   } finally {
     if (previousStore === undefined) delete process.env.AWM_X402_RECEIPT_STORE_PATH;
     else process.env.AWM_X402_RECEIPT_STORE_PATH = previousStore;
+    if (previousBackend === undefined) delete process.env.AWM_X402_RECEIPT_STORE_BACKEND;
+    else process.env.AWM_X402_RECEIPT_STORE_BACKEND = previousBackend;
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 }
@@ -289,16 +293,128 @@ async function testConsumeRejectsUnsignedQueryParams() {
   assert.deepStrictEqual(response.json().rejectedQueryParams, ['slug']);
 }
 
+function makeBinding(overrides = {}) {
+  const tx = `0x${'e'.repeat(64)}`;
+  const transfer = {
+    from: '0x1111111111111111111111111111111111111111',
+    to: '0x8d32448cbad55a3d3B12DE901e57782C409399B7',
+    value: 79000000n,
+    logIndex: 5
+  };
+
+  return x402VerifyReceipt._test.buildReceiptBinding({
+    tx,
+    transfer,
+    recipient: transfer.to,
+    productSlug: 'agent-commerce-market-map-2026',
+    expectedRaw: 79000000n,
+    quoteId: 'quote-upstash',
+    customerRef: 'cust-upstash',
+    requestId: 'req-upstash',
+    ...overrides
+  });
+}
+
+async function testUpstashReceiptConsumptionUsesSetNx() {
+  const previousBackend = process.env.AWM_X402_RECEIPT_STORE_BACKEND;
+  const previousUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const previousToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const previousFetch = global.fetch;
+  const redis = new Map();
+
+  process.env.AWM_X402_RECEIPT_STORE_BACKEND = 'upstash-redis';
+  process.env.UPSTASH_REDIS_REST_URL = 'https://example-upstash.test';
+  process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
+  global.fetch = async (_url, options) => {
+    const command = JSON.parse(options.body);
+    const [op, key, value, mode] = command;
+    if (op === 'SET' && mode === 'NX') {
+      if (redis.has(key)) {
+        return { ok: true, json: async () => ({ result: null }) };
+      }
+      redis.set(key, value);
+      return { ok: true, json: async () => ({ result: 'OK' }) };
+    }
+    if (op === 'SET') {
+      redis.set(key, value);
+      return { ok: true, json: async () => ({ result: 'OK' }) };
+    }
+    if (op === 'GET') {
+      return { ok: true, json: async () => ({ result: redis.get(key) || null }) };
+    }
+    throw new Error(`unexpected command ${op}`);
+  };
+
+  try {
+    const binding = makeBinding();
+    const first = await consumeReceipt(binding, { source: 'test-upstash' });
+    const replay = await consumeReceipt(binding, { source: 'test-upstash' });
+    const changedScope = await consumeReceipt(
+      makeBinding({ quoteId: 'quote-upstash-other' }),
+      { source: 'test-upstash' }
+    );
+
+    assert.strictEqual(first.accepted, true);
+    assert.strictEqual(first.storeBackend, 'upstash-redis');
+    assert.strictEqual(replay.accepted, false);
+    assert.strictEqual(replay.reason, 'payment_already_consumed');
+    assert.strictEqual(changedScope.accepted, false);
+    assert.strictEqual(changedScope.reason, 'payment_ref_scope_conflict');
+  } finally {
+    if (previousBackend === undefined) delete process.env.AWM_X402_RECEIPT_STORE_BACKEND;
+    else process.env.AWM_X402_RECEIPT_STORE_BACKEND = previousBackend;
+    if (previousUrl === undefined) delete process.env.UPSTASH_REDIS_REST_URL;
+    else process.env.UPSTASH_REDIS_REST_URL = previousUrl;
+    if (previousToken === undefined) delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    else process.env.UPSTASH_REDIS_REST_TOKEN = previousToken;
+    global.fetch = previousFetch;
+  }
+}
+
+async function testProductionRejectsEphemeralReceiptStore() {
+  const previousNodeEnv = process.env.NODE_ENV;
+  const previousBackend = process.env.AWM_X402_RECEIPT_STORE_BACKEND;
+  const previousAllowLocal = process.env.AWM_X402_ALLOW_LOCAL_RECEIPT_STORE;
+  const previousUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const previousToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  process.env.NODE_ENV = 'production';
+  delete process.env.AWM_X402_RECEIPT_STORE_BACKEND;
+  delete process.env.AWM_X402_ALLOW_LOCAL_RECEIPT_STORE;
+  delete process.env.UPSTASH_REDIS_REST_URL;
+  delete process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  try {
+    await assert.rejects(
+      () => consumeReceipt(makeBinding(), { source: 'test-production' }),
+      /durable_receipt_store_required/
+    );
+  } finally {
+    if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = previousNodeEnv;
+    if (previousBackend === undefined) delete process.env.AWM_X402_RECEIPT_STORE_BACKEND;
+    else process.env.AWM_X402_RECEIPT_STORE_BACKEND = previousBackend;
+    if (previousAllowLocal === undefined) delete process.env.AWM_X402_ALLOW_LOCAL_RECEIPT_STORE;
+    else process.env.AWM_X402_ALLOW_LOCAL_RECEIPT_STORE = previousAllowLocal;
+    if (previousUrl === undefined) delete process.env.UPSTASH_REDIS_REST_URL;
+    else process.env.UPSTASH_REDIS_REST_URL = previousUrl;
+    if (previousToken === undefined) delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    else process.env.UPSTASH_REDIS_REST_TOKEN = previousToken;
+  }
+}
+
 async function main() {
   await testRejectsInvalidTxHash();
   await testRejectsUnknownProductBeforeRpc();
   await testPaymentRequestExposesX402Rail();
   await testAgentProductsExposeX402Rail();
   testReceiptBindingIsStableAndScoped();
-  testReceiptConsumptionRejectsReplayAndScopeConflict();
+  await testReceiptConsumptionRejectsReplayAndScopeConflict();
   testRateLimitRejectsBurst();
   testConsumeSignatureVerification();
   await testConsumeRejectsUnsignedQueryParams();
+  await testUpstashReceiptConsumptionUsesSetNx();
+  await testProductionRejectsEphemeralReceiptStore();
 
   console.log('x402 receipt verifier smoke tests passed');
 }

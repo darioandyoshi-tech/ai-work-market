@@ -399,7 +399,7 @@ async function handler(req, res) {
       customerRef,
       requestId
     });
-    const consumption = consume ? consumeReceipt(binding, {
+    const consumption = consume ? await consumeReceipt(binding, {
       source: 'api/x402-verify-receipt',
       productSlug,
       quoteId,
