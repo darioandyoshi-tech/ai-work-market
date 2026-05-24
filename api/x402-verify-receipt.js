@@ -1,66 +1,516 @@
+const crypto = require('crypto');
 const { ethers } = require('ethers');
-const receiptManager = require('../lib/receipt-manager');
+const { productBySlug, json } = require('./_commerce-shared');
+const { consumeReceipt } = require('./_x402-receipt-store');
 
-// CONFIG: The marketplace USDC Treasury address on Base
-// In production, this would be a multisig or a specific treasury contract
-const MARKETPLACE_TREASURY = '0x8d32448cbad55a3d3B12DE901e57782C409399B7'; // Default Yoshi/Main buyer address for now
+const BASE_CHAIN_ID = 8453;
+const NETWORK_CAIP2 = 'eip155:8453';
+const BASE_RPC_URL = process.env.BASE_RPC_URL || process.env.BASE_RPC || 'https://mainnet.base.org';
+const USDC_CONTRACT =
+  process.env.BASE_USDC_CONTRACT || '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+const MARKETPLACE_TREASURY =
+  process.env.AWM_X402_TREASURY ||
+  process.env.X402_TREASURY ||
+  '0x8d32448cbad55a3d3B12DE901e57782C409399B7';
 
-module.exports = async function handler(req, res) {
-  const { tx } = req.query;
+const USDC_DECIMALS = 6n;
+const USDC_SCALE = 10n ** USDC_DECIMALS;
+const TRANSFER_ABI = [
+  'event Transfer(address indexed from, address indexed to, uint256 value)'
+];
+const TRANSFER_TOPIC = ethers.id('Transfer(address,address,uint256)');
+const USDC_IFACE = new ethers.Interface(TRANSFER_ABI);
+const rateBuckets = new Map();
 
-  if (!tx) {
-    res.statusCode = 400;
-    res.end(JSON.stringify({ error: 'Missing tx parameter' }));
+function first(value) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+async function requestParams(req) {
+  const query = { ...(req.query || {}) };
+  const queryKeys = Object.keys(query);
+  if (req.method !== 'POST') return { params: query, rawBody: Buffer.alloc(0), queryKeys };
+
+  const chunks = [];
+  for await (const chunk of req) chunks.push(Buffer.from(chunk));
+  const rawBody = Buffer.concat(chunks);
+  if (rawBody.length === 0) return { params: query, rawBody, queryKeys };
+
+  try {
+    const body = JSON.parse(rawBody.toString('utf8') || '{}');
+    return { params: { ...query, ...body }, rawBody, queryKeys };
+  } catch {
+    const err = new Error('json_body_invalid');
+    err.statusCode = 400;
+    throw err;
+  }
+}
+
+function normalizeTxHash(value) {
+  const tx = String(first(value) || '').trim();
+  return /^0x[a-fA-F0-9]{64}$/.test(tx) ? tx : '';
+}
+
+function normalizeAddress(value, fieldName) {
+  try {
+    return ethers.getAddress(String(first(value) || '').trim());
+  } catch {
+    const err = new Error(`${fieldName}_invalid`);
+    err.statusCode = 400;
+    throw err;
+  }
+}
+
+function parseUsdcAmount(value, fieldName) {
+  const text = String(first(value) || '').trim().replace(/^\$/, '');
+  if (!/^\d+(\.\d{1,6})?$/.test(text)) {
+    const err = new Error(`${fieldName}_invalid`);
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const [whole, fraction = ''] = text.split('.');
+  return BigInt(whole) * USDC_SCALE + BigInt((fraction + '000000').slice(0, 6));
+}
+
+function expectedAmountRaw(query) {
+  if (query.amountRaw !== undefined) {
+    const amount = String(first(query.amountRaw)).trim();
+    if (!/^\d+$/.test(amount)) {
+      const err = new Error('amountRaw_invalid');
+      err.statusCode = 400;
+      throw err;
+    }
+    return BigInt(amount);
+  }
+
+  if (query.amountUsd !== undefined) {
+    return parseUsdcAmount(query.amountUsd, 'amountUsd');
+  }
+
+  const slug = String(first(query.slug) || '').trim();
+  if (!slug) return null;
+
+  const product = productBySlug(slug);
+  if (!product) {
+    const err = new Error('unknown_product');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  return parseUsdcAmount(product.priceUsd, 'product_priceUsd');
+}
+
+function hasConfiguredTreasury() {
+  return Boolean(process.env.AWM_X402_TREASURY || process.env.X402_TREASURY);
+}
+
+function requireConsumeFulfillmentGuards(params, expectedRaw) {
+  if (expectedRaw === null || expectedRaw <= 0n) {
+    const err = new Error('consume_requires_positive_expected_amount');
+    err.statusCode = 400;
+    err.publicMessage =
+      'POST consume requests must include slug, amountUsd, or amountRaw with a positive exact amount.';
+    throw err;
+  }
+
+  const hasSignedRecipient = params.recipient !== undefined || params.payTo !== undefined;
+  if (process.env.NODE_ENV === 'production' && !hasSignedRecipient && !hasConfiguredTreasury()) {
+    const err = new Error('production_treasury_required');
+    err.statusCode = 503;
+    err.publicMessage =
+      'Configure AWM_X402_TREASURY or include recipient/payTo in the signed consume body before production fulfillment.';
+    throw err;
+  }
+}
+
+function parseMinConfirmations(value = process.env.AWM_X402_MIN_CONFIRMATIONS) {
+  const raw = value === undefined || value === null || value === '' ? '1' : String(value);
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 1 || String(parsed) !== raw.trim()) {
+    const err = new Error('minConfirmations_invalid');
+    err.statusCode = 500;
+    err.publicMessage = 'AWM_X402_MIN_CONFIRMATIONS must be a positive integer.';
+    throw err;
+  }
+  return parsed;
+}
+
+function receiptConfirmations(receiptBlockNumber, currentBlockNumber) {
+  const receiptBlock = Number(receiptBlockNumber);
+  const currentBlock = Number(currentBlockNumber);
+  if (!Number.isFinite(receiptBlock) || !Number.isFinite(currentBlock)) return 0;
+  return Math.max(0, currentBlock - receiptBlock + 1);
+}
+
+function requireConsumeFinality(receiptBlockNumber, currentBlockNumber) {
+  const minConfirmations = parseMinConfirmations();
+  const confirmations = receiptConfirmations(receiptBlockNumber, currentBlockNumber);
+  if (confirmations < minConfirmations) {
+    const err = new Error('receipt_confirmations_pending');
+    err.statusCode = 425;
+    err.publicMessage = 'Wait for the configured Base confirmation threshold before consuming this receipt.';
+    err.confirmations = confirmations;
+    err.minConfirmations = minConfirmations;
+    throw err;
+  }
+  return { confirmations, minConfirmations };
+}
+
+function optionalBindingRef(query, names, fieldName) {
+  for (const name of names) {
+    if (query[name] === undefined) continue;
+    const value = String(first(query[name]) || '').trim();
+    if (!value) return null;
+    if (value.length > 160 || !/^[A-Za-z0-9._:@/-]+$/.test(value)) {
+      const err = new Error(`${fieldName}_invalid`);
+      err.statusCode = 400;
+      throw err;
+    }
+    return value;
+  }
+  return null;
+}
+
+function wantsConsumption(query) {
+  return ['consume', 'consumeReceipt', 'issueAccess'].some((name) => {
+    const value = String(first(query[name]) || '').toLowerCase();
+    return ['1', 'true', 'yes'].includes(value);
+  });
+}
+
+function parsePositiveInt(value, fallback) {
+  const parsed = Number.parseInt(String(value || ''), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function requestIp(req) {
+  const forwarded = String(first(req.headers?.['x-forwarded-for']) || '').split(',')[0].trim();
+  return forwarded || req.socket?.remoteAddress || 'unknown';
+}
+
+function checkRateLimit(req, now = Date.now()) {
+  const windowMs = parsePositiveInt(process.env.AWM_X402_RATE_LIMIT_WINDOW_MS, 60_000);
+  const maxRequests = parsePositiveInt(process.env.AWM_X402_RATE_LIMIT_MAX, 60);
+  const key = `${requestIp(req)}:${req.method || 'GET'}:${String(req.url || '/api/x402-verify-receipt').split('?')[0]}`;
+  const existing = rateBuckets.get(key) || [];
+  const recent = existing.filter((timestamp) => now - timestamp < windowMs);
+
+  if (recent.length >= maxRequests) {
+    const retryAfterMs = Math.max(1, windowMs - (now - recent[0]));
+    return {
+      limited: true,
+      retryAfterSeconds: Math.ceil(retryAfterMs / 1000),
+      limit: maxRequests,
+      windowMs
+    };
+  }
+
+  recent.push(now);
+  rateBuckets.set(key, recent);
+  return {
+    limited: false,
+    remaining: maxRequests - recent.length,
+    limit: maxRequests,
+    windowMs
+  };
+}
+
+function amountToJson(value) {
+  return {
+    raw: value.toString(),
+    usdc: ethers.formatUnits(value, Number(USDC_DECIMALS))
+  };
+}
+
+function parseUsdcTransfers(receipt) {
+  return receipt.logs
+    .filter((log) => log.address.toLowerCase() === USDC_CONTRACT.toLowerCase())
+    .filter((log) => log.topics && log.topics[0] === TRANSFER_TOPIC)
+    .map((log) => {
+      const parsed = USDC_IFACE.parseLog(log);
+      return {
+        from: parsed.args.from,
+        to: parsed.args.to,
+        value: parsed.args.value,
+        logIndex: Number(log.index ?? log.logIndex)
+      };
+    });
+}
+
+function publicTransfer(transfer) {
+  return {
+    from: transfer.from,
+    to: transfer.to,
+    amount: amountToJson(transfer.value),
+    logIndex: transfer.logIndex
+  };
+}
+
+function shortHash(value) {
+  return crypto.createHash('sha256').update(value).digest('hex').slice(0, 32);
+}
+
+function buildReceiptBinding({ tx, transfer, recipient, productSlug, expectedRaw, quoteId, customerRef, requestId }) {
+  const normalizedTx = tx.toLowerCase();
+  const token = USDC_CONTRACT.toLowerCase();
+  const paymentRef = `${NETWORK_CAIP2}:${token}:${normalizedTx}:${transfer.logIndex}`;
+  const fulfillmentScope = {
+    standard: 'x402-sovereign-receipt-v1',
+    network: NETWORK_CAIP2,
+    token,
+    txHash: normalizedTx,
+    logIndex: transfer.logIndex,
+    recipient: recipient.toLowerCase(),
+    amountRaw: transfer.value.toString(),
+    expectedAmountRaw: expectedRaw === null ? null : expectedRaw.toString(),
+    productSlug,
+    quoteId,
+    customerRef,
+    requestId
+  };
+  const canonicalScope = JSON.stringify(fulfillmentScope);
+  const fulfillmentRef = `x402r_${shortHash(canonicalScope)}`;
+
+  return {
+    paymentRef,
+    fulfillmentRef,
+    scope: fulfillmentScope,
+    replayGuard: {
+      requiredBeforeFulfillment: true,
+      consumeBeforeDelivery: true,
+      storageKeys: {
+        payment: `x402-payment:${shortHash(paymentRef)}`,
+        fulfillment: `x402-fulfillment:${fulfillmentRef}`
+      },
+      rule:
+        'Persist paymentRef as single-use before issuing product access; reject repeats or a different fulfillmentRef for the same paymentRef.'
+    }
+  };
+}
+
+function headerValue(req, name) {
+  return String(first(req.headers?.[name]) || '').trim();
+}
+
+function consumeSignatureSecret() {
+  return process.env.AWM_X402_CONSUME_SECRET || process.env.X402_WEBHOOK_SECRET || '';
+}
+
+function timingSafeHexEqual(candidate, expected) {
+  if (!/^[a-fA-F0-9]{64}$/.test(candidate)) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(candidate, 'hex'), Buffer.from(expected, 'hex'));
+  } catch {
+    return false;
+  }
+}
+
+function verifyConsumeSignature(req, rawBody, now = Date.now()) {
+  const secret = consumeSignatureSecret();
+  if (!secret) {
+    const err = new Error('consume_signature_secret_missing');
+    err.statusCode = 503;
+    throw err;
+  }
+
+  const signatureHeader = headerValue(req, 'x-awm-signature') || headerValue(req, 'x-x402-signature');
+  const timestamp = headerValue(req, 'x-awm-timestamp') || headerValue(req, 'x-x402-timestamp');
+  const toleranceMs = parsePositiveInt(process.env.AWM_X402_SIGNATURE_TOLERANCE_MS, 300_000);
+  const timestampMs = Number(timestamp) * 1000;
+
+  if (!signatureHeader || !timestamp || !Number.isFinite(timestampMs)) {
+    const err = new Error('consume_signature_missing');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  if (Math.abs(now - timestampMs) > toleranceMs) {
+    const err = new Error('consume_signature_stale');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  const candidate = signatureHeader.startsWith('sha256=')
+    ? signatureHeader.slice('sha256='.length)
+    : signatureHeader;
+  const body = Buffer.isBuffer(rawBody) ? rawBody : Buffer.from(String(rawBody || ''), 'utf8');
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(Buffer.concat([Buffer.from(`${timestamp}.`), body]))
+    .digest('hex');
+
+  if (!timingSafeHexEqual(candidate, expected)) {
+    const err = new Error('consume_signature_invalid');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  return true;
+}
+
+async function handler(req, res) {
+  if (!['GET', 'POST'].includes(req.method)) {
+    res.statusCode = 405;
+    res.setHeader('allow', 'GET, POST');
+    res.end('method not allowed');
     return;
   }
 
-  // In a real implementation, we would use an ethers provider to verify:
-  // 1. The transaction hash `tx` exists on Base.
-  // 2. It is a transfer of USDC to MARKETPLACE_TREASURY.
-  // 3. The amount matches the expected quote price for the product.
-  
-  // Since this is a "Sovereign Standard" implementation for the AWM demo/infrastructure,
-  // we simulate the chain verification for the demo flow, but provide the logic structure.
-  
   try {
-    // MOCK VERIFICATION LOGIC
-    // In a production environment, we would do:
-    // const provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
-    // const txReceipt = await provider.getTransactionReceipt(tx);
-    // if (!txReceipt) throw new Error('Transaction not found');
-    // const logs = txReceipt.logs.filter(l => l.address === USDC_CONTRACT_ADDRESS);
-    // ... verify amount and recipient ...
-
-    const isValid = tx.startsWith('0x') && tx.length === 66;
-    
-    if (!isValid) {
-      res.statusCode = 400;
-      res.end(JSON.stringify({ 
-        status: 'invalid', 
-        error: 'Transaction hash format is invalid' 
-      }));
-      return;
+    const rateLimit = checkRateLimit(req);
+    if (rateLimit.limited) {
+      res.setHeader('retry-after', String(rateLimit.retryAfterSeconds));
+      return json(res, 429, {
+        error: 'rate_limited',
+        status: 'error',
+        retryAfterSeconds: rateLimit.retryAfterSeconds,
+        limit: rateLimit.limit,
+        windowMs: rateLimit.windowMs
+      });
     }
 
-    // Record the funding step in the Receipt Map for the sovereign standard
-    // Note: In a real x402 flow, the tx would be linked to a specific offer/quote
-    // Here we simply acknowledge the transfer to the treasury.
-    
-    res.statusCode = 200;
-    res.setHeader('content-type', 'application/json');
-    res.end(JSON.stringify({
+    const { params, rawBody, queryKeys } = await requestParams(req);
+    const consume = wantsConsumption(params);
+    if (consume && req.method !== 'POST') {
+      return json(res, 405, {
+        error: 'consume_requires_post',
+        message: 'Use POST with consume=true to mark a verified x402 receipt as consumed.'
+      });
+    }
+    if (consume && queryKeys.length > 0) {
+      return json(res, 400, {
+        error: 'consume_query_params_forbidden',
+        message: 'POST consume requests must put every verification and binding field in the signed JSON body, not the query string.',
+        rejectedQueryParams: queryKeys
+      });
+    }
+    if (consume) verifyConsumeSignature(req, rawBody);
+
+    const tx = normalizeTxHash(params && params.tx);
+    if (!tx) {
+      return json(res, 400, { error: 'tx_invalid', message: 'Expected a 32-byte transaction hash.' });
+    }
+
+    const recipient = normalizeAddress(
+      (params && (params.recipient || params.payTo)) || MARKETPLACE_TREASURY,
+      'recipient'
+    );
+    const expectedRaw = expectedAmountRaw(params || {});
+    const productSlug = String(first(params && params.slug) || '').trim() || null;
+    const quoteId = optionalBindingRef(params || {}, ['quoteId', 'quote_id'], 'quoteId');
+    const customerRef = optionalBindingRef(params || {}, ['customerRef', 'customer_ref'], 'customerRef');
+    const requestId = optionalBindingRef(params || {}, ['requestId', 'request_id'], 'requestId');
+    if (consume) requireConsumeFulfillmentGuards(params || {}, expectedRaw);
+    const provider = new ethers.JsonRpcProvider(BASE_RPC_URL, BASE_CHAIN_ID);
+    const receipt = await provider.getTransactionReceipt(tx);
+
+    if (!receipt) {
+      return json(res, 404, {
+        status: 'pending_or_not_found',
+        tx,
+        network: NETWORK_CAIP2,
+        message: 'Transaction receipt is not available on Base mainnet yet.'
+      });
+    }
+
+    if (Number(receipt.status) !== 1) {
+      return json(res, 422, {
+        status: 'invalid',
+        reason: 'transaction_reverted',
+        tx,
+        network: NETWORK_CAIP2
+      });
+    }
+
+    const finality = consume
+      ? requireConsumeFinality(receipt.blockNumber, await provider.getBlockNumber())
+      : null;
+    const transfers = parseUsdcTransfers(receipt);
+    const matches = transfers.filter((transfer) => {
+      const recipientMatches = transfer.to.toLowerCase() === recipient.toLowerCase();
+      const amountMatches = expectedRaw === null || transfer.value === expectedRaw;
+      return recipientMatches && amountMatches;
+    });
+
+    if (matches.length === 0) {
+      return json(res, 422, {
+        status: 'invalid',
+        reason: 'matching_usdc_transfer_not_found',
+        tx,
+        network: NETWORK_CAIP2,
+        expected: {
+          token: USDC_CONTRACT,
+          recipient,
+          amount: expectedRaw === null ? null : amountToJson(expectedRaw)
+        },
+        observedUsdcTransfers: transfers.map(publicTransfer)
+      });
+    }
+
+    const matchedTransfer = matches[0];
+    const binding = buildReceiptBinding({
+      tx,
+      transfer: matchedTransfer,
+      recipient,
+      productSlug,
+      expectedRaw,
+      quoteId,
+      customerRef,
+      requestId
+    });
+    const consumption = consume ? await consumeReceipt(binding, {
+      source: 'api/x402-verify-receipt',
+      productSlug,
+      quoteId,
+      customerRef,
+      requestId
+    }) : null;
+    const statusCode = consumption && !consumption.accepted ? 409 : 200;
+
+    return json(res, statusCode, {
       status: 'verified',
-      tx: tx,
-      treasury: MARKETPLACE_TREASURY,
+      tx,
+      blockNumber: Number(receipt.blockNumber),
+      network: NETWORK_CAIP2,
+      token: {
+        symbol: 'USDC',
+        contract: USDC_CONTRACT,
+        decimals: Number(USDC_DECIMALS)
+      },
+      recipient,
+      matchedTransfer: publicTransfer(matchedTransfer),
+      binding,
+      consumption,
+      finality,
       verifiedAt: new Date().toISOString(),
       standard: 'x402-sovereign-receipt-v1',
       receipt: {
-        type: 'funding_acknowledgment',
-        details: 'USDC transfer to AWM Treasury verified on Base'
+        type: 'base_usdc_transfer_verification',
+        details: 'USDC transfer to the requested AWM recipient verified on Base mainnet.'
       }
-    }));
-  } catch (error) {
-    res.statusCode = 500;
-    res.end(JSON.stringify({ error: error.message }));
+    });
+  } catch (err) {
+    const body = {
+      error: err.message || 'verification_failed',
+      status: 'error'
+    };
+    if (err.publicMessage) body.message = err.publicMessage;
+    if (err.confirmations !== undefined) body.confirmations = err.confirmations;
+    if (err.minConfirmations !== undefined) body.minConfirmations = err.minConfirmations;
+    return json(res, err.statusCode || 500, body);
   }
+}
+
+module.exports = handler;
+module.exports._test = {
+  buildReceiptBinding,
+  checkRateLimit,
+  optionalBindingRef,
+  parseMinConfirmations,
+  rateBuckets,
+  receiptConfirmations,
+  requireConsumeFinality,
+  requireConsumeFulfillmentGuards,
+  verifyConsumeSignature
 };
