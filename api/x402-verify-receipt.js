@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { ethers } = require('ethers');
 const { productBySlug, json } = require('./_commerce-shared');
+const { consumeReceipt } = require('./_x402-receipt-store');
 
 const BASE_CHAIN_ID = 8453;
 const NETWORK_CAIP2 = 'eip155:8453';
@@ -22,6 +23,24 @@ const USDC_IFACE = new ethers.Interface(TRANSFER_ABI);
 
 function first(value) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+async function requestParams(req) {
+  const query = { ...(req.query || {}) };
+  if (req.method !== 'POST') return query;
+
+  const chunks = [];
+  for await (const chunk of req) chunks.push(Buffer.from(chunk));
+  if (chunks.length === 0) return query;
+
+  try {
+    const body = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
+    return { ...query, ...body };
+  } catch {
+    const err = new Error('json_body_invalid');
+    err.statusCode = 400;
+    throw err;
+  }
 }
 
 function normalizeTxHash(value) {
@@ -92,6 +111,13 @@ function optionalBindingRef(query, names, fieldName) {
     return value;
   }
   return null;
+}
+
+function wantsConsumption(query) {
+  return ['consume', 'consumeReceipt', 'issueAccess'].some((name) => {
+    const value = String(first(query[name]) || '').toLowerCase();
+    return ['1', 'true', 'yes'].includes(value);
+  });
 }
 
 function amountToJson(value) {
@@ -168,28 +194,37 @@ function buildReceiptBinding({ tx, transfer, recipient, productSlug, expectedRaw
 }
 
 async function handler(req, res) {
-  if (req.method !== 'GET') {
+  if (!['GET', 'POST'].includes(req.method)) {
     res.statusCode = 405;
-    res.setHeader('allow', 'GET');
+    res.setHeader('allow', 'GET, POST');
     res.end('method not allowed');
     return;
   }
 
   try {
-    const tx = normalizeTxHash(req.query && req.query.tx);
+    const params = await requestParams(req);
+    const consume = wantsConsumption(params);
+    if (consume && req.method !== 'POST') {
+      return json(res, 405, {
+        error: 'consume_requires_post',
+        message: 'Use POST with consume=true to mark a verified x402 receipt as consumed.'
+      });
+    }
+
+    const tx = normalizeTxHash(params && params.tx);
     if (!tx) {
       return json(res, 400, { error: 'tx_invalid', message: 'Expected a 32-byte transaction hash.' });
     }
 
     const recipient = normalizeAddress(
-      (req.query && (req.query.recipient || req.query.payTo)) || MARKETPLACE_TREASURY,
+      (params && (params.recipient || params.payTo)) || MARKETPLACE_TREASURY,
       'recipient'
     );
-    const expectedRaw = expectedAmountRaw(req.query || {});
-    const productSlug = String(first(req.query && req.query.slug) || '').trim() || null;
-    const quoteId = optionalBindingRef(req.query || {}, ['quoteId', 'quote_id'], 'quoteId');
-    const customerRef = optionalBindingRef(req.query || {}, ['customerRef', 'customer_ref'], 'customerRef');
-    const requestId = optionalBindingRef(req.query || {}, ['requestId', 'request_id'], 'requestId');
+    const expectedRaw = expectedAmountRaw(params || {});
+    const productSlug = String(first(params && params.slug) || '').trim() || null;
+    const quoteId = optionalBindingRef(params || {}, ['quoteId', 'quote_id'], 'quoteId');
+    const customerRef = optionalBindingRef(params || {}, ['customerRef', 'customer_ref'], 'customerRef');
+    const requestId = optionalBindingRef(params || {}, ['requestId', 'request_id'], 'requestId');
     const provider = new ethers.JsonRpcProvider(BASE_RPC_URL, BASE_CHAIN_ID);
     const receipt = await provider.getTransactionReceipt(tx);
 
@@ -234,7 +269,26 @@ async function handler(req, res) {
     }
 
     const matchedTransfer = matches[0];
-    return json(res, 200, {
+    const binding = buildReceiptBinding({
+      tx,
+      transfer: matchedTransfer,
+      recipient,
+      productSlug,
+      expectedRaw,
+      quoteId,
+      customerRef,
+      requestId
+    });
+    const consumption = consume ? consumeReceipt(binding, {
+      source: 'api/x402-verify-receipt',
+      productSlug,
+      quoteId,
+      customerRef,
+      requestId
+    }) : null;
+    const statusCode = consumption && !consumption.accepted ? 409 : 200;
+
+    return json(res, statusCode, {
       status: 'verified',
       tx,
       blockNumber: Number(receipt.blockNumber),
@@ -246,16 +300,8 @@ async function handler(req, res) {
       },
       recipient,
       matchedTransfer: publicTransfer(matchedTransfer),
-      binding: buildReceiptBinding({
-        tx,
-        transfer: matchedTransfer,
-        recipient,
-        productSlug,
-        expectedRaw,
-        quoteId,
-        customerRef,
-        requestId
-      }),
+      binding,
+      consumption,
       verifiedAt: new Date().toISOString(),
       standard: 'x402-sovereign-receipt-v1',
       receipt: {

@@ -2,9 +2,13 @@
 'use strict';
 
 const assert = require('assert');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const agentProducts = require('../api/agent-products');
 const paymentRequest = require('../api/payment-request');
 const x402VerifyReceipt = require('../api/x402-verify-receipt');
+const { consumeReceipt } = require('../api/_x402-receipt-store');
 
 function makeResponse() {
   const chunks = [];
@@ -139,12 +143,58 @@ function testReceiptBindingIsStableAndScoped() {
   assert.notStrictEqual(differentQuote.fulfillmentRef, binding.fulfillmentRef);
 }
 
+function testReceiptConsumptionRejectsReplayAndScopeConflict() {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'awm-x402-receipts-'));
+  const previousStore = process.env.AWM_X402_RECEIPT_STORE_PATH;
+  process.env.AWM_X402_RECEIPT_STORE_PATH = path.join(tmpDir, 'receipts.json');
+  try {
+    const tx = `0x${'b'.repeat(64)}`;
+    const transfer = {
+      from: '0x1111111111111111111111111111111111111111',
+      to: '0x8d32448cbad55a3d3B12DE901e57782C409399B7',
+      value: 79000000n,
+      logIndex: 3
+    };
+    const base = {
+      tx,
+      transfer,
+      recipient: transfer.to,
+      productSlug: 'agent-commerce-market-map-2026',
+      expectedRaw: 79000000n,
+      quoteId: 'quote-abc',
+      customerRef: 'cust-123',
+      requestId: 'req-123'
+    };
+
+    const binding = x402VerifyReceipt._test.buildReceiptBinding(base);
+    const first = consumeReceipt(binding, { source: 'test' });
+    const replay = consumeReceipt(binding, { source: 'test' });
+    const changedScope = consumeReceipt(
+      x402VerifyReceipt._test.buildReceiptBinding({ ...base, quoteId: 'quote-def' }),
+      { source: 'test' }
+    );
+
+    assert.strictEqual(first.accepted, true);
+    assert.strictEqual(first.reason, 'receipt_consumed');
+    assert.strictEqual(replay.accepted, false);
+    assert.strictEqual(replay.reason, 'payment_already_consumed');
+    assert.strictEqual(changedScope.accepted, false);
+    assert.strictEqual(changedScope.reason, 'payment_ref_scope_conflict');
+    assert.strictEqual(changedScope.paymentRef, binding.paymentRef);
+  } finally {
+    if (previousStore === undefined) delete process.env.AWM_X402_RECEIPT_STORE_PATH;
+    else process.env.AWM_X402_RECEIPT_STORE_PATH = previousStore;
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+}
+
 async function main() {
   await testRejectsInvalidTxHash();
   await testRejectsUnknownProductBeforeRpc();
   await testPaymentRequestExposesX402Rail();
   await testAgentProductsExposeX402Rail();
   testReceiptBindingIsStableAndScoped();
+  testReceiptConsumptionRejectsReplayAndScopeConflict();
 
   console.log('x402 receipt verifier smoke tests passed');
 }
