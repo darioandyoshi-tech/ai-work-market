@@ -40,8 +40,8 @@ contract MockEIP1271 {
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4) {
-        if (hash == lastHash && signature == lastSignature) {
-            return abi.encodeWithSignature("isValidSignature(bytes32,bytes)");
+        if (hash == lastHash && keccak256(signature) == keccak256(lastSignature)) {
+            return 0x4e54b5b3; // keccak256("isValidSignature(bytes32,bytes)")
         }
         return 0x00000000;
     }
@@ -68,7 +68,7 @@ contract AgentWorkEscrowTest is Test {
         seller = vm.addr(sellerPk);
         usdc = new MockUSDC();
         vm.prank(owner);
-        escrow = new AgentWorkEscrow(address(usdc), feeRecipient);
+        escrow = new AgentWorkEscrow(address(usdc), feeRecipient, owner);
         usdc.mint(buyer, amount * 10);
         vm.prank(buyer);
         usdc.approve(address(escrow), type(uint256).max);
@@ -320,6 +320,8 @@ contract AgentWorkEscrowTest is Test {
 
     function testOwnerCanResolvePartialDisputeWithFee() public {
         uint256 id = _createIntent();
+        // Check that buyer sent amount to escrow
+        assertEq(usdc.balanceOf(buyer), amount * 9);
         vm.prank(buyer);
         escrow.dispute(id, "ipfs://reason");
         uint256 buyerAmount = 400e6;
@@ -327,8 +329,8 @@ contract AgentWorkEscrowTest is Test {
         vm.prank(owner);
         escrow.resolveDispute(id, buyerAmount, sellerGross, true);
         uint256 fee = sellerGross / 100;
-        
-        uint256 expectedBuyerBalance = (amount * 10) - amount + buyerAmount;
+       
+        uint256 expectedBuyerBalance = (amount * 100) - amount + buyerAmount;
         assertEq(usdc.balanceOf(buyer), expectedBuyerBalance);
         assertEq(usdc.balanceOf(seller), sellerGross - fee);
         assertEq(escrow.accumulatedFees(), fee);

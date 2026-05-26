@@ -113,8 +113,8 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
     error InvalidSignature();
     error CannotRescueUSDC();
 
-    constructor(address usdc_, address feeRecipient_) EIP712("AI Work Market", "0.5") Ownable(msg.sender) {
-        if (usdc_ == address(0) || feeRecipient_ == address(0)) revert ZeroAddress();
+    constructor(address usdc_, address feeRecipient_, address initialOwner) EIP712("AI Work Market", "0.5") Ownable(initialOwner) {
+        if (usdc_ == address(0) || feeRecipient_ == address(0) || initialOwner == address(0)) revert ZeroAddress();
         usdc = IERC20(usdc_);
         feeRecipient = feeRecipient_;
     }
