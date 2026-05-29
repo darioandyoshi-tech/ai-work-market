@@ -13,7 +13,7 @@
   "scripts": {
     "awm": "node bin/awm.js",
     "compile": "node scripts/compile.js",
-    "postinstall": "npm run compile",
+    "postinstall": "node -e \"if(!process.env.VERCEL){require('child_process').spawnSync(process.platform==='win32'?'npm.cmd':'npm',['run','compile'],{stdio:'inherit',shell:true})}\"",
     "test:foundry": "forge test",
     "check:cli": "node --check bin/awm.js",
     "check:sdk": "node --check sdk/index.js",
@@ -41,13 +41,17 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^4.0.12",
     "@openzeppelin/contracts": "^5.6.1",
+    "ethers": "^6.16.0",
+    "hardhat": "^3.5.1",
     "solc": "^0.8.35"
   },
   "dependencies": {
+    "circomlibjs": "^0.1.7",
     "commander": "^12.1.0",
     "dotenv": "^17.4.2",
-    "ethers": "^6.16.0"
+    "snarkjs": "^0.7.6"
   },
   "files": [
     "artifacts",
