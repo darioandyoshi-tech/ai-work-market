@@ -1,0 +1,44 @@
+{
+  "network": "base-mainnet",
+  "chainId": 8453,
+  "deploymentDate": "2026-05-29T04:00:00Z",
+  "deployer": "0xec89c40CA296F502cD033e07f18DA5E01cdd197d",
+  "contracts": {
+    "Safe": {
+      "address": "0x7f36896F6b6496B4E2fE95f672B3DAf28386b637",
+      "version": "1.3.0",
+      "singleton": "0x69f4D1788e39c87893C980c06EdF4b7f686e2938",
+      "threshold": 2,
+      "owners": [
+        "0xec89c40CA296F502cD033e07f18DA5E01cdd197d",
+        "0x5d03e94ee2eddde143e7c17095195e7a54afe142",
+        "0x2dAF658B01e257206375798a15832E9f547D65dD"
+      ],
+      "txHash": "0x29ad092e6d52eda07fb007b42108eb582fddb6ae8cd625f5072b104b02ef259a"
+    },
+    "TimelockController": {
+      "address": "0xF8C67A2F195d98Dbb7df2e7B8ca70Cc430AD0967",
+      "minDelaySeconds": 172800,
+      "txHash": "0xcfbc51ca7a1670b38db72efbe458dd6370d42469e12ab476b9836c7d49ac3f1e"
+    },
+    "Groth16Verifier": {
+      "address": "0xbEA159B9982c790B872093736E54590bec295132",
+      "txHash": "0x69ad6edcb0f10a9c50ed43cd28ce64fbd970f09766b26e1369948cc068d862ac"
+    },
+    "AgentWorkEscrowZK": {
+      "address": "0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2",
+      "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "feeRecipient": "0xec89c40CA296F502cD033e07f18DA5E01cdd197d",
+      "owner": "TimelockController",
+      "zkVerifier": "0xbEA159B9982c790B872093736E54590bec295132",
+      "txHash": "0x76df69b2406687bf454b2ae8e4b4cc9f82e69125f7914a3a58f23e2213c4d826"
+    }
+  },
+  "transactionLog": {
+    "0x29ad092e6d52eda07fb007b42108eb582fddb6ae8cd625f5072b104b02ef259a": "Safe Proxy creation",
+    "0xcfbc51ca7a1670b38db72efbe458dd6370d42469e12ab476b9836c7d49ac3f1e": "TimelockController deployment",
+    "0x69ad6edcb0f10a9c50ed43cd28ce64fbd970f09766b26e1369948cc068d862ac": "Groth16Verifier deployment",
+    "0x76df69b2406687bf454b2ae8e4b4cc9f82e69125f7914a3a58f23e2213c4d826": "AgentWorkEscrowZK deployment",
+    "0x1a28fd470e97540a0f6bafef89fc338c84162e462c2c4f684f9384cc85d7cabb": "Deployer renounced Timelock admin"
+  }
+}

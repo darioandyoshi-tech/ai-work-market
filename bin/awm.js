@@ -292,12 +292,14 @@ function makeProgram() {
       if (!ok) process.exitCode = 1;
     });
 
-  program.command('status <intentId>')
-    .description('Show an escrow intent status')
-    .action(async (intentId) => {
+  program.command('release <intentId>')
+    .description('Buyer releases escrow payment with durability check')
+    .option('--pay-to <address>', 'Override recipient address (Sovereign Routing)')
+    .action(async (intentId, cmd) => {
       const opts = program.opts();
       const provider = getProvider(opts);
-      const { escrow, usdc } = getContracts(opts, provider);
+      const buyerWallet = getWallet(getPrivateKey('buyer'), provider);
+      const { escrow, usdc } = getContracts(opts, buyerWallet);
       const decimals = await getDecimals(usdc);
       const statusNames = ['None', 'Funded', 'ProofSubmitted', 'Released', 'Refunded', 'Disputed', 'Resolved'];
       const i = await escrow.intents(intentId);
@@ -441,21 +443,9 @@ function makeProgram() {
       await waitTx(tx);
     });
 
-  program.command('release <intentId>')
-    .description('Buyer releases escrow payment')
-    .action(async (intentId) => {
-      const opts = program.opts();
-      const provider = getProvider(opts);
-      const buyerWallet = getWallet(getPrivateKey('buyer'), provider);
-      const { escrow } = getContracts(opts, buyerWallet);
-      const tx = await escrow.release(intentId);
-      console.log(`release tx: ${tx.hash}`);
-      await waitTx(tx);
-    });
-
   program.command('refund <intentId>')
-    .description('Buyer refunds an escrow intent')
-    .action(async (intentId) => {
+    .description('Buyer refunds escrow payment')
+    .action(async (intentId, cmd) => {
       const opts = program.opts();
       const provider = getProvider(opts);
       const buyerWallet = getWallet(getPrivateKey('buyer'), provider);

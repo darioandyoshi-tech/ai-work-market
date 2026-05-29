@@ -17,7 +17,7 @@ contract DeployAgentWorkEscrow is Script {
         address feeRecipient = vm.envAddress("FEE_RECIPIENT");
 
         vm.startBroadcast(deployerKey);
-        escrow = new AgentWorkEscrow(usdc, feeRecipient);
+        escrow = new AgentWorkEscrow(usdc, feeRecipient, tx.origin);
         vm.stopBroadcast();
 
         console2.log("AgentWorkEscrow deployed at", address(escrow));

@@ -1,0 +1,26 @@
+{
+  "network": "Base Mainnet",
+  "chainId": 8453,
+  "contract": "AgentWorkEscrowZK",
+  "address": "0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2",
+  "transactionHash": "0x76df69b2406687bf454b2ae8e4b4cc9f82e69125f7914a3a58f23e2213c4d826",
+  "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "owner": "TimelockController",
+  "timelock": "0xF8C67A2F195d98Dbb7df2e7B8ca70Cc430AD0967",
+  "safe": "0x7f36896F6b6496B4E2fE95f672B3DAf28386b637",
+  "zkVerifier": "0xbEA159B9982c790B872093736E54590bec295132",
+  "zkVerifierReal": "0x09DF1d2D899412cB6c20c37A392610985b8a0d80",
+  "commitRevealAdapter": "0xC0038FB94e2d2ee1Eeb20B476C4d5322dF2A4ca9",
+  "deployedAt": "2026-05-29T04:00:00Z",
+  "explorer": "https://basescan.org/address/0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2",
+  "transactionExplorer": "https://basescan.org/tx/0x76df69b2406687bf454b2ae8e4b4cc9f82e69125f7914a3a58f23e2213c4d826",
+  "verification": {
+    "ownerChecked": true,
+    "feeRecipientChecked": true,
+    "usdcChecked": true,
+    "timelockVerified": true,
+    "safeVerified": true,
+    "renounceRoleExecuted": true,
+    "sourcifyStatus": "pending"
+  }
+}
