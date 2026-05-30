@@ -21,8 +21,8 @@ interface IGroth16Verifier {
 
 /// @title AgentWorkEscrowZK
 /// @notice ZK-SNARK enhanced USDC escrow for agent-to-agent work on Base/Base Sepolia.
-/// @dev v0.6 adds optional on-chain ZK proof verification before fund release.
-/// @custom:version 0.6-zk
+/// @dev v0.7 adds TessPay (Verify-then-Pay) - automatic payment upon valid ZK proof.
+/// @custom:version 0.7-tesspay
 contract AgentWorkEscrowZK is EIP712, ReentrancyGuard, Ownable2Step {
     using SafeERC20 for IERC20;
 
@@ -100,6 +100,7 @@ contract AgentWorkEscrowZK is EIP712, ReentrancyGuard, Ownable2Step {
         uint96 feeBps
     );
     event SignedOfferFunded(uint256 indexed intentId, bytes32 indexed offerDigest, uint256 nonce);
+    event OfferNooncedCancelled(address indexed seller, uint256 indexed nonce);
     event OfferNonceCancelled(address indexed seller, uint256 indexed nonce);
     event ProofSubmitted(uint256 indexed intentId, string proofURI, uint256 reviewDeadline);
     event ZKProofSubmitted(uint256 indexed intentId, uint256 commitment);
@@ -114,6 +115,8 @@ contract AgentWorkEscrowZK is EIP712, ReentrancyGuard, Ownable2Step {
     event FeeRecipientUpdated(address indexed feeRecipient);
     event DefaultFeeBpsUpdated(uint96 feeBps);
     event ZKVerifierSet(address indexed verifier);
+    /// @notice TessPay automatic payment event
+    event TessPay(uint256 indexed intentId, uint256 sellerAmount, uint256 feeAmount);
 
     error ZeroAddress();
     error InvalidAmount();
@@ -143,7 +146,7 @@ contract AgentWorkEscrowZK is EIP712, ReentrancyGuard, Ownable2Step {
     error ZKProofInvalid();
     error ZKNotConfigured();
 
-    constructor(address usdc_, address feeRecipient_, address initialOwner, address zkVerifier_) EIP712("AI Work Market", "0.6-zk") Ownable(initialOwner) {
+    constructor(address usdc_, address feeRecipient_, address initialOwner, address zkVerifier_) EIP712("AI Work Market", "0.7-tesspay") Ownable(initialOwner) {
         if (usdc_ == address(0) || feeRecipient_ == address(0) || initialOwner == address(0)) revert ZeroAddress();
         usdc = IERC20(usdc_);
         feeRecipient = feeRecipient_;
@@ -157,7 +160,7 @@ contract AgentWorkEscrowZK is EIP712, ReentrancyGuard, Ownable2Step {
     // ============================================================
 
     /// @notice Set or update the ZK-SNARK verifier contract.
-    /// @param verifier Address of the Groth16 verifier contract. Pass address(0) to disable ZK.
+    /// @param verifier Address of the Groth16 verifier contract. Address(0) to disable ZK.
     function setZKVerifier(address verifier) external onlyOwner {
         // Prevent accidentally setting same verifier twice
         if (address(zkVerifier) == verifier) revert InvalidURI();
@@ -304,10 +307,13 @@ contract AgentWorkEscrowZK is EIP712, ReentrancyGuard, Ownable2Step {
 
         emit ProofSubmitted(intentId, proofURI, reviewDeadline);
         emit ZKProofSubmitted(intentId, pubSignals[1]); // commitment
+
+        // TESSPAY: Automatically verify and pay if ZK proof is valid
+        _tryAutoPayWithZK(intentId);
     }
 
     // ============================================================
-    // RELEASE / CLAIM (ZK-verified)
+    // RELEASE / CLAIM (ZK-verified) - Kept for backward compatibility
     // ============================================================
 
     function release(uint256 intentId) external nonReentrant {
@@ -522,5 +528,32 @@ contract AgentWorkEscrowZK is EIP712, ReentrancyGuard, Ownable2Step {
     function _feeSplit(uint256 amount, uint96 feeBps) internal pure returns (uint256 feeAmount, uint256 sellerAmount) {
         feeAmount = (amount * feeBps) / BPS_DENOMINATOR;
         sellerAmount = amount - feeAmount;
+    }
+
+    /// @notice Internal function to attempt automatic payment with ZK verification
+    /// @dev Called after ZK proof submission to enable tesspay (verify-then-pay)
+    function _tryAutoPayWithZK(uint256 intentId) internal {
+        Intent storage intent = intents[intentId];
+        ZKProof memory zk = zkProofs[intentId];
+
+        // Only attempt auto-pay if ZK verifier is configured and proof was submitted
+        if (address(zkVerifier) != address(0) && zk.submitted) {
+            // Verify the ZK proof on-chain
+            bool valid = zkVerifier.verifyProof(zk.pA, zk.pB, zk.pC, zk.pubSignals);
+            if (valid) {
+                // AUTOMATIC PAYMENT: TessPay - verify-then-pay
+                intent.status = Status.Released;
+                (uint256 feeAmount, uint256 sellerAmount) = _feeSplit(intent.amount, intent.feeBps);
+                accumulatedFees += feeAmount;
+                usdc.safeTransfer(intent.seller, sellerAmount);
+
+                emit ZKVerificationPassed(intentId);
+                emit TessPay(intentId, sellerAmount, feeAmount);
+            } else {
+                emit ZKVerificationFailed(intentId);
+                // Note: We don't revert here to allow fallback to manual release/claim
+                // The intent remains in ProofSubmitted status for manual handling
+            }
+        }
     }
 }
