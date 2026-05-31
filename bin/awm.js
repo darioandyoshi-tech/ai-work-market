@@ -485,7 +485,7 @@ function makeProgram() {
           buyer: intent.buyer,
           seller: intent.seller,
           amount: intent.amount.toString(),
-          deadline: intent.deadline.toString(),
+          deadline: intent.workDeadline.toString(),
           timestamp: new Date().toISOString()
         }));
       } catch (error) {
