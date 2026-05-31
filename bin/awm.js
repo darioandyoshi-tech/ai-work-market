@@ -466,6 +466,37 @@ function makeProgram() {
       console.log(JSON.stringify({ raw: fees.toString(), usdc: formatAmount(fees, decimals) }, null, 2));
     });
 
+
+  program.command('status <intentId>')
+    .description('Get the status of a specific intent by ID')
+    .option('--network <network>', 'Network to use (base-sepolia or base-mainnet)', 'base-sepolia')
+    .action(async (intentId, cmd) => {
+      const opts = program.opts();
+      const provider = getProvider(opts);
+      const { escrow } = getContracts(opts, provider);
+      try {
+        const intent = await escrow.intents(intentId);
+        const statusNames = ['None', 'Funded', 'ProofSubmitted', 'Released', 'Refunded', 'Disputed', 'Resolved'];
+        const status = statusNames[Number(intent.status)] || String(intent.status);
+        console.log(JSON.stringify({
+          intentId: intentId,
+          status: status,
+          statusCode: Number(intent.status),
+          buyer: intent.buyer,
+          seller: intent.seller,
+          amount: intent.amount.toString(),
+          deadline: intent.deadline.toString(),
+          timestamp: new Date().toISOString()
+        }));
+      } catch (error) {
+        console.error(JSON.stringify({
+          error: 'Failed to fetch intent status',
+          intentId: intentId,
+          details: error.message
+        }));
+        process.exitCode = 1;
+      }
+    });
   return program;
 }
 
