@@ -460,10 +460,10 @@ node bin/awm.js fees</pre>
     
     async function updateTerminal() {
       try {
-        const res = await fetch('/api/contract-status?id=2');
+        const res = await fetch('/api/contract-status?id=2&network=sepolia');
         const data = await res.json();
         if (data.rawStatus) {
-          terminalBody.innerHTML = `<div class="prompt">Sovereign-SRE:</div> ${data.rawStatus.replace(/\\n/g, '<br>')}</div>`;
+          terminalBody.innerHTML = `<div class="prompt">Sovereign-SRE:</div> ${data.rawStatus.replace(/\n/g, '<br>')}</div>`;
         }
       } catch (e) {
         console.error('Terminal sync failed', e);
