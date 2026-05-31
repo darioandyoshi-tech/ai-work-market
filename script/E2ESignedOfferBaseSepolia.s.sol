@@ -23,13 +23,13 @@ contract E2ESignedOfferBaseSepolia is Script {
         IERC20 usdc = IERC20(vm.envAddress("USDC"));
 
         uint256 amount = vm.envOr("E2E_USDC_AMOUNT", uint256(10_000));
-        uint256 workTimeout = 1 hours;
-        uint256 reviewPeriod = 1 hours;
+        uint256 workTimeout = 6 hours;
+        uint256 reviewPeriod = 6 hours;
         bytes32 workHash = keccak256("AI Work Market Base Sepolia E2E v1");
         string memory workURI = "ipfs://awm-e2e-work";
         string memory proofURI = "ipfs://awm-e2e-proof";
         uint256 nonce = uint256(keccak256(abi.encodePacked(block.chainid, address(escrow), buyer, seller, block.timestamp)));
-        uint256 expiry = block.timestamp + 1 hours;
+        uint256 expiry = block.timestamp + 6 hours;
 
         bytes32 digest = escrow.getOfferDigest(
             buyer,

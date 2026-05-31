@@ -1,0 +1,43 @@
+{
+  "name": "awm-integration",
+  "description": "Integrates the discovery system with the AWM smart contracts for payments and escrow",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step": "Setup",
+      "commands": [
+        "cd /home/dario/ai-work-market",
+        "python3 -m venv venv",
+        "source venv/bin/activate",
+        "pip install web3 eth-account python-dotenv"
+      ],
+      "description": "Set up virtual environment and install required packages"
+    }
+  ],
+  "components": [
+    {
+      "name": "awm_integration.py",
+      "purpose": "Handles interaction with the deployed AWM contract for payments and escrow",
+      "key_features": [
+        "Connects to AWM contract using verified ABI",
+        "Provides methods for creating/funding work requests",
+        "Methods for claiming, submitting, and releasing payment for work",
+        "Error handling for blockchain interactions",
+        "Uses environment variables for configuration"
+      ]
+    }
+  ],
+  "integration_points": [
+    {
+      "from": "discovery_system.py",
+      "to": "awm_integration.py",
+      "description": "When work is completed in discovery system, call awm_integration to release payment via smart contract"
+    }
+  ],
+  "next_steps": [
+    "Update discovery_system.py to call awm_integration when work is completed",
+    "Test the integration with real transactions using test ETH",
+    "Create agent clients that use both systems",
+    "Deploy as a service for continuous operation"
+  ]
+}

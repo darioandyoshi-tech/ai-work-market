@@ -35,10 +35,9 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
         uint256 reviewDeadline;
         uint256 reviewPeriod;
         bytes32 workHash;
-        string workURI;
         Status status;
-        string proofURI;
-        string disputeURI;
+        bytes32 proofHash;
+        bytes32 disputeHash;
     }
 
     IERC20 public immutable usdc;
@@ -48,9 +47,9 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
     uint96 public constant MAX_FEE_BPS = 1_000;
     uint96 public constant BPS_DENOMINATOR = 10_000;
 
-    uint256 public constant MIN_WORK_TIMEOUT = 1 hours;
+    uint256 public constant MIN_WORK_TIMEOUT = 6 hours;
     uint256 public constant MAX_WORK_TIMEOUT = 30 days;
-    uint256 public constant MIN_REVIEW_PERIOD = 1 hours;
+    uint256 public constant MIN_REVIEW_PERIOD = 6 hours;
     uint256 public constant MAX_REVIEW_PERIOD = 14 days;
     uint256 public constant MAX_URI_BYTES = 512;
 
@@ -208,7 +207,7 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
         if (block.timestamp >= intent.workDeadline) revert WorkDeadlinePassed();
 
         uint256 reviewDeadline = block.timestamp + intent.reviewPeriod;
-        intent.proofURI = proofURI;
+        intent.proofHash = keccak256(bytes(proofURI));
         intent.reviewDeadline = reviewDeadline;
         intent.status = Status.ProofSubmitted;
 
@@ -260,7 +259,7 @@ contract AgentWorkEscrow is EIP712, ReentrancyGuard, Ownable2Step {
         if (msg.sender != intent.buyer && msg.sender != intent.seller) revert NotParty();
         if (intent.status != Status.Funded && intent.status != Status.ProofSubmitted) revert InvalidStatus();
 
-        intent.disputeURI = disputeURI;
+        intent.disputeHash = keccak256(bytes(disputeURI));
         intent.status = Status.Disputed;
 
         emit Disputed(intentId, msg.sender, disputeURI);

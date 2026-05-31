@@ -1,87 +1,28 @@
 {
   "name": "ai-work-market",
   "version": "1.0.0",
-  "description": "Escrow rails for humans and AI agents to hire AI agents with USDC.",
-  "main": "sdk/index.js",
-  "bin": {
-    "awm": "bin/awm.js"
-  },
-  "directories": {
-    "doc": "docs",
-    "test": "test"
-  },
+  "description": "A decentralized platform for AI agents to find work opportunities",
+  "main": "index.js",
   "scripts": {
-    "awm": "node bin/awm.js",
-    "compile": "node scripts/compile.js",
-    "postinstall": "node -e \"if(!process.env.VERCEL){require('child_process').spawnSync(process.platform==='win32'?'npm.cmd':'npm',['run','compile'],{stdio:'inherit',shell:true})}\"",
-    "test:foundry": "forge test",
-    "check:cli": "node --check bin/awm.js",
-    "check:sdk": "node --check sdk/index.js",
-    "check:mcp": "node --check examples/mcp/awm-mcp-server.js && node scripts/smoke-mcp-agent-commerce.js",
-    "check:agentkit": "node --check examples/agentkit/awm-agentkit-actions.js",
-    "check:x402": "node --check examples/x402/quote-gate.js && node --check api/_x402-receipt-store.js && node --check api/x402-verify-receipt.js && node scripts/test-x402-receipt-verifier.js && python3 -m json.tool examples/x402/quote-to-escrow.example.json >/tmp/awm-x402-quote-to-escrow.json",
-    "check:a2a": "node --check examples/a2a/awm-a2a-adapter.js",
-    "check:private-assets": "node --check api/delivery-status.js && node --check api/private-delivery-link.js && node --check api/private-delivery-download.js && node --check scripts/test-private-delivery-link.js && node scripts/test-private-delivery-link.js && node --check scripts/verify-private-assets.js && node scripts/verify-private-assets.js && node scripts/test-private-delivery-full.js && node scripts/test-fulfillment-store.js",
-    "check:demo": "python3 -m json.tool demo/offers.json >/tmp/awm-offers.json && python3 -m json.tool demo/agent-manifest.yoshi.json >/tmp/awm-manifest.json && python3 -m json.tool vercel.json >/tmp/awm-vercel.json",
-    "check:all": "npm run check:cli && npm run check:sdk && npm run check:mcp && npm run check:agentkit && npm run check:x402 && npm run check:a2a && npm run check:xpay && npm run check:demo && npm run check:private-assets && npm run check:agent-commerce && npm run check:monitor",
-    "check:agent-commerce": "node --check examples/agent-commerce/agent-payment-client.js && python3 -m json.tool examples/agent-commerce/mpp-x402-payment-envelope.example.json >/tmp/awm-mpp-envelope.json && python3 -m json.tool examples/agent-commerce/mpp-x402-payment-receipt.example.json >/tmp/awm-mpp-receipt.json",
-    "check:monitor": "node --check scripts/escrow-monitor.js",
-    "monitor:escrow": "node scripts/escrow-monitor.js",
-    "check:xpay": "node --check examples/xpay/lifecycle-bridge.js && node examples/xpay/lifecycle-bridge.js >/tmp/awm-xpay-bridge.json && python3 -m json.tool /tmp/awm-xpay-bridge.json >/tmp/awm-xpay-bridge.pretty.json"
-  },
-  "keywords": [
-    "ai-agents",
-    "escrow",
-    "usdc",
-    "base",
-    "eip712",
-    "work-market"
-  ],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "devDependencies": {
-    "@nomicfoundation/hardhat-ethers": "^4.0.12",
-    "@openzeppelin/contracts": "^5.6.1",
-    "ethers": "^6.16.0",
-    "hardhat": "^3.5.1",
-    "solc": "^0.8.35"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "dependencies": {
-    "circomlibjs": "^0.1.7",
-    "commander": "^12.1.0",
-    "dotenv": "^17.4.2",
-    "snarkjs": "^0.7.6"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "vite": "^4.4.0",
+    "hardhat": "^2.17.0",
+    "ethers": "^6.7.0",
+    "@openzeppelin/contracts": "^5.0.0"
   },
-  "files": [
-    "artifacts",
-    "bin",
-    "contracts",
-    "deployments",
-    "docs",
-    "sdk",
-    "examples",
-    "demo",
-    ".well-known",
-    "llms.txt",
-    "README.md",
-    "FIRST-USER-TEST.md",
-    "MVP-COMPLETE.md",
-    "index.html",
-    "products.html",
-    "purchase-complete.html",
-    "agent-commerce.html",
-    "manifesto.html",
-    "trust.html",
-    "founding-testers.html",
-    "first-agents.html",
-    "integration-sprint.html",
-    "offers.json",
-    "og-image.svg",
-    "robots.txt",
-    "sitemap.xml",
-    "use-cases",
-    ".github",
-    "vercel.json"
-  ]
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^4.0.0"
+  },
+  "keywords": ["blockchain", "AI", "decentralized", "marketplace"],
+  "author": "Dario",
+  "license": "MIT"
 }

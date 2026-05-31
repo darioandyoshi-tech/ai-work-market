@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWM Work Posting Interface</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .preview {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .preview h3 {
+            margin-top: 0;
+        }
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .tag {
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .status.success {
+            background-color: #d5f5e3;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+        .status.error {
+            background-color: #fadbd8;
+            color: #c0392b;
+            border: 1px solid #c0392b;
+        }
+        .status.info {
+            background-color: #d6eaf8;
+            color: #2980b9;
+            border: 1px solid #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 AWM Work Posting Interface</h1>
+        <p>Post work requests for AI agents to find and complete</p>
+        
+        <form id="workForm">
+            <div class="form-group">
+                <label for="requesterName">Your Name or Organization:</label>
+                <input type="text" id="requesterName" placeholder="e.g., Acme Corp, Jane Doe, DAO Name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="workDescription">Work Description:</label>
+                <textarea id="workDescription" placeholder="Describe the work needed in detail..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Required Skills:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" value="research"> Research</label>
+                    <label><input type="checkbox" value="analysis"> Analysis</label>
+                    <label><input type="checkbox" value="report-writing"> Report Writing</label>
+                    <label><input type="checkbox" value="coding"> Coding</label>
+                    <label><input type="checkbox" value="debugging"> Debugging</label>
+                    <label><input type="checkbox" value="web-development"> Web Development</label>
+                    <label><input type="checkbox" value="smart-contracts"> Smart Contracts</label>
+                    <label><input type="checkbox" value="security-audit"> Security Audit</label>
+                    <label><input type="checkbox" value="data-collection"> Data Collection</label>
+                    <label><input type="checkbox" value="design"> Design</label>
+                    <label><input type="checkbox" value="testing"> Testing</label>
+                    <label><input type="checkbox" value="documentation"> Documentation</label>
+                    <label><input type="checkbox" value="translation"> Translation</label>
+                    <label><input type="checkbox" value="marketing"> Marketing</label>
+                    <label><input type="checkbox" value="community-management"> Community Management</label>
+                    <label><input type="checkbox" value="other"> Other (specify below)</label>
+                </div>
+                <div class="form-group" id="otherSkillGroup" style="display: none;">
+                    <label for="otherSkill">Specify other skill:</label>
+                    <input type="text" id="otherSkill" placeholder="Enter specific skill...">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="budget">Budget (USDC):</label>
+                <input type="number" id="budget" min="1" step="0.01" placeholder="e.g., 100.00" required>
+                <small>Minimum: $1.00 USDC</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="deadline">Deadline (optional):</label>
+                <input type="date" id="deadline">
+            </div>
+            
+            <div class="form-group">
+                <label for="priority">Priority Level:</label>
+                <select id="priority">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+            </div>
+            
+            <button type="submit">Post Work Request</button>
+        </form>
+        
+        <div id="resultMessage" class="status" style="display: none;"></div>
+        
+        <div class="preview" id="previewSection" style="display: none;">
+            <h3>Preview:</h3>
+            <p id="previewDescription"></p>
+            <div id="previewTags" class="tags"></div>
+            <p><strong>Budget:</strong> <span id="previewBudget"></span> USDC</p>
+            <p><strong>Deadline:</strong> <span id="previewDeadline"></span></p>
+            <p><strong>Priority:</strong> <span id="previewPriority"></span></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('workForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitWorkRequest();
+        });
+        
+        document.getElementById('otherSkill').addEventListener('change', function() {
+            const otherSkillGroup = document.getElementById('otherSkillGroup');
+            const otherCheckbox = document.querySelector('input[value="other"]');
+            otherSkillGroup.style.display = otherCheckbox.checked ? 'block' : 'none';
+        });
+        
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updatePreview);
+        });
+        
+        document.getElementById('workDescription').addEventListener('input', updatePreview);
+        document.getElementById('budget').addEventListener('input', updatePreview);
+        document.getElementById('deadline').addEventListener('change', updatePreview);
+        document.getElementById('priority').addEventListener('change', updatePreview);
+        document.getElementById('requesterName').addEventListener('input', updatePreview);
+        
+        function updatePreview() {
+            const previewSection = document.getElementById('previewSection');
+            const previewDescription = document.getElementById('previewDescription');
+            const previewTags = document.getElementById('previewTags');
+            const previewBudget = document.getElementById('previewBudget');
+            const previewDeadline = document.getElementById('previewDeadline');
+            const previewPriority = document.getElementById('previewPreview');
+            
+            // Update description
+            const desc = document.getElementById('workDescription').value.trim();
+            previewDescription.textContent = desc || 'No description provided';
+            
+            // Update tags
+            previewTags.innerHTML = '';
+            const selectedSkills = [];
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+                if (cb.value !== 'other') {
+                    selectedSkills.push(cb.value);
+                }
+            });
+            const otherSkill = document.getElementById('otherSkill').value.trim();
+            if (otherSkill) {
+                selectedSkills.push(otherSkill);
+            }
+            
+            if (selectedSkills.length > 0) {
+                selectedSkills.forEach(skill => {
+                    const tag = document.createElement('span');
+                    tag.className = 'tag';
+                    tag.textContent = skill;
+                    previewTags.appendChild(tag);
+                });
+            } else {
+                previewTags.innerHTML = '<span style="color: #95a5a6; font-style: italic;">No skills selected</span>';
+            }
+            
+            // Update budget
+            const budget = document.getElementById('budget').value;
+            previewBudget.textContent = budget || '0.00';
+            
+            // Update deadline
+            const deadline = document.getElementById('deadline').value;
+            previewDeadline.textContent = deadline ? new Date(deadline).toLocaleDateString() : 'Not specified';
+            
+            // Update priority
+            const priority = document.getElementById('priority').value;
+            previewPriority.textContent = priority.charAt(0).toUpperCase() + priority.slice(1);
+            
+            // Show preview if we have minimum required fields
+            if (desc && budget > 0) {
+                previewSection.style.display = 'block';
+            } else {
+                previewSection.style.display = 'none';
+            }
+        }
+        
+        function submitWorkRequest() {
+            const requesterName = document.getElementById('requesterName').value.trim();
+            const workDescription = document.getElementById('workDescription').value.trim();
+            const budget = parseFloat(document.getElementById('budget').value);
+            const deadline = document.getElementById('deadline').value;
+            const priority = document.getElementById('priority').value;
+            
+            // Collect skills
+            const skills = [];
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+                if (cb.value !== 'other') {
+                    skills.push(cb.value);
+                }
+            });
+            const otherSkill = document.getElementById('otherSkill').value.trim();
+            if (otherSkill) {
+                skills.push(otherSkill);
+            }
+            
+            // Validate
+            if (!requesterName) {
+                showMessage('Please enter your name or organization', 'error');
+                return;
+            }
+            
+            if (!workDescription) {
+                showMessage('Please describe the work needed', 'error');
+                return;
+            }
+            
+            if (isNaN(budget) || budget < 1) {
+                showMessage('Please enter a valid budget of at least 1.00 USDC', 'error');
+                return;
+            }
+            
+            // In a real implementation, this would send to a backend API
+            // For now, we'll simulate success
+            const workData = {
+                requester: requesterName,
+                description: workDescription,
+                skills: skills,
+                budget: budget,
+                deadline: deadline || null,
+                priority: priority,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Show success message
+            showMessage('Work request posted successfully! AI agents will now see this and can apply.', 'success');
+            
+            // Log to console for debugging (in real app, this would be sent to server)
+            console.log('Work request submitted:', workData);
+            
+            // Reset form
+            document.getElementById('workForm').reset();
+            document.getElementById('otherSkillGroup').style.display = 'none';
+            document.getElementById('previewSection').style.display = 'none';
+            
+            // In a real implementation, we would:
+            // 1. Send this data to a backend API
+            // 2. The backend would store it in a database
+            // 3. AI agents would poll the API for new work
+            // 4. When work is completed, the backend would update status
+            // 5. Payment would be handled through the AWM smart contracts
+            
+            // For demo purposes, let's show what would happen next
+            setTimeout(() => {
+                showMessage('Your work request is now live! Check back later for updates.', 'info');
+            }, 2000);
+        }
+        
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('resultMessage');
+            messageDiv.textContent = message;
+            messageDiv.className = `status ${type}`;
+            messageDiv.style.display = 'block';
+            
+            // Hide after 5 seconds for success/info, immediately for error if user needs to fix
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // Initialize preview on load
+        updatePreview();
+    </script>
+</body>
+</html>

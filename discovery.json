@@ -1,0 +1,2140 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-05-30T23:03:38.270373",
+  "description": "Simple discovery registry for AWM - tracks available work requests and agent capabilities",
+  "work_requests": [
+    {
+      "id": "wr_000001_1780191492",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T20:38:12.668994",
+      "status": "assigned",
+      "assigned_to": "ag_000001_1780191492",
+      "assigned_at": "2026-05-30T20:38:12.669772",
+      "started_at": null,
+      "completed_at": null
+    },
+    {
+      "id": "wr_000002_1780191492",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T20:38:12.669215",
+      "status": "assigned",
+      "assigned_to": "ag_000002_1780191492",
+      "assigned_at": "2026-05-30T20:38:12.669955",
+      "started_at": null,
+      "completed_at": null
+    },
+    {
+      "id": "wr_000003_1780191492",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T20:38:12.669445",
+      "status": "assigned",
+      "assigned_to": "ag_000004_1780192275",
+      "assigned_at": "2026-05-30T20:51:15.595128",
+      "started_at": null,
+      "completed_at": null
+    },
+    {
+      "id": "wr_000004_1780192275",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T20:51:15.594022",
+      "status": "assigned",
+      "assigned_to": "ag_000007_1780196800",
+      "assigned_at": "2026-05-30T22:06:40.110817",
+      "started_at": null,
+      "completed_at": null
+    },
+    {
+      "id": "wr_000005_1780192275",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T20:51:15.594294",
+      "status": "assigned",
+      "assigned_to": "ag_000005_1780192275",
+      "assigned_at": "2026-05-30T20:51:15.595428",
+      "started_at": null,
+      "completed_at": null
+    },
+    {
+      "id": "wr_000006_1780192275",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T20:51:15.594601",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:17:51.513085",
+      "started_at": "2026-05-30T22:17:51.514511",
+      "completed_at": "2026-05-30T22:17:51.515070",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 250.0
+    },
+    {
+      "id": "wr_000007_1780196800",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:06:40.109193",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:18:06.517518",
+      "started_at": "2026-05-30T22:18:06.518243",
+      "completed_at": "2026-05-30T22:18:06.523568",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 300.0
+    },
+    {
+      "id": "wr_000008_1780196800",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:06:40.109772",
+      "status": "assigned",
+      "assigned_to": "ag_000008_1780196800",
+      "assigned_at": "2026-05-30T22:06:40.111194",
+      "started_at": null,
+      "completed_at": null
+    },
+    {
+      "id": "wr_000009_1780196800",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:06:40.110200",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:18:21.524741",
+      "started_at": "2026-05-30T22:18:21.525491",
+      "completed_at": "2026-05-30T22:18:21.530811",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 250.0
+    },
+    {
+      "id": "wr_000010_1780197471",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:17:51.510766",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:18:36.532003",
+      "started_at": "2026-05-30T22:18:36.532847",
+      "completed_at": "2026-05-30T22:18:36.538433",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 300.0
+    },
+    {
+      "id": "wr_000011_1780197471",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:17:51.511496",
+      "status": "completed",
+      "assigned_to": "ag_000011_1780197471",
+      "assigned_at": "2026-05-30T22:17:51.513818",
+      "started_at": "2026-05-30T22:17:51.515801",
+      "completed_at": "2026-05-30T22:17:51.516307",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 500.0
+    },
+    {
+      "id": "wr_000012_1780197471",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:17:51.512065",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:21:09.556673",
+      "started_at": "2026-05-30T22:21:09.558810",
+      "completed_at": "2026-05-30T22:21:09.559648",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 250.0
+    },
+    {
+      "id": "wr_000013_1780197669",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:21:09.554420",
+      "status": "completed",
+      "assigned_to": "ag_000013_1780197669",
+      "assigned_at": "2026-05-30T22:21:09.557328",
+      "started_at": "2026-05-30T22:21:09.561323",
+      "completed_at": "2026-05-30T22:21:09.562141",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 300.0
+    },
+    {
+      "id": "wr_000014_1780197669",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:21:09.555137",
+      "status": "completed",
+      "assigned_to": "ag_000011_1780197471",
+      "assigned_at": "2026-05-30T22:21:09.558064",
+      "started_at": "2026-05-30T22:21:09.564273",
+      "completed_at": "2026-05-30T22:21:09.565143",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 500.0
+    },
+    {
+      "id": "wr_000015_1780197669",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:21:09.555895",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:21:24.567263",
+      "started_at": "2026-05-30T22:21:24.568201",
+      "completed_at": "2026-05-30T22:21:24.573756",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 250.0
+    },
+    {
+      "id": "wr_000016_1780197748",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:22:28.245642",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:22:28.248822",
+      "started_at": "2026-05-30T22:22:28.251746",
+      "completed_at": "2026-05-30T22:22:28.252791",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 300.0
+    },
+    {
+      "id": "wr_000017_1780197748",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:22:28.246865",
+      "status": "completed",
+      "assigned_to": "ag_000011_1780197471",
+      "assigned_at": "2026-05-30T22:22:28.249713",
+      "started_at": "2026-05-30T22:22:28.254971",
+      "completed_at": "2026-05-30T22:22:28.256172",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 500.0
+    },
+    {
+      "id": "wr_000018_1780197748",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:22:28.247807",
+      "status": "completed",
+      "assigned_to": "ag_000013_1780197669",
+      "assigned_at": "2026-05-30T22:22:28.250745",
+      "started_at": "2026-05-30T22:22:28.258529",
+      "completed_at": "2026-05-30T22:22:28.259488",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 250.0
+    },
+    {
+      "id": "wr_000019_1780198178",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:29:38.157174",
+      "status": "in_progress",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:29:38.160491",
+      "started_at": "2026-05-30T22:29:38.164355",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000020_1780198178",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:29:38.158217",
+      "status": "in_progress",
+      "assigned_to": "ag_000011_1780197471",
+      "assigned_at": "2026-05-30T22:29:38.161835",
+      "started_at": "2026-05-30T22:29:38.165716",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000021_1780198178",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:29:38.159296",
+      "status": "in_progress",
+      "assigned_to": "ag_000013_1780197669",
+      "assigned_at": "2026-05-30T22:29:38.162977",
+      "started_at": "2026-05-30T22:29:38.166895",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000022_1780198324",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:32:04.785368",
+      "status": "in_progress",
+      "assigned_to": "ag_000016_1780197748",
+      "assigned_at": "2026-05-30T22:32:04.789580",
+      "started_at": "2026-05-30T22:32:04.793928",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000023_1780198324",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:32:04.786869",
+      "status": "in_progress",
+      "assigned_to": "ag_000014_1780197669",
+      "assigned_at": "2026-05-30T22:32:04.791334",
+      "started_at": "2026-05-30T22:32:04.795319",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000024_1780198324",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:32:04.788186",
+      "status": "in_progress",
+      "assigned_to": "ag_000019_1780198178",
+      "assigned_at": "2026-05-30T22:32:04.792533",
+      "started_at": "2026-05-30T22:32:04.796623",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000025_1780198440",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:34:00.520650",
+      "status": "in_progress",
+      "assigned_to": "ag_000022_1780198324",
+      "assigned_at": "2026-05-30T22:34:00.524928",
+      "started_at": "2026-05-30T22:34:00.528947",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000026_1780198440",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:34:00.522068",
+      "status": "in_progress",
+      "assigned_to": "ag_000017_1780197748",
+      "assigned_at": "2026-05-30T22:34:00.526234",
+      "started_at": "2026-05-30T22:34:00.530399",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000027_1780198440",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:34:00.523448",
+      "status": "in_progress",
+      "assigned_to": "ag_000025_1780198440",
+      "assigned_at": "2026-05-30T22:34:00.527537",
+      "started_at": "2026-05-30T22:34:00.531950",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000028_1780198571",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:36:11.052818",
+      "status": "in_progress",
+      "assigned_to": "ag_000001_1780191492",
+      "assigned_at": "2026-05-30T22:43:24.275710",
+      "started_at": "2026-05-30T22:43:24.277065",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000029_1780198571",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:36:11.054206",
+      "status": "in_progress",
+      "assigned_to": "ag_000012_1780197471",
+      "assigned_at": "2026-05-30T22:36:11.062285",
+      "started_at": "2026-05-30T22:36:11.063764",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000030_1780198571",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:36:11.060547",
+      "status": "in_progress",
+      "assigned_to": "ag_000001_1780191492",
+      "assigned_at": "2026-05-30T22:44:14.530712",
+      "started_at": "2026-05-30T22:44:14.532411",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000031_1780199262",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 0.1,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:47:42.286168",
+      "status": "in_progress",
+      "assigned_to": "ag_000001_1780191492",
+      "assigned_at": "2026-05-30T22:47:42.290996",
+      "started_at": "2026-05-30T22:47:42.292377",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000032_1780199262",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:47:42.287789",
+      "status": "in_progress",
+      "assigned_to": "ag_000011_1780197471",
+      "assigned_at": "2026-05-30T22:47:43.425688",
+      "started_at": "2026-05-30T22:47:43.427381",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000033_1780199262",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:47:42.289254",
+      "status": "in_progress",
+      "assigned_to": "ag_000001_1780191492",
+      "assigned_at": "2026-05-30T22:57:59.088127",
+      "started_at": "2026-05-30T22:57:59.090380",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000034_1780200037",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 0.1,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T23:00:37.434727",
+      "status": "in_progress",
+      "assigned_to": "ag_000001_1780191492",
+      "assigned_at": "2026-05-30T23:00:37.438950",
+      "started_at": "2026-05-30T23:00:37.440301",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000035_1780200037",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T23:00:37.436087",
+      "status": "in_progress",
+      "assigned_to": "ag_000011_1780197471",
+      "assigned_at": "2026-05-30T23:00:37.668381",
+      "started_at": "2026-05-30T23:00:37.669871",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000036_1780200037",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T23:00:37.437493",
+      "status": "in_progress",
+      "assigned_to": "ag_000001_1780191492",
+      "assigned_at": "2026-05-30T23:01:56.171956",
+      "started_at": "2026-05-30T23:01:56.173599",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000037_1780200217",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 0.1,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T23:03:37.108495",
+      "status": "in_progress",
+      "assigned_to": "ag_000001_1780191492",
+      "assigned_at": "2026-05-30T23:03:37.112936",
+      "started_at": "2026-05-30T23:03:37.114363",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000038_1780200217",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T23:03:37.109920",
+      "status": "in_progress",
+      "assigned_to": "ag_000011_1780197471",
+      "assigned_at": "2026-05-30T23:03:38.268357",
+      "started_at": "2026-05-30T23:03:38.270367",
+      "completed_at": null
+    },
+    {
+      "id": "wr_000039_1780200217",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T23:03:37.111401",
+      "status": "open",
+      "assigned_to": null,
+      "assigned_at": null,
+      "started_at": null,
+      "completed_at": null
+    }
+  ],
+  "available_agents": [
+    {
+      "id": "ag_000001_1780191492",
+      "name": "Yoshi-Research-Bot",
+      "capabilities": [
+        "research",
+        "analysis",
+        "report-writing",
+        "data-collection"
+      ],
+      "wallet_address": "0x1111111111111111111111111111111111111111",
+      "metadata": {
+        "version": "1.2.0",
+        "specialties": [
+          "market-research",
+          "competitive-analysis"
+        ],
+        "max_concurrent": 3,
+        "typical_rate": 50
+      },
+      "registered_at": "2026-05-30T20:38:12.668394",
+      "status": "busy",
+      "current_task": "wr_000037_1780200217",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000002_1780191492",
+      "name": "Patchwright-Dev-Bot",
+      "capabilities": [
+        "debugging",
+        "coding",
+        "web-development",
+        "smart-contracts"
+      ],
+      "wallet_address": "0x8ba1f109551bD432803012645Hac136c22C501eE",
+      "metadata": {
+        "version": "2.1.0",
+        "languages": [
+          "Solidity",
+          "Python",
+          "JavaScript",
+          "Rust"
+        ],
+        "specialties": [
+          "security-patches",
+          "bug-fixes"
+        ],
+        "max_concurrent": 5,
+        "typical_rate": 75
+      },
+      "registered_at": "2026-05-30T20:38:12.668550",
+      "status": "busy",
+      "current_task": "wr_000002_1780191492",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000003_1780191492",
+      "name": "Auditling-Security-Bot",
+      "capabilities": [
+        "security-audit",
+        "code-review",
+        "vulnerability-assessment",
+        "penetration-testing"
+      ],
+      "wallet_address": "0x9b67e888d76a034b8d4123456789012345678901",
+      "metadata": {
+        "version": "1.0.0",
+        "certifications": [
+          "CEH",
+          "OSCP",
+          "CSSLP"
+        ],
+        "specialties": [
+          "smart-contract-audit",
+          "defi-security"
+        ],
+        "max_concurrent": 2,
+        "typical_rate": 100
+      },
+      "registered_at": "2026-05-30T20:38:12.668783",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000004_1780192275",
+      "name": "Yoshi-Research-Bot",
+      "capabilities": [
+        "research",
+        "analysis",
+        "report-writing",
+        "data-collection"
+      ],
+      "wallet_address": "0x742d35Cc6634C0532925a3b8D4C0532950532950",
+      "metadata": {
+        "version": "1.2.0",
+        "specialties": [
+          "market-research",
+          "competitive-analysis"
+        ],
+        "max_concurrent": 3,
+        "typical_rate": 50
+      },
+      "registered_at": "2026-05-30T20:51:15.588446",
+      "status": "busy",
+      "current_task": "wr_000003_1780191492",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000005_1780192275",
+      "name": "Patchwright-Dev-Bot",
+      "capabilities": [
+        "debugging",
+        "coding",
+        "web-development",
+        "smart-contracts"
+      ],
+      "wallet_address": "0x8ba1f109551bD432803012645Hac136c22C501eE",
+      "metadata": {
+        "version": "2.1.0",
+        "languages": [
+          "Solidity",
+          "Python",
+          "JavaScript",
+          "Rust"
+        ],
+        "specialties": [
+          "security-patches",
+          "bug-fixes"
+        ],
+        "max_concurrent": 5,
+        "typical_rate": 75
+      },
+      "registered_at": "2026-05-30T20:51:15.588790",
+      "status": "busy",
+      "current_task": "wr_000005_1780192275",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000006_1780192275",
+      "name": "Auditling-Security-Bot",
+      "capabilities": [
+        "security-audit",
+        "code-review",
+        "vulnerability-assessment",
+        "penetration-testing"
+      ],
+      "wallet_address": "0x9b67e888d76a034b8d4123456789012345678901",
+      "metadata": {
+        "version": "1.0.0",
+        "certifications": [
+          "CEH",
+          "OSCP",
+          "CSSLP"
+        ],
+        "specialties": [
+          "smart-contract-audit",
+          "defi-security"
+        ],
+        "max_concurrent": 2,
+        "typical_rate": 100
+      },
+      "registered_at": "2026-05-30T20:51:15.593766",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000007_1780196800",
+      "name": "Yoshi-Research-Bot",
+      "capabilities": [
+        "research",
+        "analysis",
+        "report-writing",
+        "data-collection"
+      ],
+      "wallet_address": "0x742d35Cc6634C0532925a3b8D4C0532950532950",
+      "metadata": {
+        "version": "1.2.0",
+        "specialties": [
+          "market-research",
+          "competitive-analysis"
+        ],
+        "max_concurrent": 3,
+        "typical_rate": 50
+      },
+      "registered_at": "2026-05-30T22:06:40.103006",
+      "status": "busy",
+      "current_task": "wr_000004_1780192275",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000008_1780196800",
+      "name": "Patchwright-Dev-Bot",
+      "capabilities": [
+        "debugging",
+        "coding",
+        "web-development",
+        "smart-contracts"
+      ],
+      "wallet_address": "0x8ba1f109551bD432803012645Hac136c22C501eE",
+      "metadata": {
+        "version": "2.1.0",
+        "languages": [
+          "Solidity",
+          "Python",
+          "JavaScript",
+          "Rust"
+        ],
+        "specialties": [
+          "security-patches",
+          "bug-fixes"
+        ],
+        "max_concurrent": 5,
+        "typical_rate": 75
+      },
+      "registered_at": "2026-05-30T22:06:40.103399",
+      "status": "busy",
+      "current_task": "wr_000008_1780196800",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000009_1780196800",
+      "name": "Auditling-Security-Bot",
+      "capabilities": [
+        "security-audit",
+        "code-review",
+        "vulnerability-assessment",
+        "penetration-testing"
+      ],
+      "wallet_address": "0x9b67e888d76a034b8d4123456789012345678901",
+      "metadata": {
+        "version": "1.0.0",
+        "certifications": [
+          "CEH",
+          "OSCP",
+          "CSSLP"
+        ],
+        "specialties": [
+          "smart-contract-audit",
+          "defi-security"
+        ],
+        "max_concurrent": 2,
+        "typical_rate": 100
+      },
+      "registered_at": "2026-05-30T22:06:40.108664",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000010_1780197471",
+      "name": "Yoshi-Research-Bot",
+      "capabilities": [
+        "research",
+        "analysis",
+        "report-writing",
+        "data-collection"
+      ],
+      "wallet_address": "0x742d35Cc6634C0532925a3b8D4C0532950532950",
+      "metadata": {
+        "version": "1.2.0",
+        "specialties": [
+          "market-research",
+          "competitive-analysis"
+        ],
+        "max_concurrent": 3,
+        "typical_rate": 50
+      },
+      "registered_at": "2026-05-30T22:17:51.504232",
+      "status": "busy",
+      "current_task": "wr_000019_1780198178",
+      "task_history": [
+        {
+          "work_id": "wr_000006_1780192275",
+          "completed_at": "2026-05-30T22:17:51.515070",
+          "payment": 250.0
+        },
+        {
+          "work_id": "wr_000007_1780196800",
+          "completed_at": "2026-05-30T22:18:06.523568",
+          "payment": 300.0
+        },
+        {
+          "work_id": "wr_000009_1780196800",
+          "completed_at": "2026-05-30T22:18:21.530811",
+          "payment": 250.0
+        },
+        {
+          "work_id": "wr_000010_1780197471",
+          "completed_at": "2026-05-30T22:18:36.538433",
+          "payment": 300.0
+        },
+        {
+          "work_id": "wr_000012_1780197471",
+          "completed_at": "2026-05-30T22:21:09.559648",
+          "payment": 250.0
+        },
+        {
+          "work_id": "wr_000015_1780197669",
+          "completed_at": "2026-05-30T22:21:24.573756",
+          "payment": 250.0
+        },
+        {
+          "work_id": "wr_000016_1780197748",
+          "completed_at": "2026-05-30T22:22:28.252791",
+          "payment": 300.0
+        }
+      ],
+      "total_completed": 10,
+      "total_earned": 2696.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000011_1780197471",
+      "name": "Patrick-Dev-Bot",
+      "capabilities": [
+        "debugging",
+        "coding",
+        "web-development",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "wallet_address": "0x2222222222222222222222222222222222222222",
+      "metadata": {
+        "version": "2.1.0",
+        "languages": [
+          "Solidity",
+          "Python",
+          "JavaScript",
+          "Rust"
+        ],
+        "specialties": [
+          "security-patches",
+          "bug-fixes"
+        ],
+        "max_concurrent": 5,
+        "typical_rate": 75
+      },
+      "registered_at": "2026-05-30T22:17:51.504856",
+      "status": "busy",
+      "current_task": "wr_000038_1780200217",
+      "task_history": [
+        {
+          "work_id": "wr_000011_1780197471",
+          "completed_at": "2026-05-30T22:17:51.516307",
+          "payment": 500.0
+        },
+        {
+          "work_id": "wr_000014_1780197669",
+          "completed_at": "2026-05-30T22:21:09.565143",
+          "payment": 500.0
+        },
+        {
+          "work_id": "wr_000017_1780197748",
+          "completed_at": "2026-05-30T22:22:28.256172",
+          "payment": 500.0
+        }
+      ],
+      "total_completed": 5,
+      "total_earned": 2495.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000012_1780197471",
+      "name": "AuditSec-Bot",
+      "capabilities": [
+        "security-audit",
+        "code-review",
+        "vulnerability-assessment",
+        "penetration-testing"
+      ],
+      "wallet_address": "0x9b67e888d76a034b8d4123456789012345678901",
+      "metadata": {
+        "version": "1.0.0",
+        "certifications": [
+          "CEH",
+          "OSCP",
+          "CSSLP"
+        ],
+        "specialties": [
+          "smart-contract-audit",
+          "defi-security"
+        ],
+        "max_concurrent": 2,
+        "typical_rate": 100
+      },
+      "registered_at": "2026-05-30T22:17:51.510164",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000013_1780197669",
+      "name": "Yoshi-Research-Bot",
+      "capabilities": [
+        "research",
+        "analysis",
+        "report-writing",
+        "data-collection"
+      ],
+      "wallet_address": "0x742d35Cc6634C0532925a3b8D4C0532950532950",
+      "metadata": {
+        "version": "1.2.0",
+        "specialties": [
+          "market-research",
+          "competitive-analysis"
+        ],
+        "max_concurrent": 3,
+        "typical_rate": 50
+      },
+      "registered_at": "2026-05-30T22:21:09.547366",
+      "status": "busy",
+      "current_task": "wr_000021_1780198178",
+      "task_history": [
+        {
+          "work_id": "wr_000013_1780197669",
+          "completed_at": "2026-05-30T22:21:09.562141",
+          "payment": 300.0
+        },
+        {
+          "work_id": "wr_000018_1780197748",
+          "completed_at": "2026-05-30T22:22:28.259488",
+          "payment": 250.0
+        }
+      ],
+      "total_completed": 4,
+      "total_earned": 1097.25,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000014_1780197669",
+      "name": "Patrick-Dev-Bot",
+      "capabilities": [
+        "debugging",
+        "coding",
+        "web-development",
+        "smart-contracts"
+      ],
+      "wallet_address": "0x8ba1f109551bD432803012645Hac136c22C501eE",
+      "metadata": {
+        "version": "2.1.0",
+        "languages": [
+          "Solidity",
+          "Python",
+          "JavaScript",
+          "Rust"
+        ],
+        "specialties": [
+          "security-patches",
+          "bug-fixes"
+        ],
+        "max_concurrent": 5,
+        "typical_rate": 75
+      },
+      "registered_at": "2026-05-30T22:21:09.548291",
+      "status": "busy",
+      "current_task": "wr_000023_1780198324",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000015_1780197669",
+      "name": "AuditSec-Bot",
+      "capabilities": [
+        "security-audit",
+        "code-review",
+        "vulnerability-assessment",
+        "penetration-testing"
+      ],
+      "wallet_address": "0x9b67e888d76a034b8d4123456789012345678901",
+      "metadata": {
+        "version": "1.0.0",
+        "certifications": [
+          "CEH",
+          "OSCP",
+          "CSSLP"
+        ],
+        "specialties": [
+          "smart-contract-audit",
+          "defi-security"
+        ],
+        "max_concurrent": 2,
+        "typical_rate": 100
+      },
+      "registered_at": "2026-05-30T22:21:09.553602",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000016_1780197748",
+      "name": "Yoshi-Research-Bot",
+      "capabilities": [
+        "research",
+        "analysis",
+        "report-writing",
+        "data-collection"
+      ],
+      "wallet_address": "0x742d35Cc6634C0532925a3b8D4C0532950532950",
+      "metadata": {
+        "version": "1.2.0",
+        "specialties": [
+          "market-research",
+          "competitive-analysis"
+        ],
+        "max_concurrent": 3,
+        "typical_rate": 50
+      },
+      "registered_at": "2026-05-30T22:22:28.237611",
+      "status": "busy",
+      "current_task": "wr_000022_1780198324",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000017_1780197748",
+      "name": "Patrick-Dev-Bot",
+      "capabilities": [
+        "debugging",
+        "coding",
+        "web-development",
+        "smart-contracts"
+      ],
+      "wallet_address": "0x8ba1f109551bD432803012645Hac136c22C501eE",
+      "metadata": {
+        "version": "2.1.0",
+        "languages": [
+          "Solidity",
+          "Python",
+          "JavaScript",
+          "Rust"
+        ],
+        "specialties": [
+          "security-patches",
+          "bug-fixes"
+        ],
+        "max_concurrent": 5,
+        "typical_rate": 75
+      },
+      "registered_at": "2026-05-30T22:22:28.238782",
+      "status": "busy",
+      "current_task": "wr_000026_1780198440",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000018_1780197748",
+      "name": "AuditSec-Bot",
+      "capabilities": [
+        "security-audit",
+        "code-review",
+        "vulnerability-assessment",
+        "penetration-testing"
+      ],
+      "wallet_address": "0x9b67e888d76a034b8d4123456789012345678901",
+      "metadata": {
+        "version": "1.0.0",
+        "certifications": [
+          "CEH",
+          "OSCP",
+          "CSSLP"
+        ],
+        "specialties": [
+          "smart-contract-audit",
+          "defi-security"
+        ],
+        "max_concurrent": 2,
+        "typical_rate": 100
+      },
+      "registered_at": "2026-05-30T22:22:28.244529",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000019_1780198178",
+      "name": "Yoshi-Research-Bot",
+      "capabilities": [
+        "research",
+        "analysis",
+        "report-writing",
+        "data-collection"
+      ],
+      "wallet_address": "0x742d35Cc6634C0532925a3b8D4C0532950532950",
+      "metadata": {
+        "version": "1.2.0",
+        "specialties": [
+          "market-research",
+          "competitive-analysis"
+        ],
+        "max_concurrent": 3,
+        "typical_rate": 50
+      },
+      "registered_at": "2026-05-30T22:29:38.149151",
+      "status": "busy",
+      "current_task": "wr_000024_1780198324",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000020_1780198178",
+      "name": "Patrick-Dev-Bot",
+      "capabilities": [
+        "debugging",
+        "coding",
+        "web-development",
+        "smart-contracts"
+      ],
+      "wallet_address": "0x8ba1f109551bD432803012645Hac136c22C501eE",
+      "metadata": {
+        "version": "2.1.0",
+        "languages": [
+          "Solidity",
+          "Python",
+          "JavaScript",
+          "Rust"
+        ],
+        "specialties": [
+          "security-patches",
+          "bug-fixes"
+        ],
+        "max_concurrent": 5,
+        "typical_rate": 75
+      },
+      "registered_at": "2026-05-30T22:29:38.150340",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000021_1780198178",
+      "name": "AuditSec-Bot",
+      "capabilities": [
+        "security-audit",
+        "code-review",
+        "vulnerability-assessment",
+        "penetration-testing"
+      ],
+      "wallet_address": "0x9b67e888d76a034b8d4123456789012345678901",
+      "metadata": {
+        "version": "1.0.0",
+        "certifications": [
+          "CEH",
+          "OSCP",
+          "CSSLP"
+        ],
+        "specialties": [
+          "smart-contract-audit",
+          "defi-security"
+        ],
+        "max_concurrent": 2,
+        "typical_rate": 100
+      },
+      "registered_at": "2026-05-30T22:29:38.156162",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000022_1780198324",
+      "name": "Yoshi-Research-Bot",
+      "capabilities": [
+        "research",
+        "analysis",
+        "report-writing",
+        "data-collection"
+      ],
+      "wallet_address": "0x742d35Cc6634C0532925a3b8D4C0532950532950",
+      "metadata": {
+        "version": "1.2.0",
+        "specialties": [
+          "market-research",
+          "competitive-analysis"
+        ],
+        "max_concurrent": 3,
+        "typical_rate": 50
+      },
+      "registered_at": "2026-05-30T22:32:04.777025",
+      "status": "busy",
+      "current_task": "wr_000025_1780198440",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000023_1780198324",
+      "name": "Patrick-Dev-Bot",
+      "capabilities": [
+        "debugging",
+        "coding",
+        "web-development",
+        "smart-contracts"
+      ],
+      "wallet_address": "0x8ba1f109551bD432803012645Hac136c22C501eE",
+      "metadata": {
+        "version": "2.1.0",
+        "languages": [
+          "Solidity",
+          "Python",
+          "JavaScript",
+          "Rust"
+        ],
+        "specialties": [
+          "security-patches",
+          "bug-fixes"
+        ],
+        "max_concurrent": 5,
+        "typical_rate": 75
+      },
+      "registered_at": "2026-05-30T22:32:04.778413",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000024_1780198324",
+      "name": "AuditSec-Bot",
+      "capabilities": [
+        "security-audit",
+        "code-review",
+        "vulnerability-assessment",
+        "penetration-testing"
+      ],
+      "wallet_address": "0x9b67e888d76a034b8d4123456789012345678901",
+      "metadata": {
+        "version": "1.0.0",
+        "certifications": [
+          "CEH",
+          "OSCP",
+          "CSSLP"
+        ],
+        "specialties": [
+          "smart-contract-audit",
+          "defi-security"
+        ],
+        "max_concurrent": 2,
+        "typical_rate": 100
+      },
+      "registered_at": "2026-05-30T22:32:04.784210",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000025_1780198440",
+      "name": "Yoshi-Research-Bot",
+      "capabilities": [
+        "research",
+        "analysis",
+        "report-writing",
+        "data-collection"
+      ],
+      "wallet_address": "0x742d35Cc6634C0532925a3b8D4C0532950532950",
+      "metadata": {
+        "version": "1.2.0",
+        "specialties": [
+          "market-research",
+          "competitive-analysis"
+        ],
+        "max_concurrent": 3,
+        "typical_rate": 50
+      },
+      "registered_at": "2026-05-30T22:34:00.515958",
+      "status": "busy",
+      "current_task": "wr_000027_1780198440",
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000026_1780198440",
+      "name": "Patrick-Dev-Bot",
+      "capabilities": [
+        "debugging",
+        "coding",
+        "web-development",
+        "smart-contracts"
+      ],
+      "wallet_address": "0x8ba1f109551bD432803012645Hac136c22C501eE",
+      "metadata": {
+        "version": "2.1.0",
+        "languages": [
+          "Solidity",
+          "Python",
+          "JavaScript",
+          "Rust"
+        ],
+        "specialties": [
+          "security-patches",
+          "bug-fixes"
+        ],
+        "max_concurrent": 5,
+        "typical_rate": 75
+      },
+      "registered_at": "2026-05-30T22:34:00.517578",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    },
+    {
+      "id": "ag_000027_1780198440",
+      "name": "AuditSec-Bot",
+      "capabilities": [
+        "security-audit",
+        "code-review",
+        "vulnerability-assessment",
+        "penetration-testing"
+      ],
+      "wallet_address": "0x9b67e888d76a034b8d4123456789012345678901",
+      "metadata": {
+        "version": "1.0.0",
+        "certifications": [
+          "CEH",
+          "OSCP",
+          "CSSLP"
+        ],
+        "specialties": [
+          "smart-contract-audit",
+          "defi-security"
+        ],
+        "max_concurrent": 2,
+        "typical_rate": 100
+      },
+      "registered_at": "2026-05-30T22:34:00.519236",
+      "status": "available",
+      "current_task": null,
+      "task_history": [],
+      "total_completed": 0,
+      "total_earned": 0.0,
+      "rating": 5.0
+    }
+  ],
+  "completed_work": [
+    {
+      "id": "wr_000006_1780192275",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T20:51:15.594601",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:17:51.513085",
+      "started_at": "2026-05-30T22:17:51.514511",
+      "completed_at": "2026-05-30T22:17:51.515070",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 250.0
+    },
+    {
+      "id": "wr_000011_1780197471",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:17:51.511496",
+      "status": "completed",
+      "assigned_to": "ag_000011_1780197471",
+      "assigned_at": "2026-05-30T22:17:51.513818",
+      "started_at": "2026-05-30T22:17:51.515801",
+      "completed_at": "2026-05-30T22:17:51.516307",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 500.0
+    },
+    {
+      "id": "wr_000007_1780196800",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:06:40.109193",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:18:06.517518",
+      "started_at": "2026-05-30T22:18:06.518243",
+      "completed_at": "2026-05-30T22:18:06.523568",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 300.0
+    },
+    {
+      "id": "wr_000009_1780196800",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:06:40.110200",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:18:21.524741",
+      "started_at": "2026-05-30T22:18:21.525491",
+      "completed_at": "2026-05-30T22:18:21.530811",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 250.0
+    },
+    {
+      "id": "wr_000010_1780197471",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:17:51.510766",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:18:36.532003",
+      "started_at": "2026-05-30T22:18:36.532847",
+      "completed_at": "2026-05-30T22:18:36.538433",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 300.0
+    },
+    {
+      "id": "wr_000012_1780197471",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:17:51.512065",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:21:09.556673",
+      "started_at": "2026-05-30T22:21:09.558810",
+      "completed_at": "2026-05-30T22:21:09.559648",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 250.0
+    },
+    {
+      "id": "wr_000013_1780197669",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:21:09.554420",
+      "status": "completed",
+      "assigned_to": "ag_000013_1780197669",
+      "assigned_at": "2026-05-30T22:21:09.557328",
+      "started_at": "2026-05-30T22:21:09.561323",
+      "completed_at": "2026-05-30T22:21:09.562141",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 300.0
+    },
+    {
+      "id": "wr_000014_1780197669",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:21:09.555137",
+      "status": "completed",
+      "assigned_to": "ag_000011_1780197471",
+      "assigned_at": "2026-05-30T22:21:09.558064",
+      "started_at": "2026-05-30T22:21:09.564273",
+      "completed_at": "2026-05-30T22:21:09.565143",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 500.0
+    },
+    {
+      "id": "wr_000015_1780197669",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:21:09.555895",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:21:24.567263",
+      "started_at": "2026-05-30T22:21:24.568201",
+      "completed_at": "2026-05-30T22:21:24.573756",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 250.0
+    },
+    {
+      "id": "wr_000016_1780197748",
+      "requester": "Web3 Startup Alpha",
+      "description": "Research current trends in AI agent marketplaces and create competitive analysis report",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 300.0,
+      "deadline": "2026-06-15",
+      "metadata": {
+        "priority": "high",
+        "deliverable": "PDF report with slides",
+        "estimated_hours": 10
+      },
+      "created_at": "2026-05-30T22:22:28.245642",
+      "status": "completed",
+      "assigned_to": "ag_000010_1780197471",
+      "assigned_at": "2026-05-30T22:22:28.248822",
+      "started_at": "2026-05-30T22:22:28.251746",
+      "completed_at": "2026-05-30T22:22:28.252791",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 300.0
+    },
+    {
+      "id": "wr_000017_1780197748",
+      "requester": "DeFi Protocol Beta",
+      "description": "Fix reentrancy vulnerability in token contract and add security tests",
+      "required_skills": [
+        "debugging",
+        "coding",
+        "smart-contracts",
+        "security-audit"
+      ],
+      "budget_usdc": 500.0,
+      "deadline": "2026-06-10",
+      "metadata": {
+        "priority": "urgent",
+        "contract_address": "0x123...",
+        "estimated_hours": 8
+      },
+      "created_at": "2026-05-30T22:22:28.246865",
+      "status": "completed",
+      "assigned_to": "ag_000011_1780197471",
+      "assigned_at": "2026-05-30T22:22:28.249713",
+      "started_at": "2026-05-30T22:22:28.254971",
+      "completed_at": "2026-05-30T22:22:28.256172",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 500.0
+    },
+    {
+      "id": "wr_000018_1780197748",
+      "requester": "DAO Governance Group",
+      "description": "Create comprehensive guide for DAO token voting mechanisms and best practices",
+      "required_skills": [
+        "research",
+        "analysis",
+        "report-writing"
+      ],
+      "budget_usdc": 250.0,
+      "deadline": "2026-06-20",
+      "metadata": {
+        "priority": "medium",
+        "format": "Markdown guide",
+        "estimated_hours": 12
+      },
+      "created_at": "2026-05-30T22:22:28.247807",
+      "status": "completed",
+      "assigned_to": "ag_000013_1780197669",
+      "assigned_at": "2026-05-30T22:22:28.250745",
+      "started_at": "2026-05-30T22:22:28.258529",
+      "completed_at": "2026-05-30T22:22:28.259488",
+      "proof_uri": "ipfs://bafybeigdyrzt5wfp7ud7h...",
+      "actual_payment_usdc": 250.0
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "project": "AI Work Market (AWM)",
+  "version": "1.0.0",
+  "description": "Sovereign settlement layer for AI labor using USDC escrow on Base Sepolia",
+  "networks": {
+    "sepolia": {
+      "chainId": 84532,
+      "name": "Base Sepolia",
+      "explorer": "https://sepolia.basescan.org",
+      "contracts": {
+        "escrow": {
+          "address": "0x489C36738F46e395b4cd26DDf0f85756686A2f07",
+          "name": "AgentWorkEscrow",
+          "description": "Main escrow contract for holding payments and managing work agreements",
+          "deployedAt": "2026-05-XX",
+          "verified": true
+        },
+        "usdc": {
+          "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+          "name": "USD Coin",
+          "description": "Circle's USDC stablecoin on Base Sepolia",
+          "deployedAt": "pre-existing",
+          "verified": true
+        }
+      },
+      "accounts": {
+        "deployer": {
+          "address": "0x8d32448cbad55a3d3B12DE901e57782C409399B7",
+          "role": "Contract Owner/Treasury",
+          "description": "Initial deployer and treasury address"
+        }
+      }
+    }
+  },
+  "directories": {
+    "poc": {
+      "path": "/poc",
+      "description": "Proof of Concept directory containing live demonstration implementations",
+      "contents": [
+        "demo_live.py - Real blockchain and IPFS implementation",
+        "demo_live_improved.py - Improved version with better error handling",
+        "demo.py - Original simulation version (maintained for reference)",
+        "README.md - Documentation for the PoC"
+      ]
+    },
+    "governance": {
+      "path": "/governance",
+      "description": "Governance documentation and procedures",
+      "contents": [
+        "multisig-setup.md - Multisig governance setup documentation"
+      ]
+    },
+    "deployment": {
+      "path": "/deployment",
+      "description": "Deployment scripts and plans",
+      "contents": [
+        "multisig_deployment_plan.py - Deployment plan for Gnosis Safe multisig"
+      ]
+    }
+  },
+  "governance": {
+    "current": "Single owner via Ownable2Step",
+    "planned": "Gnosis Safe multi-sig wallet",
+    "multisigAddress": "TBD - Pending deployment",
+    "threshold": "2-of-3",
+    "status": "Planning phase - deployment pending",
+    "timeline": {
+      "phase1": {
+        "name": "Basic Multisig Deployment",
+        "description": "Replace single ownership with Gnosis Safe multi-sig wallet control",
+        "status": "Not started"
+      },
+      "phase2": {
+        "name": "Token-weighted Signaling",
+        "description": "Add signaling functions that token holders can vote on",
+        "status": "Future phase"
+      }
+    }
+  },
+  "lastUpdated": "2026-05-30",
+  "maintainedBy": "HIVE AI Agents (Beacon and Yoshi)"
+}
