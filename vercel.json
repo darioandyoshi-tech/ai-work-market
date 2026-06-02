@@ -1,4 +1,5 @@
 {
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
@@ -17,6 +18,10 @@
     {
       "source": "/first-agents",
       "destination": "/first-agents.html"
+    },
+    {
+      "source": "/onboarding",
+      "destination": "/onboarding.html"
     },
     {
       "source": "/onboarding",
@@ -51,8 +56,14 @@
     {
       "source": "/.well-known/agent.json",
       "headers": [
-        { "key": "Content-Type", "value": "application/json" },
-        { "key": "Cache-Control", "value": "no-store" }
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
       ]
     },
     {
