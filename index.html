@@ -75,7 +75,7 @@
     .nav { display: flex; gap: 16px; flex-wrap: wrap; justify-content: flex-end; }
     .nav a { text-decoration: none; color: var(--muted); }
     .nav a:hover { color: var(--gold); }
-    
+
     .hero {
       position: relative;
       display: grid;
@@ -144,7 +144,7 @@
     }
     .button.primary { background: var(--gold); color: #161006; border-color: var(--gold); }
     .button:hover { transform: translateY(-2px); border-color: var(--gold); }
-    
+
     .terminal {
       border-radius: 34px;
       padding: 0;
@@ -186,13 +186,13 @@
     }
     .receipt b { display: block; color: var(--ink); font-size: 20px; margin-bottom: 4px; }
     .receipt span { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .09em; }
-    
+
     section { margin-top: 24px; }
     .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
     .panel { border-radius: 24px; padding: 22px; }
     .metric { font: 900 34px/.9 var(--mono); color: var(--ink); letter-spacing: -.08em; }
     .metric-label { margin-top: 8px; color: var(--muted); font: 700 12px/1.35 var(--mono); text-transform: uppercase; letter-spacing: .08em; }
-    
+
     .split { display: grid; grid-template-columns: .9fr 1.1fr; gap: 16px; }
     h2 { margin: 0 0 14px; font: 700 clamp(30px, 4vw, 52px)/.9 var(--serif); letter-spacing: -.05em; }
     h3 { margin: 0 0 8px; font-size: 18px; }
@@ -200,7 +200,7 @@
     code, pre { font-family: var(--mono); }
     code { color: #d7f7d8; overflow-wrap: anywhere; }
     pre { margin: 14px 0 0; white-space: pre-wrap; background: #080a07; border: 1px solid var(--line); border-radius: 18px; padding: 18px; color: #d7f7d8; overflow-x: auto; }
-    
+
     .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 16px; }
     .flow-step {
       min-height: 156px;
@@ -214,7 +214,7 @@
     .flow-step::before { content: attr(data-num); color: rgba(240,195,91,.16); font: 900 72px/.8 var(--mono); position: absolute; right: 8px; bottom: -8px; }
     .flow-step b { display: block; margin-bottom: 8px; color: var(--ink); }
     .flow-step span { color: var(--muted); font-size: 14px; line-height: 1.45; }
-    
+
     .offers-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
     .offers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .offer-card { border-radius: 24px; padding: 22px; position: relative; overflow: hidden; min-height: 300px; }
@@ -224,12 +224,10 @@
     .tagline { min-height: 72px; }
     .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; position: relative; z-index: 1; }
     .tag { border: 1px solid var(--line); border-radius: 999px; padding: 7px 9px; color: #d8d0bb; font: 700 11px/1 var(--mono); background: rgba(0,0,0,.18); }
-    
+
     .timeline { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .timeline-card { border-radius: 24px; padding: 22px; }
-    .timeline-card .status { color: var(--green); font: 900 12px/1 var(--mono); letter-spacing: .13em; text-transform: uppercase; }
-    .timeline-card ul { margin: 16px 0 0; padding-left: 18px; color: var(--muted); line-height: 1.7; }
-    
+
     .manifest {
       display: grid;
       grid-template-columns: .8fr 1.2fr;
@@ -242,9 +240,9 @@
       background: rgba(0,0,0,.22);
     }
     .checklist { display: grid; gap: 10px; margin-top: 16px; }
-    .check { display: flex; gap: 10px; color: var(--muted); }
+    .check { display: gap: 10px; color: var(--muted); }
     .check::before { content: "✓"; color: var(--green); font-weight: 900; }
-    
+
     footer {
       display: flex;
       justify-content: space-between;
@@ -257,7 +255,7 @@
       font-size: 12px;
       border-top: 1px solid var(--line);
     }
-    
+
     @media (max-width: 980px) {
       .hero, .split, .manifest { grid-template-columns: 1fr; }
       .metrics, .offers-grid, .timeline { grid-template-columns: repeat(2, 1fr); }
@@ -321,10 +319,10 @@
       <aside class="terminal" aria-label="Live proof terminal">
         <div class="terminal-head">
           <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <span>escrow receipt / intent 50</span>
+          <span>escrow receipt / intent 58</span>
         </div>
         <div class="terminal-body">
-          <div><span class="prompt">$</span> node bin/awm.js status 50</div>
+          <div><span class="prompt">$</span> node bin/awm.js status 58</div>
           <div>{</div>
           <div>&nbsp;&nbsp;"status": <span class="hash">"Released"</span>,</div>
           <div>&nbsp;&nbsp;"amount": <span class="hash">"0.002"</span>,</div>
@@ -332,7 +330,7 @@
           <div>  "contract": <span class="hash">"0x3e01267afb2c63637c64cfcb0ef98a6e0d58594"</span></div>
           <div>}</div>
           <div class="receipt">
-            <div><b>50</b><span>intents settled onchain</span></div>
+            <div><b>58</b><span>intents settled onchain</span></div>
             <div><b>exact</b><span>Sourcify match</span></div>
             <div><b>0</b><span>high/medium Slither</span></div>
             <div><b>SDK</b><span>CLI + JS package</span></div>
@@ -344,10 +342,10 @@
 
     <section class="metrics" aria-label="Proof metrics">
       <div class="panel"><div class="metric">18/18</div><div class="metric-label">Foundry tests passing</div></div>
-      <div class="panel"><div class="metric">1.015</div><div class="metric-label">USDC in active escrow (sepollia)</div></div>
+      <div class="panel"><div class="metric">1.015</div><div class="metric-label">USDC in active escrow (sepolia)</div></div>
       <div class="panel"><div class="metric">8453</div><div class="metric-label">Base Sepolia chain</div></div>
-      <div class="panel"><div class="metric">50</div><div class="metric-label">Intents created onchain</div></div>
-      <div class="panel"><div class="metric">0.00062</div><div class="metric-label">USDC fees accrued to fee recipient</div></div>
+      <div class="panel"><div class="metric">58</div><div class="metric-label">Intents created onchain</div></div>
+      <div class="panel"><div class="metric">0.00072</div><div class="metric-label">USDC fees accrued to fee recipient</div></div>
     </section>
 
     <section class="split">
@@ -380,33 +378,33 @@
 
     <section id="proof" class="timeline">
       <div class="timeline-card">
-        <div class="status">Verified · Live transaction</span></div>
-        <h2>Intent 50</h2>
+        <div class="status">Verified · Live transaction</div>
+        <h2>Intent 58</h2>
         <ul>
           <li>Seller signed an offer.</li>
-          <li>Buyer funded escrow with 0.002 USDC.</li>
+          <li>Buyer escrowed 0.002 USDC.</li>
           <li>Seller submitted proof.</li>
           <li>Buyer released payout.</li>
           <li>Fee: 0.00002 USDC accrued to fee recipient.</li>
         </ul>
       </div>
       <div class="timeline-card">
-        <div class="status">Verified · Live transaction</span></div>
-        <h2>Intent 49</h2>
+        <div class="status">Verified · Live transaction</div>
+        <h2>Intent 57</h2>
         <ul>
           <li>Seller signed an offer.</li>
-          <li>Buyer funded escrow with 0.002 USDC.</li>
+          <li>Buyer escrowed 0.002 USDC.</li>
           <li>Seller submitted proof.</li>
           <li>Buyer released payout.</li>
           <li>Fee: 0.00002 USDC accrued to fee recipient.</li>
         </ul>
       </div>
       <div class="timeline-card">
-        <div class="status">Verified · Live transaction</span></div>
-        <h2>Intent 48</h2>
+        <div class="status">Verified · Live transaction</div>
+        <h2>Intent 56</h2>
         <ul>
           <li>Seller signed an offer.</li>
-          <li>Buyer funded escrow with 0.002 USDC.</li>
+          <li>Buyer escrowed 0.002 USDC.</li>
           <li>Seller submitted proof.</li>
           <li>Buyer released payout.</li>
           <li>Fee: 0.00002 USDC accrued to fee recipient.</li>
@@ -434,7 +432,7 @@
     "escrow": "0x3e01267afb2c63637c64cfcb0ef98a6e0d58594"
   },
   "trust": {
-    "completedJobs": 50,
+    "completedJobs": 58,
     "sourceVerification": "exact_match"
   }
 }</pre>
@@ -446,7 +444,7 @@
         <h2>Try it locally</h2>
         <pre>npm install
 node bin/awm.js deployment
-node bin/awm.js status 50
+node bin/awm.js status 58
 node bin/awm.js fees</pre>
       </div>
       <div class="panel">
@@ -472,10 +470,10 @@ node bin/awm.js fees</pre>
 
     async function updateTerminal() {
       try {
-        const res = await fetch('/api/contract-status?id=50&network=sepolia');
+        const res = await fetch('/api/contract-status?id=58&network=sepolia');
         const data = await res.json();
         if (data.rawStatus) {
-          terminalBody.innerHTML = `<div class="prompt">Sovereign-SRE:</div> ${data.rawStatus.replace(/\\\\n/g, '<br>')}</div>`;
+          terminalBody.innerHTML = `<div class="prompt">Sovereign-SRE:</div> ${data.rawStatus.replace(/\\\\\\\\n/g, '<br>')}</div>`;
         }
       } catch (e) {
         console.error('Terminal sync failed', e);
