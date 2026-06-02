@@ -11,6 +11,7 @@ if (!fs.existsSync(distDir)) {
 const filesToCopy = [
   'index.html',
   'AWM_SYSTEM_STATUS.html',
+  'docs.html',
   'og-image.svg',
   'robots.txt'
 ];
