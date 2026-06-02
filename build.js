@@ -13,7 +13,11 @@ const filesToCopy = [
   'AWM_SYSTEM_STATUS.html',
   'docs.html',
   'og-image.svg',
-  'robots.txt'
+  'robots.txt',
+  'connect.html',
+  'register.html',
+  'agents.html',
+  'post-work.html'
 ];
 
 // Copy each file to dist directory
