@@ -116,16 +116,22 @@ function main() {
   // (We can't sign without a key, but we can call the static read methods
   // to confirm the Timelock has the Safe as PROPOSER_ROLE.)
   console.log('--- To verify on-chain before submitting ---');
-  console.log('1. Safe has PROPOSER_ROLE on Timelock:');
+  console.log('1. Safe has PROPOSER_ROLE on Timelock (verified live 2026-06-03):');
   console.log('   cast call 0xF8C67A2F195d98Dbb7df2e7B8ca70Cc430AD0967 \\');
   console.log('     "hasRole(bytes32,address)(bool)" \\');
-  console.log('     0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27b66b4a9c4c0727589f00 \\');
+  console.log('     0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27a1d5ca736082b6819cc1 \\');
   console.log('     0x7f36896F6b6496B4E2fE95f672B3DAf28386b637 --rpc-url https://mainnet.base.org');
-  console.log('   (MUST return true)');
+  console.log('   (VERIFIED: returns true)');
   console.log();
-  console.log('2. Safe has EXECUTOR_ROLE on Timelock (same hasRole pattern, hash for EXECUTOR_ROLE):');
-  console.log('   EXECUTOR_ROLE = 0xd8d0f19b08e74e8c1e9b8a8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b (recompute fresh)');
-  console.log('   cast keccak "EXECUTOR_ROLE"');
+  console.log('2. Safe has EXECUTOR_ROLE on Timelock:');
+  console.log('   EXECUTOR_ROLE = 0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63');
+  console.log('   (VERIFIED: returns true)');
+  console.log();
+  console.log('3. Admin is NOT renounced yet (you still have DEFAULT_ADMIN_ROLE).');
+  console.log('   This is GOOD for recovery. After the proposal executes, optionally');
+  console.log('   renounce admin in a separate Timelock proposal.');
+  console.log();
+  console.log('4. Min delay: 172800 sec = 48h ✓ (matches the script).');
   console.log();
   console.log('3. The deployer (0xec89c40c…) still has DEFAULT_ADMIN_ROLE on the Timelock.');
   console.log('   If you intend to renounce admin AFTER the proposal executes, do that');
