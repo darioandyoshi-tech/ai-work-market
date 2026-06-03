@@ -76,13 +76,15 @@ async function readIntentFromStorage(provider, escrowAddr, intentId) {
   if (!isHex || isHex === '0x' || isHex === '0x0') {
     return { found: false, reason: 'no_code' };
   }
-  // Find the base slot by probing 0..15 in parallel.
-  const targetBuyer = '0xec89c40ca296f502cd033e07f18da5e01cdd197d'; // deployer EOA
+  // Find the base slot by probing 0..15. Use raw provider.send for each call
+  // because ethers v6's getStorage auto-batches into one eth_getStorageAt batch
+  // (with the 10-call Base Mainnet cap, only 1 of 16 returns data).
+  const targetBuyer = '0xec89c40ca296f502cd033e07f18da5e01cdd197d';
   const probeKeys = Array.from({ length: 16 }, (_, base) =>
     ethers.solidityPackedKeccak256(['uint256', 'uint256'], [BigInt(intentId), BigInt(base)])
   );
   const probeVals = await Promise.all(
-    probeKeys.map((k) => provider.getStorage(escrowAddr, k).catch(() => '0x' + '0'.repeat(64)))
+    probeKeys.map((k) => provider.send('eth_getStorageAt', [escrowAddr, k, 'latest']).catch(() => '0x' + '0'.repeat(64)))
   );
   let baseSlot = null;
   for (let i = 0; i < 16; i++) {
