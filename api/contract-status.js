@@ -35,32 +35,28 @@ const STATUS_NAMES = [
 // without a CALL_EXCEPTION wins. Each candidate is a JS object describing how
 // to project the decoded tuple into the canonical response shape.
 //
-// The deployed mainnet bytecode exposes a 14-field struct. The 12-field local
-// source mismatches because of string fields (workURI, proofURI) and trailing
-// bytes32. ethers v6's Contract.method() is fragile when strings are involved
-// (returns "deferred error during ABI decoding"). We bypass it by using
-// provider.call + Interface.decodeFunctionResult, which gives us full control
-// over decoding and surfaces the actual error string.
+// ethers v6 has "deferred error" semantics for ABI decoding: if any dynamic
+// field in the result is malformed, the WHOLE destructure throws at access
+// time. To avoid this, we use minimal ABIs (no dynamic strings) and read the
+// canonical fields directly.
 const INTENT_CANDIDATES = [
-  // 14 fields, observed order on deployed mainnet (workURI, proofURI included)
+  // 12 fields, local source: (buyer, seller, amount, feeBps, createdAt,
+  //   workDeadline, reviewDeadline, reviewPeriod, workHash, status, proofHash, disputeHash)
+  // Dynamic strings (workURI, proofURI) are dropped because ethers v6 throws
+  // "deferred error" when ANY subsequent field is accessed after a corrupt
+  // dynamic type. We can fetch the strings separately via eth_getStorageAt
+  // if needed (out of scope here).
   {
-    label: 'mainnet-14field',
-    signature:
-      'function intents(uint256) view returns (address, address, uint256, uint96, uint256, uint256, uint256, uint256, bytes32, string, string, uint8, bytes32, bytes32)',
-    layout: '14',
-  },
-  // 12 fields, local AgentWorkEscrowZK.sol (no workURI/proofURI)
-  {
-    label: 'local-12field',
-    signature:
-      'function intents(uint256) view returns (address, address, uint96, uint256, uint256, uint256, uint256, uint256, bytes32, uint8, bytes32, bytes32)',
-    layout: '12',
-  },
-  // 12 fields, swapped amount/feeBps
-  {
-    label: 'mainnet-12field-amount-feeBps-swap',
+    label: 'mainnet-12field-minimal',
     signature:
       'function intents(uint256) view returns (address, address, uint256, uint96, uint256, uint256, uint256, uint256, bytes32, uint8, bytes32, bytes32)',
+    layout: '12-minimal',
+  },
+  // 12 fields, swapped amount/feeBps (older local source revision)
+  {
+    label: 'local-12field-feeBps-first',
+    signature:
+      'function intents(uint256) view returns (address, address, uint96, uint256, uint256, uint256, uint256, uint256, bytes32, uint8, bytes32, bytes32)',
     layout: '12-swap',
   },
 ];
@@ -201,24 +197,29 @@ module.exports = async function handler(req, res) {
   //    reviewPeriod, workHash, workURI, proofURI, status, proofHash, disputeHash)
   // 12-field (local source): (buyer, seller, feeBps, amount, createdAt,
   //   workDeadline, reviewDeadline, reviewPeriod, workHash, status, proofHash, disputeHash)
-  // 12-field-swap: (buyer, seller, amount, feeBps, ...)
-  const [a, b, c, d, e, f, g, h, i, j, k, l, m, n] = best.decoded;
-  const layout = best.layout;
-  let buyer, seller, amount, feeBps, createdAt, workDeadline, reviewDeadline, reviewPeriod, workHash, workURI, proofURI, statusCode, proofHash, disputeHash;
+  // 12-minimal: (buyer, seller, amount, feeBps, createdAt, workDeadline,
+  //   reviewDeadline, reviewPeriod, workHash, status, proofHash, disputeHash)
+  // 12-swap: (buyer, seller, feeBps, amount, createdAt, workDeadline,
+  //   reviewDeadline, reviewPeriod, workHash, status, proofHash, disputeHash)
   // Coerce BigInt and string addresses/bytes32 to the expected response types.
   const str = (v) => (v == null || v === '' ? null : typeof v === 'bigint' ? v.toString() : String(v));
   const num = (v) => (v == null ? null : typeof v === 'bigint' ? Number(v) : Number(v));
   const addr = (v) => { if (v == null) return null; const s = str(v); return /^0x[0-9a-fA-F]{40}$/.test(s) ? s : null; };
-  if (layout === '14') {
-    buyer = addr(a); seller = addr(b);
-    amount = str(c); feeBps = num(d);
-    createdAt = str(e); workDeadline = str(f); reviewDeadline = str(g); reviewPeriod = str(h);
-    workHash = str(i);
-    workURI = str(j) || null; proofURI = str(k) || null;
-    // status is a uint8 returned as number; handle "deferred error" from the strings
-    try { statusCode = num(l); } catch (_) { statusCode = null; }
-    proofHash = str(m); disputeHash = str(n);
-  } else if (layout === '12-swap') {
+  // Wrap destructure in try/catch — ethers v6 deferred error semantics throw
+  // when any field after a corrupt one is accessed. We need all 12 fields to
+  // map the response shape.
+  let a, b, c, d, e, f, g, h, i, j, k, l;
+  try {
+    [a, b, c, d, e, f, g, h, i, j, k, l] = best.decoded;
+  } catch (err) {
+    // Fall back to per-field access with try/catch
+    const safe = (idx) => { try { return best.decoded[idx]; } catch (_) { return null; } };
+    a = safe(0); b = safe(1); c = safe(2); d = safe(3); e = safe(4); f = safe(5);
+    g = safe(6); h = safe(7); i = safe(8); j = safe(9); k = safe(10); l = safe(11);
+  }
+  const layout = best.layout;
+  let buyer, seller, amount, feeBps, createdAt, workDeadline, reviewDeadline, reviewPeriod, workHash, statusCode, proofHash, disputeHash;
+  if (layout === '12-minimal') {
     buyer = addr(a); seller = addr(b);
     amount = str(c); feeBps = num(d);
     createdAt = str(e); workDeadline = str(f); reviewDeadline = str(g); reviewPeriod = str(h);
@@ -241,6 +242,7 @@ module.exports = async function handler(req, res) {
     intentId: String(id),
     exists: true,
     decodedWith: best.candidate,
+    layout,
     status: statusName,
     statusCode,
     buyer: buyer || (storage.possibleBuyer || null),
@@ -252,10 +254,9 @@ module.exports = async function handler(req, res) {
     reviewDeadline: reviewDeadline != null ? String(reviewDeadline) : null,
     reviewPeriod: reviewPeriod != null ? String(reviewPeriod) : null,
     workHash,
-    workURI: workURI || null,
-    proofURI: proofURI || null,
     proofHash,
     disputeHash,
+    note: 'workURI and proofURI are dynamic strings not decoded (ethers v6 deferred-error). Use storage slots or full ABI with try/catch if you need them.',
     storage,
     attempts,
     timestamp: new Date().toISOString(),
