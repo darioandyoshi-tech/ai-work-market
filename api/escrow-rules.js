@@ -105,14 +105,27 @@ module.exports = async function handler(req, res) {
     maxReviewPeriodSeconds: 14 * 24 * 3600,     // 14 days
     minDisputeFeeRaw: 10000n,                   // 0.01 USDC (6 decimals)
   };
-  async function safe(p) { try { return await p; } catch (e) { return { __err: (e && e.message || String(e)).slice(0, 200) }; } }
-  const feeBps        = { status: 'fulfilled', value: await safe(escrow.defaultFeeBps()) };
-  const owner         = { status: 'fulfilled', value: await safe(escrow.owner()) };
-  const feeRecipient  = { status: 'fulfilled', value: await safe(escrow.feeRecipient()) };
-  const zkVerifier    = { status: 'fulfilled', value: await safe(escrow.zkVerifier()) };
-  const usdc          = { status: 'fulfilled', value: await safe(escrow.usdc()) };
-  const accumulatedFees = { status: 'fulfilled', value: await safe(escrow.accumulatedFees()) };
-  const nextIntentId  = { status: 'fulfilled', value: await safe(escrow.nextIntentId()) };
+  // Use provider.call + interface.decodeFunctionResult to bypass ethers v6's
+  // auto-batcher quirks. For the 7 view functions that exist on the deployed
+  // bytecode, this is the most reliable way.
+  const iface = new ethers.Interface(ESCROW_ABI);
+  async function callDecoded(name) {
+    try {
+      const data = iface.encodeFunctionData(name, []);
+      const raw = await provider.call({ to: cfg.escrow, data });
+      const decoded = iface.decodeFunctionResult(name, raw);
+      return decoded[0];
+    } catch (e) {
+      return { __err: (e && e.message || String(e)).slice(0, 200) };
+    }
+  }
+  const feeBps        = { status: 'fulfilled', value: await callDecoded('defaultFeeBps') };
+  const owner         = { status: 'fulfilled', value: await callDecoded('owner') };
+  const feeRecipient  = { status: 'fulfilled', value: await callDecoded('feeRecipient') };
+  const zkVerifier    = { status: 'fulfilled', value: await callDecoded('zkVerifier') };
+  const usdc          = { status: 'fulfilled', value: await callDecoded('usdc') };
+  const accumulatedFees = { status: 'fulfilled', value: await callDecoded('accumulatedFees') };
+  const nextIntentId  = { status: 'fulfilled', value: await callDecoded('nextIntentId') };
   function asSettled(r) {
     if (r.value && r.value.__err) return { status: 'rejected', reason: new Error(r.value.__err) };
     return r;
