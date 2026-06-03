@@ -157,9 +157,9 @@ module.exports = async function handler(req, res) {
   // Try each candidate ABI using provider.call + Interface.decodeFunctionResult
   // (bypasses ethers v6's auto-batcher and gives a clean error string).
   //
-  // NOTE: For a single-return function, decodeFunctionResult returns a 1-element
-  // array where decoded[0] IS the tuple (a Result, which is array-like). Do NOT
-  // wrap it in Array.from() — that stringifies it character-by-character.
+  // NOTE: decodeFunctionResult returns the tuple DIRECTLY (array-like with
+  // length=N for an N-field return). It is NOT wrapped in another array.
+  // decoded[0] is the first field, not the inner tuple.
   const attempts = [];
   let best = null;
   for (const cand of INTENT_CANDIDATES) {
@@ -167,13 +167,11 @@ module.exports = async function handler(req, res) {
       const iface = new ethers.Interface([cand.signature]);
       const data = iface.encodeFunctionData('intents', [id]);
       const raw = await provider.call({ to: cfg.escrow, data });
-      const decodedRes = iface.decodeFunctionResult('intents', raw);
-      const arr = decodedRes[0]; // Result object, array-like (length=N, arr[i] = field i)
+      const arr = iface.decodeFunctionResult('intents', raw); // direct tuple
       attempts.push({ candidate: cand.label, ok: true, length: arr.length });
-      // Prefer the 14-field layout (real on-chain); fall back to others
       if (!best || cand.layout === '14') {
         best = { candidate: cand.label, layout: cand.layout, decoded: arr };
-        if (cand.layout === '14') break; // 14 is canonical
+        if (cand.layout === '14') break;
       }
     } catch (err) {
       attempts.push({ candidate: cand.label, ok: false, error: (err && err.message || '').slice(0, 200) });
@@ -207,22 +205,31 @@ module.exports = async function handler(req, res) {
   const [a, b, c, d, e, f, g, h, i, j, k, l, m, n] = best.decoded;
   const layout = best.layout;
   let buyer, seller, amount, feeBps, createdAt, workDeadline, reviewDeadline, reviewPeriod, workHash, workURI, proofURI, statusCode, proofHash, disputeHash;
+  // Coerce BigInt and string addresses/bytes32 to the expected response types.
+  const str = (v) => (v == null || v === '' ? null : typeof v === 'bigint' ? v.toString() : String(v));
+  const num = (v) => (v == null ? null : typeof v === 'bigint' ? Number(v) : Number(v));
+  const addr = (v) => { if (v == null) return null; const s = str(v); return /^0x[0-9a-fA-F]{40}$/.test(s) ? s : null; };
   if (layout === '14') {
-    buyer = a; seller = b; amount = c; feeBps = d;
-    createdAt = e; workDeadline = f; reviewDeadline = g; reviewPeriod = h;
-    workHash = i; workURI = j; proofURI = k;
-    statusCode = typeof l === 'number' || typeof l === 'bigint' ? Number(l) : (typeof l === 'string' ? parseInt(l, 16) : null);
-    proofHash = m; disputeHash = n;
+    buyer = addr(a); seller = addr(b);
+    amount = str(c); feeBps = num(d);
+    createdAt = str(e); workDeadline = str(f); reviewDeadline = str(g); reviewPeriod = str(h);
+    workHash = str(i);
+    workURI = str(j) || null; proofURI = str(k) || null;
+    // status is a uint8 returned as number; handle "deferred error" from the strings
+    try { statusCode = num(l); } catch (_) { statusCode = null; }
+    proofHash = str(m); disputeHash = str(n);
   } else if (layout === '12-swap') {
-    buyer = a; seller = b; amount = c; feeBps = d;
-    createdAt = e; workDeadline = f; reviewDeadline = g; reviewPeriod = h;
-    workHash = i; statusCode = typeof j === 'number' || typeof j === 'bigint' ? Number(j) : null;
-    proofHash = k; disputeHash = l;
+    buyer = addr(a); seller = addr(b);
+    amount = str(c); feeBps = num(d);
+    createdAt = str(e); workDeadline = str(f); reviewDeadline = str(g); reviewPeriod = str(h);
+    workHash = str(i); statusCode = num(j);
+    proofHash = str(k); disputeHash = str(l);
   } else {
-    buyer = a; seller = b; feeBps = c; amount = d;
-    createdAt = e; workDeadline = f; reviewDeadline = g; reviewPeriod = h;
-    workHash = i; statusCode = typeof j === 'number' || typeof j === 'bigint' ? Number(j) : null;
-    proofHash = k; disputeHash = l;
+    buyer = addr(a); seller = addr(b);
+    feeBps = num(c); amount = str(d);
+    createdAt = str(e); workDeadline = str(f); reviewDeadline = str(g); reviewPeriod = str(h);
+    workHash = str(i); statusCode = num(j);
+    proofHash = str(k); disputeHash = str(l);
   }
 
   const statusName = statusCode != null && STATUS_NAMES[statusCode] ? STATUS_NAMES[statusCode] : (statusCode != null ? `Unknown(${statusCode})` : 'Unknown');
