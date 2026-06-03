@@ -243,7 +243,7 @@ module.exports = async function handler(req, res) {
         feeRecipient: errFor(feeRecipient),
         owner: errFor(owner),
         zkVerifier: errFor(zkVerifier),
-        usdc: errFor(usdc),
+        // usdc, accumulatedFees, nextIntentId are hardcoded (see DEPLOYED_GAPS).
       },
     },
   });
