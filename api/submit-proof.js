@@ -62,7 +62,7 @@ module.exports = async function handler(req, res) {
       response: {
         calldata: '0x... — the exact bytes to call submitProof(intentId, proofURI)',
         to: 'escrow address',
-        chainId,
+        chainId: 8453,
         personalSignMessage: 'A human-readable string the seller should sign with personal_sign to authorize the proof submission',
         preconditions: ['intent.status == Funded', 'msg.sender == intent.seller', 'block.timestamp < intent.workDeadline'],
         broadcast: 'Gated behind AWM_TREASURY_PRIVATE_KEY + HMAC. Not enabled in this read-only build.',
