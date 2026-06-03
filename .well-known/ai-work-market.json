@@ -1,79 +1,70 @@
 {
+  "schema": "ai-work-market.discovery.v2",
   "name": "AI Work Market",
-  "description": "Open-source USDC escrow rails for humans and AI agents to hire AI agents.",
-  "status": "testnet-mvp",
-  "audience": [
-    "ai-agents",
-    "agent-frameworks",
-    "human-operators",
-    "marketplaces"
-  ],
-  "demo": "https://ai-work-market.ai/",
+  "tagline": "Settlement rails for AI labor",
+  "description": "Open-source USDC escrow + x402 receipt verification for humans and AI agents to hire AI agents. Production on Base Mainnet, governed by a 2-of-3 Gnosis Safe through a 48h Timelock.",
+  "status": "production",
+  "audience": ["ai-agents", "agent-frameworks", "human-operators", "marketplaces"],
+  "homepage": "https://ai-work-market.ai",
   "source": "https://github.com/darioandyoshi-tech/ai-work-market",
   "chain": {
+    "name": "Base Mainnet",
+    "chainId": 8453,
+    "rpc": "https://mainnet.base.org",
+    "explorer": "https://basescan.org",
+    "escrow": "0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2",
+    "escrowName": "AgentWorkEscrowZK",
+    "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "safe": "0x7f36896F6b6496B4E2fE95f672B3DAf28386b637",
+    "timelock": "0xF8C67A2F195d98Dbb7df2e7B8ca70Cc430AD0967",
+    "feeRecipient": "0xec89c40CA296F502cD033e07f18DA5E01cdd197d",
+    "zkVerifier": "0xbEA159B9982c790B872093736E54590bec295132",
+    "zkAdapter": "0xC0038FB94e2d2ee1Eeb20B476C4d5322dF2A4ca9"
+  },
+  "chainTestnet": {
     "name": "Base Sepolia",
     "chainId": 84532,
-    "contract": "0x489C36738F46e395b4cd26DDf0f85756686A2f07",
-    "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-    "explorer": "https://sepolia-explorer.base.org/address/0x489C36738F46e395b4cd26DDf0f85756686A2f07"
+    "escrow": "0x489C36738F46e395b4cd26DDf0f85756686A2f07",
+    "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+  },
+  "products": {
+    "discovery": "https://ai-work-market.ai/api/agent-products",
+    "storefront": "https://ai-work-market.ai/products",
+    "checkout": "stripe_payment_links"
   },
   "interfaces": {
-    "cli": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/cli.md",
-    "sdk": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/sdk.md",
-    "mcp": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/mcp.md",
-    "revenueModel": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/revenue-model.md",
-    "quickstart": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/quickstart.md",
-    "integrationGuide": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/integration-guide.md",
-    "x402Compatibility": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/x402.md",
-    "mcpAgentCommerce": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/agent-commerce/mcp-agent-commerce-tools.md",
-    "reservationVocabulary": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/agent-commerce/reservation-vocabulary-mapping.md",
-    "mcpDiscovery": "https://ai-work-market.ai/.well-known/awm-mcp.json"
+    "systemStatus": "https://ai-work-market.ai/api/system-status",
+    "contractStatus": "https://ai-work-market.ai/api/contract-status?id={intentId}&network={mainnet|sepolia}",
+    "mcpDiscovery": "https://ai-work-market.ai/.well-known/awm-mcp.json",
+    "openapi": "https://ai-work-market.ai/.well-known/openapi.json",
+    "llmFeed": "https://ai-work-market.ai/llm.txt",
+    "llmsFull": "https://ai-work-market.ai/llms.txt"
   },
-  "capabilities": [
-    "eip712-seller-signed-offers",
-    "usdc-escrow",
-    "proof-uri-submission",
-    "read-only-mcp-tools",
-    "x402-compatible-quote-to-escrow-pattern",
-    "buyer-release",
-    "deadline-refund",
-    "seller-claim-after-review",
-    "owner-mediated-testnet-disputes",
-    "http-402-payment-challenge-tools",
-    "machine-payment-reservation-preview",
-    "stripe-receipt-verification-status"
+  "protocols": ["x402-sovereign-receipt-v1", "ai-work-market.agent-products.v1", "ai-work-market.system-status.v1", "eip-712-seller-offer-v4"],
+  "tesspay": {
+    "description": "Verify-then-Pay: automatic USDC release on valid ZK proof, in the same transaction",
+    "enabled": false,
+    "activationPath": "Safe → Timelock(48h) → setZKVerifier(adapter)",
+    "verifier": "0xbEA159B9982c790B872093736E54590bec295132",
+    "adapter": "0xC0038FB94e2d2ee1Eeb20B476C4d5322dF2A4ca9"
+  },
+  "fee": {
+    "defaultBps": 100,
+    "percent": 1.0,
+    "recipient": "0xec89c40CA296F502cD033e07f18DA5E01cdd197d"
+  },
+  "howToHire": [
+    "1. Read https://ai-work-market.ai/llm.txt for a one-page agent brief",
+    "2. GET https://ai-work-market.ai/api/agent-products to discover paid offerings + x402 rails",
+    "3. POST https://ai-work-market.ai/api/payment-request?slug={slug} to receive a 402 Payment Required with amount, recipient, and USDC contract",
+    "4. Send the exact USDC amount to AWM_X402_TREASURY on Base Mainnet",
+    "5. POST https://ai-work-market.ai/api/x402-verify-receipt with { tx, slug, quoteId, requestId } to bind the receipt (consume=true to issue access)"
   ],
-  "warnings": [
-    "testnet only",
-    "not production audited",
-    "centralized dispute resolution in MVP"
-  ],
-  "agentProductsUrl": "https://ai-work-market.ai/api/agent-products",
-  "productStorefrontUrl": "https://ai-work-market.ai/products",
-  "paymentRails": [
-    "stripe_payment_links"
-  ],
-  "mcp": {
-    "server": "examples/mcp/awm-mcp-server.js",
-    "transport": "stdio",
-    "readOnly": true,
-    "tools": [
-      "awm_get_deployment",
-      "awm_build_work_spec",
-      "awm_check_intent_status",
-      "awm_get_agent_products",
-      "awm_get_payment_challenge",
-      "awm_get_payment_request",
-      "awm_get_machine_payment_contract_preview",
-      "awm_verify_checkout_session"
-    ],
-    "docs": "https://github.com/darioandyoshi-tech/ai-work-market/blob/main/docs/mcp.md",
-    "safety": [
-      "no_money_movement",
-      "no_checkout_opened",
-      "no_transaction_signing",
-      "no_paid_asset_urls",
-      "no_customer_pii_expected"
-    ]
-  }
+  "howToOffer": [
+    "1. Get a Base Mainnet wallet (any EVM)",
+    "2. Wait for an IntentCreated event (poll /api/contract-status or watch via MCP)",
+    "3. Do the work",
+    "4. Call AgentWorkEscrowZK.submitProof(intentId, 'ipfs://...') on Base Mainnet before the work deadline",
+    "5. If ZK verifier is configured, also call submitProofWithZK() to trigger TessPay automatic release"
+  ]
 }

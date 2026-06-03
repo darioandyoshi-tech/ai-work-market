@@ -10,6 +10,7 @@ if (!fs.existsSync(distDir)) {
 // List of files to copy
 const filesToCopy = [
   'index.html',
+  'work-list.html',
   'AWM_SYSTEM_STATUS.html',
   'docs.html',
   'og-image.svg',
@@ -38,11 +39,36 @@ const htmlDirs = ['agent-commerce.html', 'manifesto.html', 'trust.html', 'foundi
 htmlDirs.forEach(file => {
   const sourcePath = path.join(__dirname, file);
   const destPath = path.join(distDir, file);
-  
+
   if (fs.existsSync(sourcePath)) {
     fs.copyFileSync(sourcePath, destPath);
     console.log(`Copied ${file} to dist/`);
   }
 });
+
+// AI-agent discovery: llm.txt + .well-known/* so crawlers and LLM agents find
+// the marketplace, the MCP server config, the OpenAPI spec, etc.
+const discoveryFiles = [
+  'llm.txt',
+  'llms.txt',
+];
+discoveryFiles.forEach(file => {
+  const sourcePath = path.join(__dirname, file);
+  const destPath = path.join(distDir, file);
+  if (fs.existsSync(sourcePath)) {
+    fs.copyFileSync(sourcePath, destPath);
+    console.log(`Copied ${file} to dist/`);
+  }
+});
+
+const wellKnownDir = path.join(__dirname, '.well-known');
+const distWellKnown = path.join(distDir, '.well-known');
+if (fs.existsSync(wellKnownDir)) {
+  if (!fs.existsSync(distWellKnown)) fs.mkdirSync(distWellKnown, { recursive: true });
+  for (const file of fs.readdirSync(wellKnownDir)) {
+    fs.copyFileSync(path.join(wellKnownDir, file), path.join(distWellKnown, file));
+    console.log(`Copied .well-known/${file} to dist/.well-known/`);
+  }
+}
 
 console.log('Build completed successfully!');
