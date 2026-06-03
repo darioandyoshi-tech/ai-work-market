@@ -156,6 +156,10 @@ module.exports = async function handler(req, res) {
 
   // Try each candidate ABI using provider.call + Interface.decodeFunctionResult
   // (bypasses ethers v6's auto-batcher and gives a clean error string).
+  //
+  // NOTE: For a single-return function, decodeFunctionResult returns a 1-element
+  // array where decoded[0] IS the tuple (a Result, which is array-like). Do NOT
+  // wrap it in Array.from() — that stringifies it character-by-character.
   const attempts = [];
   let best = null;
   for (const cand of INTENT_CANDIDATES) {
@@ -163,8 +167,8 @@ module.exports = async function handler(req, res) {
       const iface = new ethers.Interface([cand.signature]);
       const data = iface.encodeFunctionData('intents', [id]);
       const raw = await provider.call({ to: cfg.escrow, data });
-      const decoded = iface.decodeFunctionResult('intents', raw);
-      const arr = Array.from(decoded[0]); // Result → array
+      const decodedRes = iface.decodeFunctionResult('intents', raw);
+      const arr = decodedRes[0]; // Result object, array-like (length=N, arr[i] = field i)
       attempts.push({ candidate: cand.label, ok: true, length: arr.length });
       // Prefer the 14-field layout (real on-chain); fall back to others
       if (!best || cand.layout === '14') {
