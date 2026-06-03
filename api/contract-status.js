@@ -95,7 +95,7 @@ async function rawGetStorage(rpc, address, slot) {
 //
 // This layout is empirically derived, not declared. Verify with eth_getStorageAt
 // before relying on it for other deployments.
-async function readIntentFromStorage(provider, escrowAddr, intentId) {
+async function readIntentFromStorage(rpc, provider, escrowAddr, intentId) {
   const isHex = await provider.send('eth_getCode', [escrowAddr, 'latest']);
   if (!isHex || isHex === '0x' || isHex === '0x0') {
     return { found: false, reason: 'no_code' };
@@ -197,7 +197,7 @@ module.exports = async function handler(req, res) {
     return json(res, 500, { error: 'rpc_unreachable', details: err.message, network: cfg.label });
   }
 
-  const storageResult = await readIntentFromStorage(provider, cfg.escrow, id).catch((e) => ({
+  const storageResult = await readIntentFromStorage(cfg.rpc, provider, cfg.escrow, id).catch((e) => ({
     found: false,
     reason: 'storage_error',
     error: e.message,
