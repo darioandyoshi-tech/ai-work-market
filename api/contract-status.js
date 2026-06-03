@@ -35,28 +35,33 @@ const STATUS_NAMES = [
 // without a CALL_EXCEPTION wins. Each candidate is a JS object describing how
 // to project the decoded tuple into the canonical response shape.
 //
-// The local source uses 12 fields with feeBps,amount adjacent.
-// The deployed mainnet bytecode empirically presents 14 fields (with workURI
-// and proofURI as strings) but in an order that doesn't fully match either
-// local source, so we read by-name as much as possible.
+// The deployed mainnet bytecode exposes a 14-field struct. The 12-field local
+// source mismatches because of string fields (workURI, proofURI) and trailing
+// bytes32. ethers v6's Contract.method() is fragile when strings are involved
+// (returns "deferred error during ABI decoding"). We bypass it by using
+// provider.call + Interface.decodeFunctionResult, which gives us full control
+// over decoding and surfaces the actual error string.
 const INTENT_CANDIDATES = [
   // 14 fields, observed order on deployed mainnet (workURI, proofURI included)
   {
-    label: 'mainnet-14field-workuri-proofuri',
+    label: 'mainnet-14field',
     signature:
       'function intents(uint256) view returns (address, address, uint256, uint96, uint256, uint256, uint256, uint256, bytes32, string, string, uint8, bytes32, bytes32)',
+    layout: '14',
   },
-  // 12 fields, local AgentWorkEscrow.sol (no workURI/proofURI)
+  // 12 fields, local AgentWorkEscrowZK.sol (no workURI/proofURI)
   {
     label: 'local-12field',
     signature:
       'function intents(uint256) view returns (address, address, uint96, uint256, uint256, uint256, uint256, uint256, bytes32, uint8, bytes32, bytes32)',
+    layout: '12',
   },
   // 12 fields, swapped amount/feeBps
   {
     label: 'mainnet-12field-amount-feeBps-swap',
     signature:
       'function intents(uint256) view returns (address, address, uint256, uint96, uint256, uint256, uint256, uint256, bytes32, uint8, bytes32, bytes32)',
+    layout: '12-swap',
   },
 ];
 
@@ -149,18 +154,22 @@ module.exports = async function handler(req, res) {
     return json(res, 500, { error: 'rpc_unreachable', details: err.message, network: cfg.label });
   }
 
-  // Try each candidate ABI. First one that decodes wins.
+  // Try each candidate ABI using provider.call + Interface.decodeFunctionResult
+  // (bypasses ethers v6's auto-batcher and gives a clean error string).
   const attempts = [];
   let best = null;
   for (const cand of INTENT_CANDIDATES) {
     try {
-      const contract = new ethers.Contract(cfg.escrow, [cand.signature], provider);
-      const result = await contract.intents(id);
-      // ethers returns a Result which is array-like; convert to plain array.
-      const arr = Array.from(result);
+      const iface = new ethers.Interface([cand.signature]);
+      const data = iface.encodeFunctionData('intents', [id]);
+      const raw = await provider.call({ to: cfg.escrow, data });
+      const decoded = iface.decodeFunctionResult('intents', raw);
+      const arr = Array.from(decoded[0]); // Result → array
       attempts.push({ candidate: cand.label, ok: true, length: arr.length });
-      if (!best) {
-        best = { candidate: cand.label, decoded: arr };
+      // Prefer the 14-field layout (real on-chain); fall back to others
+      if (!best || cand.layout === '14') {
+        best = { candidate: cand.label, layout: cand.layout, decoded: arr };
+        if (cand.layout === '14') break; // 14 is canonical
       }
     } catch (err) {
       attempts.push({ candidate: cand.label, ok: false, error: (err && err.message || '').slice(0, 200) });
@@ -185,36 +194,30 @@ module.exports = async function handler(req, res) {
   }
 
   // Map the decoded tuple to canonical fields by best-effort index assumption.
-  // We accept that the field order may be wrong for some fields; we still
-  // surface the raw values so the caller can interpret.
+  // 14-field layout (the real on-chain struct):
+  //   (buyer, seller, amount, feeBps, createdAt, workDeadline, reviewDeadline,
+  //    reviewPeriod, workHash, workURI, proofURI, status, proofHash, disputeHash)
+  // 12-field (local source): (buyer, seller, feeBps, amount, createdAt,
+  //   workDeadline, reviewDeadline, reviewPeriod, workHash, status, proofHash, disputeHash)
+  // 12-field-swap: (buyer, seller, amount, feeBps, ...)
   const [a, b, c, d, e, f, g, h, i, j, k, l, m, n] = best.decoded;
-
-  // 14-field candidate has fields in order: (buyer, seller, amount, feeBps,
-  // createdAt, workDeadline, reviewDeadline, reviewPeriod, workHash, workURI,
-  // proofURI, status, proofHash, disputeHash).
-  // 12-field candidate has: (buyer, seller, feeBps, amount, createdAt,
-  // workDeadline, reviewDeadline, reviewPeriod, workHash, status, proofHash,
-  // disputeHash).
-  // 12-field swap candidate: (buyer, seller, amount, feeBps, ...).
-  const is14 = best.candidate.includes('14');
-  const isSwap = best.candidate.includes('swap');
-
+  const layout = best.layout;
   let buyer, seller, amount, feeBps, createdAt, workDeadline, reviewDeadline, reviewPeriod, workHash, workURI, proofURI, statusCode, proofHash, disputeHash;
-  if (is14) {
+  if (layout === '14') {
     buyer = a; seller = b; amount = c; feeBps = d;
     createdAt = e; workDeadline = f; reviewDeadline = g; reviewPeriod = h;
     workHash = i; workURI = j; proofURI = k;
-    statusCode = typeof l === 'number' || typeof l === 'bigint' ? Number(l) : null;
+    statusCode = typeof l === 'number' || typeof l === 'bigint' ? Number(l) : (typeof l === 'string' ? parseInt(l, 16) : null);
     proofHash = m; disputeHash = n;
-  } else if (isSwap) {
+  } else if (layout === '12-swap') {
     buyer = a; seller = b; amount = c; feeBps = d;
     createdAt = e; workDeadline = f; reviewDeadline = g; reviewPeriod = h;
-    workHash = i; statusCode = Number(j);
+    workHash = i; statusCode = typeof j === 'number' || typeof j === 'bigint' ? Number(j) : null;
     proofHash = k; disputeHash = l;
   } else {
     buyer = a; seller = b; feeBps = c; amount = d;
     createdAt = e; workDeadline = f; reviewDeadline = g; reviewPeriod = h;
-    workHash = i; statusCode = Number(j);
+    workHash = i; statusCode = typeof j === 'number' || typeof j === 'bigint' ? Number(j) : null;
     proofHash = k; disputeHash = l;
   }
 
