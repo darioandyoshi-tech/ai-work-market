@@ -50,6 +50,30 @@ function pickNetwork(req) {
   return 'mainnet';
 }
 
+// rawGetStorage — direct JSON-RPC eth_getStorageAt via fetch.
+// Bypasses ethers v6's auto-batcher entirely, so each call is its own HTTP
+// request. The Base Mainnet public RPC caps eth_call batches at 10, but
+// eth_getStorageAt is not batched when sent as discrete requests.
+async function rawGetStorage(rpc, address, slot) {
+  try {
+    const res = await fetch(rpc, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_getStorageAt',
+        params: [address, slot, 'latest'],
+      }),
+    });
+    const data = await res.json();
+    if (data && data.result) return data.result;
+    return '0x' + '0'.repeat(64);
+  } catch (_) {
+    return '0x' + '0'.repeat(64);
+  }
+}
+
 // Read the entire struct from raw storage at the discovered base slot.
 // Bypasses ABI decoding entirely — works on any deployed bytecode regardless
 // of declared ABI.
@@ -76,15 +100,15 @@ async function readIntentFromStorage(provider, escrowAddr, intentId) {
   if (!isHex || isHex === '0x' || isHex === '0x0') {
     return { found: false, reason: 'no_code' };
   }
-  // Find the base slot by probing 0..15. Use raw provider.send for each call
-  // because ethers v6's getStorage auto-batches into one eth_getStorageAt batch
-  // (with the 10-call Base Mainnet cap, only 1 of 16 returns data).
+  // Find the base slot by probing 0..15. Use raw JSON-RPC via fetch to bypass
+  // ethers v6's auto-batcher entirely (proven to fail on the 10-call Base cap).
+  // Each probe is its own HTTP request.
   const targetBuyer = '0xec89c40ca296f502cd033e07f18da5e01cdd197d';
   const probeKeys = Array.from({ length: 16 }, (_, base) =>
     ethers.solidityPackedKeccak256(['uint256', 'uint256'], [BigInt(intentId), BigInt(base)])
   );
   const probeVals = await Promise.all(
-    probeKeys.map((k) => provider.send('eth_getStorageAt', [escrowAddr, k, 'latest']).catch(() => '0x' + '0'.repeat(64)))
+    probeKeys.map((k) => rawGetStorage(cfg.rpc, escrowAddr, k))
   );
   let baseSlot = null;
   for (let i = 0; i < 16; i++) {
@@ -100,13 +124,11 @@ async function readIntentFromStorage(provider, escrowAddr, intentId) {
   }
   if (baseSlot === null) return { found: false, reason: 'not_initialized', probeCount: probeVals.length, probeFirst: probeVals[0] };
 
-  // Read slots 0..15 in parallel via eth_getStorageAt.
+  // Read slots 0..15 in parallel via raw JSON-RPC fetch.
   const baseKey = ethers.solidityPackedKeccak256(['uint256', 'uint256'], [BigInt(intentId), BigInt(baseSlot)]);
   const baseKeyBig = BigInt(baseKey);
   const slotKeys = Array.from({ length: 16 }, (_, i) => '0x' + (baseKeyBig + BigInt(i)).toString(16));
-  const rawSlots = await Promise.all(
-    slotKeys.map((s) => provider.send('eth_getStorageAt', [escrowAddr, s, 'latest']).catch(() => '0x' + '0'.repeat(64)))
-  );
+  const rawSlots = await Promise.all(slotKeys.map((s) => rawGetStorage(cfg.rpc, escrowAddr, s)));
   const slots = {};
   rawSlots.forEach((v, i) => { slots[i] = v; });
 
