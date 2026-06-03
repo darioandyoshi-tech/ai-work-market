@@ -98,7 +98,7 @@ async function readIntentFromStorage(provider, escrowAddr, intentId) {
       break;
     }
   }
-  if (baseSlot === null) return { found: false, reason: 'not_initialized' };
+  if (baseSlot === null) return { found: false, reason: 'not_initialized', probeCount: probeVals.length, probeFirst: probeVals[0] };
 
   // Read slots 0..15 in parallel via eth_getStorageAt.
   const baseKey = ethers.solidityPackedKeccak256(['uint256', 'uint256'], [BigInt(intentId), BigInt(baseSlot)]);
@@ -190,7 +190,7 @@ module.exports = async function handler(req, res) {
       {
         schema: 'ai-work-market.contract-status.v3',
         network: cfg.label,
-        escrow: cfg.escrow,
+        rpc: cfg.rpc,
         intentId: String(id),
         exists: true,
         method: 'storage-probe',
@@ -223,6 +223,7 @@ module.exports = async function handler(req, res) {
   return json(res, 200, {
     schema: 'ai-work-market.contract-status.v3',
     network: cfg.label,
+    rpc: cfg.rpc,
     escrow: cfg.escrow,
     intentId: String(id),
     exists: false,
