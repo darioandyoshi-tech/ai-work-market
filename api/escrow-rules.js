@@ -87,30 +87,47 @@ module.exports = async function handler(req, res) {
   // The Base Mainnet public RPC caps eth_call batches at 10, and ethers v6
   // auto-batches anything queued in the same microtask. We serialize the
   // reads to stay under the cap. (Cheap contract calls on Base; ~50ms each.)
+  //
+  // NOTE: The deployed AgentWorkEscrowZK at this address is a stripped
+  // version that exposes only: defaultFeeBps, owner, feeRecipient,
+  // zkVerifier, usdc, accumulatedFees, nextIntentId. Time/bounds fields
+  // (workTimeout, reviewPeriod, disputeWindow, etc.) DO NOT exist on this
+  // bytecode — we hardcode the documented defaults below. If a future
+  // upgrade adds them, swap them in here.
+  const DEFAULT_RULES = {
+    // These constants are read from the local Solidity source and pinned.
+    // If the source changes, update these or re-derive them from a different
+    // on-chain source.
+    workTimeoutSeconds: 14 * 24 * 3600,         // 14 days
+    reviewPeriodSeconds: 2 * 24 * 3600,         // 2 days
+    disputeWindowSeconds: 7 * 24 * 3600,         // 7 days
+    minWorkTimeoutSeconds: 24 * 3600,           // 1 day
+    maxReviewPeriodSeconds: 14 * 24 * 3600,     // 14 days
+    minDisputeFeeRaw: 10000n,                   // 0.01 USDC (6 decimals)
+  };
   async function safe(p) { try { return await p; } catch (e) { return { __err: (e && e.message || String(e)).slice(0, 200) }; } }
   const feeBps        = { status: 'fulfilled', value: await safe(escrow.defaultFeeBps()) };
-  const workTimeout   = { status: 'fulfilled', value: await safe(escrow.defaultWorkTimeout()) };
-  const reviewPeriod  = { status: 'fulfilled', value: await safe(escrow.defaultReviewPeriod()) };
-  const disputeWindow = { status: 'fulfilled', value: await safe(escrow.defaultDisputeWindow()) };
-  const minDisputeFee = { status: 'fulfilled', value: await safe(escrow.minDisputeFee()) };
-  const maxReview     = { status: 'fulfilled', value: await safe(escrow.maxReviewPeriod()) };
-  const minWork       = { status: 'fulfilled', value: await safe(escrow.minWorkTimeout()) };
-  const paused        = { status: 'fulfilled', value: await safe(escrow.paused()) };
-  const feeRecipient  = { status: 'fulfilled', value: await safe(escrow.feeRecipient()) };
   const owner         = { status: 'fulfilled', value: await safe(escrow.owner()) };
+  const feeRecipient  = { status: 'fulfilled', value: await safe(escrow.feeRecipient()) };
   const zkVerifier    = { status: 'fulfilled', value: await safe(escrow.zkVerifier()) };
   const usdc          = { status: 'fulfilled', value: await safe(escrow.usdc()) };
-  // Convert {__err} failures into the rejected shape the rest of the code expects.
+  const accumulatedFees = { status: 'fulfilled', value: await safe(escrow.accumulatedFees()) };
+  const nextIntentId  = { status: 'fulfilled', value: await safe(escrow.nextIntentId()) };
   function asSettled(r) {
     if (r.value && r.value.__err) return { status: 'rejected', reason: new Error(r.value.__err) };
     return r;
   }
-  const reads = [asSettled(feeBps), asSettled(workTimeout), asSettled(reviewPeriod), asSettled(disputeWindow), asSettled(minDisputeFee), asSettled(maxReview), asSettled(minWork), asSettled(paused), asSettled(feeRecipient), asSettled(owner), asSettled(zkVerifier), asSettled(usdc)];
+  const reads = [asSettled(feeBps), asSettled(owner), asSettled(feeRecipient), asSettled(zkVerifier), asSettled(usdc), asSettled(accumulatedFees), asSettled(nextIntentId)];
   const errFor = (r) => (r.status === 'rejected' ? (r.reason && r.reason.message || String(r.reason)).slice(0, 200) : null);
 
   // 0.01 USDC in raw units, used as the default minDisputeFee on the deployed
   // contract. Fall back to that if the RPC call fails.
   const usdcUnits = (raw) => raw != null ? (Number(raw) / 1e6).toFixed(6) + ' USDC' : null;
+
+  // Time/bounds are hardcoded from DEFAULT_RULES because the deployed contract
+  // doesn't expose them as getters (verified 2026-06-03: only defaultFeeBps,
+  // owner, feeRecipient, zkVerifier, usdc, accumulatedFees, nextIntentId exist).
+  const toOk = (r) => r.status === 'fulfilled' ? r.value : null;
 
   return json(res, 200, {
     schema: 'ai-work-market.escrow-rules.v1',
@@ -119,28 +136,31 @@ module.exports = async function handler(req, res) {
     chainId: cfg.chainId,
     escrow: cfg.escrow,
     rules: {
-      feeBps: feeBps.status === 'fulfilled' ? Number(feeBps.value) : null,
-      feePercent: feeBps.status === 'fulfilled' ? (Number(feeBps.value) / 100).toFixed(2) : null,
-      feeRecipient: feeRecipient.status === 'fulfilled' ? feeRecipient.value : null,
-      owner: owner.status === 'fulfilled' ? owner.value : null,
-      paused: paused.status === 'fulfilled' ? paused.value : null,
-      usdc: usdc.status === 'fulfilled' ? usdc.value : null,
-      zkVerifierConfigured: zkVerifier.status === 'fulfilled' ? zkVerifier.value : null,
-      zkReady: zkVerifier.status === 'fulfilled' && zkVerifier.value !== ethers.ZeroAddress,
+      feeBps: toOk(feeBps) != null ? Number(toOk(feeBps)) : null,
+      feePercent: toOk(feeBps) != null ? (Number(toOk(feeBps)) / 100).toFixed(2) : null,
+      feeRecipient: toOk(feeRecipient),
+      owner: toOk(owner),
+      usdc: toOk(usdc),
+      zkVerifierConfigured: toOk(zkVerifier),
+      zkReady: toOk(zkVerifier) != null && toOk(zkVerifier) !== ethers.ZeroAddress,
+      accumulatedFeesRaw: toOk(accumulatedFees) != null ? toOk(accumulatedFees).toString() : null,
+      accumulatedFees: toOk(accumulatedFees) != null ? (Number(toOk(accumulatedFees)) / 1e6).toFixed(6) + ' USDC' : null,
+      nextIntentId: toOk(nextIntentId) != null ? Number(toOk(nextIntentId)) : null,
 
-      // The four duration knobs an agent cares about
-      workTimeoutSeconds: workTimeout.status === 'fulfilled' ? Number(workTimeout.value) : null,
-      workTimeoutHours: workTimeout.status === 'fulfilled' ? (Number(workTimeout.value) / 3600).toFixed(2) : null,
-      reviewPeriodSeconds: reviewPeriod.status === 'fulfilled' ? Number(reviewPeriod.value) : null,
-      reviewPeriodHours: reviewPeriod.status === 'fulfilled' ? (Number(reviewPeriod.value) / 3600).toFixed(2) : null,
-      disputeWindowSeconds: disputeWindow.status === 'fulfilled' ? Number(disputeWindow.value) : null,
-      disputeWindowDays: disputeWindow.status === 'fulfilled' ? (Number(disputeWindow.value) / 86400).toFixed(2) : null,
-
-      // Bounds
-      minWorkTimeoutSeconds: minWork.status === 'fulfilled' ? Number(minWork.value) : null,
-      maxReviewPeriodSeconds: maxReview.status === 'fulfilled' ? Number(maxReview.value) : null,
-      minDisputeFeeRaw: minDisputeFee.status === 'fulfilled' ? minDisputeFee.value.toString() : null,
-      minDisputeFee: minDisputeFee.status === 'fulfilled' ? usdcUnits(minDisputeFee.value) : '0.010000 USDC',
+      // Hardcoded defaults from the deployed contract's source. The deployed
+      // bytecode at 0x8b49FF5B…Dae2 doesn't expose these as getters, so we
+      // surface the documented constants and mark the source.
+      workTimeoutSeconds: DEFAULT_RULES.workTimeoutSeconds,
+      workTimeoutHours: (DEFAULT_RULES.workTimeoutSeconds / 3600).toFixed(2),
+      reviewPeriodSeconds: DEFAULT_RULES.reviewPeriodSeconds,
+      reviewPeriodHours: (DEFAULT_RULES.reviewPeriodSeconds / 3600).toFixed(2),
+      disputeWindowSeconds: DEFAULT_RULES.disputeWindowSeconds,
+      disputeWindowDays: (DEFAULT_RULES.disputeWindowSeconds / 86400).toFixed(2),
+      minWorkTimeoutSeconds: DEFAULT_RULES.minWorkTimeoutSeconds,
+      maxReviewPeriodSeconds: DEFAULT_RULES.maxReviewPeriodSeconds,
+      minDisputeFeeRaw: DEFAULT_RULES.minDisputeFeeRaw.toString(),
+      minDisputeFee: '0.010000 USDC',
+      defaultsSource: 'hardcoded from local Solidity source (deployed contract does not expose these getters)',
     },
     lifecycle: LIFECYCLE,
     failureModes: {
