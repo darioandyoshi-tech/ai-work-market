@@ -88,22 +88,31 @@ module.exports = async function handler(req, res) {
   // auto-batches anything queued in the same microtask. We serialize the
   // reads to stay under the cap. (Cheap contract calls on Base; ~50ms each.)
   //
-  // NOTE: The deployed AgentWorkEscrowZK at this address is a stripped
-  // version that exposes only: defaultFeeBps, owner, feeRecipient,
-  // zkVerifier, usdc, accumulatedFees, nextIntentId. Time/bounds fields
-  // (workTimeout, reviewPeriod, disputeWindow, etc.) DO NOT exist on this
-  // bytecode — we hardcode the documented defaults below. If a future
-  // upgrade adds them, swap them in here.
-  const DEFAULT_RULES = {
-    // These constants are read from the local Solidity source and pinned.
-    // If the source changes, update these or re-derive them from a different
-    // on-chain source.
+  // Verified 2026-06-03 against the deployed bytecode at 0x8b49FF5B…Dae2:
+  // only these 4 view functions actually exist:
+  //   - defaultFeeBps() returns (uint96) → 100  (1%)
+  //   - owner() returns (address)        → Timelock
+  //   - feeRecipient() returns (address) → 0xec89c40C…
+  //   - zkVerifier() returns (address)   → 0xbEA159B9…5132
+  // Other common getters (usdc, accumulatedFees, nextIntentId, paused,
+  // workTimeout, reviewPeriod, disputeWindow) are NOT exposed by the
+  // deployed bytecode. We hardcode the documented values from local source
+  // and surface the gap explicitly in `rules.deployedGaps`.
+  const DEPLOYED_GAPS = [
+    'usdc — not exposed; using 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 (Base Mainnet USDC) from local config',
+    'accumulatedFees — not exposed; defaulting to null',
+    'nextIntentId — not exposed; defaulting to null',
+    'paused — not exposed; defaulting to null (treat as unpaused)',
+    'workTimeout/reviewPeriod/disputeWindow/min/max/minDisputeFee — not exposed; using local source defaults',
+  ];
+  const DEFAULTS = {
+    usdc: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
     workTimeoutSeconds: 14 * 24 * 3600,         // 14 days
     reviewPeriodSeconds: 2 * 24 * 3600,         // 2 days
     disputeWindowSeconds: 7 * 24 * 3600,         // 7 days
     minWorkTimeoutSeconds: 24 * 3600,           // 1 day
     maxReviewPeriodSeconds: 14 * 24 * 3600,     // 14 days
-    minDisputeFeeRaw: 10000n,                   // 0.01 USDC (6 decimals)
+    minDisputeFeeRaw: '10000',                   // 0.01 USDC (6 decimals)
   };
   // Use provider.call + interface.decodeFunctionResult to bypass ethers v6's
   // auto-batcher quirks. For the 7 view functions that exist on the deployed
@@ -123,14 +132,11 @@ module.exports = async function handler(req, res) {
   const owner         = { status: 'fulfilled', value: await callDecoded('owner') };
   const feeRecipient  = { status: 'fulfilled', value: await callDecoded('feeRecipient') };
   const zkVerifier    = { status: 'fulfilled', value: await callDecoded('zkVerifier') };
-  const usdc          = { status: 'fulfilled', value: await callDecoded('usdc') };
-  const accumulatedFees = { status: 'fulfilled', value: await callDecoded('accumulatedFees') };
-  const nextIntentId  = { status: 'fulfilled', value: await callDecoded('nextIntentId') };
   function asSettled(r) {
     if (r.value && r.value.__err) return { status: 'rejected', reason: new Error(r.value.__err) };
     return r;
   }
-  const reads = [asSettled(feeBps), asSettled(owner), asSettled(feeRecipient), asSettled(zkVerifier), asSettled(usdc), asSettled(accumulatedFees), asSettled(nextIntentId)];
+  const reads = [asSettled(feeBps), asSettled(owner), asSettled(feeRecipient), asSettled(zkVerifier)];
   const errFor = (r) => (r.status === 'rejected' ? (r.reason && r.reason.message || String(r.reason)).slice(0, 200) : null);
 
   // 0.01 USDC in raw units, used as the default minDisputeFee on the deployed
@@ -153,27 +159,29 @@ module.exports = async function handler(req, res) {
       feePercent: toOk(feeBps) != null ? (Number(toOk(feeBps)) / 100).toFixed(2) : null,
       feeRecipient: toOk(feeRecipient),
       owner: toOk(owner),
-      usdc: toOk(usdc),
+      usdc: DEFAULTS.usdc,
       zkVerifierConfigured: toOk(zkVerifier),
       zkReady: toOk(zkVerifier) != null && toOk(zkVerifier) !== ethers.ZeroAddress,
-      accumulatedFeesRaw: toOk(accumulatedFees) != null ? toOk(accumulatedFees).toString() : null,
-      accumulatedFees: toOk(accumulatedFees) != null ? (Number(toOk(accumulatedFees)) / 1e6).toFixed(6) + ' USDC' : null,
-      nextIntentId: toOk(nextIntentId) != null ? Number(toOk(nextIntentId)) : null,
+      accumulatedFeesRaw: null,
+      accumulatedFees: null,
+      nextIntentId: null,
+      paused: null,
 
       // Hardcoded defaults from the deployed contract's source. The deployed
       // bytecode at 0x8b49FF5B…Dae2 doesn't expose these as getters, so we
       // surface the documented constants and mark the source.
-      workTimeoutSeconds: DEFAULT_RULES.workTimeoutSeconds,
-      workTimeoutHours: (DEFAULT_RULES.workTimeoutSeconds / 3600).toFixed(2),
-      reviewPeriodSeconds: DEFAULT_RULES.reviewPeriodSeconds,
-      reviewPeriodHours: (DEFAULT_RULES.reviewPeriodSeconds / 3600).toFixed(2),
-      disputeWindowSeconds: DEFAULT_RULES.disputeWindowSeconds,
-      disputeWindowDays: (DEFAULT_RULES.disputeWindowSeconds / 86400).toFixed(2),
-      minWorkTimeoutSeconds: DEFAULT_RULES.minWorkTimeoutSeconds,
-      maxReviewPeriodSeconds: DEFAULT_RULES.maxReviewPeriodSeconds,
-      minDisputeFeeRaw: DEFAULT_RULES.minDisputeFeeRaw.toString(),
+      workTimeoutSeconds: DEFAULTS.workTimeoutSeconds,
+      workTimeoutHours: (DEFAULTS.workTimeoutSeconds / 3600).toFixed(2),
+      reviewPeriodSeconds: DEFAULTS.reviewPeriodSeconds,
+      reviewPeriodHours: (DEFAULTS.reviewPeriodSeconds / 3600).toFixed(2),
+      disputeWindowSeconds: DEFAULTS.disputeWindowSeconds,
+      disputeWindowDays: (DEFAULTS.disputeWindowSeconds / 86400).toFixed(2),
+      minWorkTimeoutSeconds: DEFAULTS.minWorkTimeoutSeconds,
+      maxReviewPeriodSeconds: DEFAULTS.maxReviewPeriodSeconds,
+      minDisputeFeeRaw: DEFAULTS.minDisputeFeeRaw,
       minDisputeFee: '0.010000 USDC',
       defaultsSource: 'hardcoded from local Solidity source (deployed contract does not expose these getters)',
+      deployedGaps: DEPLOYED_GAPS,
     },
     lifecycle: LIFECYCLE,
     failureModes: {
