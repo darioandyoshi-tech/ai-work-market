@@ -108,7 +108,7 @@ async function readIntentFromStorage(rpc, provider, escrowAddr, intentId) {
     ethers.solidityPackedKeccak256(['uint256', 'uint256'], [BigInt(intentId), BigInt(base)])
   );
   const probeVals = await Promise.all(
-    probeKeys.map((k) => rawGetStorage(cfg.rpc, escrowAddr, k))
+    probeKeys.map((k) => rawGetStorage(rpc, escrowAddr, k))
   );
   let baseSlot = null;
   for (let i = 0; i < 16; i++) {
@@ -128,7 +128,7 @@ async function readIntentFromStorage(rpc, provider, escrowAddr, intentId) {
   const baseKey = ethers.solidityPackedKeccak256(['uint256', 'uint256'], [BigInt(intentId), BigInt(baseSlot)]);
   const baseKeyBig = BigInt(baseKey);
   const slotKeys = Array.from({ length: 16 }, (_, i) => '0x' + (baseKeyBig + BigInt(i)).toString(16));
-  const rawSlots = await Promise.all(slotKeys.map((s) => rawGetStorage(cfg.rpc, escrowAddr, s)));
+  const rawSlots = await Promise.all(slotKeys.map((s) => rawGetStorage(rpc, escrowAddr, s)));
   const slots = {};
   rawSlots.forEach((v, i) => { slots[i] = v; });
 
