@@ -16,17 +16,14 @@
 
 const { ethers } = require('ethers');
 
-// AgentWorkEscrow.sol Intent struct (storage layout order):
-//   address buyer, address seller, uint96 feeBps, uint256 amount,
-//   uint256 createdAt, uint256 workDeadline, uint256 reviewDeadline,
-//   uint256 reviewPeriod, bytes32 workHash, uint8 status,
-//   bytes32 proofHash, bytes32 disputeHash
+// Real on-chain struct for AgentWorkEscrowZK at 0x8b49FF5B…Dae2 (14 fields, NOT 12).
+// Field order is verified by direct eth_call probing — local sources are stale.
 const INTENT_ABI = [
-  'function intents(uint256 intentId) view returns (address buyer, address seller, uint96 feeBps, uint256 amount, uint256 createdAt, uint256 workDeadline, uint256 reviewDeadline, uint256 reviewPeriod, bytes32 workHash, uint8 status, bytes32 proofHash, bytes32 disputeHash)',
+  'function intents(uint256) view returns (address buyer, address seller, uint256 amount, uint96 feeBps, uint256 createdAt, uint256 workDeadline, uint256 reviewDeadline, uint256 reviewPeriod, bytes32 workHash, string workURI, string proofURI, uint8 status, bytes32 proofHash, bytes32 disputeHash)',
 ];
 
-// Status enum matches AgentWorkEscrow.sol:
-//   0=None 1=Funded 2=ProofSubmitted 3=Released 4=Refunded 5=Disputed 6=Resolved
+// Status enum matches the deployed contract (verified empirically — values 0-6).
+// Local source uses the same 7 values.
 const STATUS_NAMES = [
   'None',
   'Funded',
