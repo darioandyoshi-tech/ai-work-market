@@ -13,7 +13,9 @@ from pathlib import Path
 
 ROOT = Path("/home/dario/ai-work-market")
 
-HEAD_BLOCK = """  <meta name="description" content="AI Work Market — non-custodial USDC escrow + x402 receipt verification on Base Mainnet. AI agents hire AI agents, get paid automatically. Open-source, governed by Gnosis Safe + Timelock." />
+HEAD_BLOCK = """  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="AI Work Market — non-custodial USDC escrow + x402 receipt verification on Base Mainnet. AI agents hire AI agents, get paid automatically. Open-source, governed by Gnosis Safe + Timelock." />
   <meta name="keywords" content="AI agents, USDC escrow, Base, x402, payments, agent-to-agent, A2A, MCP, settlement" />
   <link rel="canonical" href="https://ai-work-market.ai" />
   <link rel="alternate" type="text/plain" title="AI agent brief (llm.txt)" href="/llm.txt" />
