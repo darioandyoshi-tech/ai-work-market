@@ -124,22 +124,24 @@ async function readIntentFromStorage(provider, escrowAddr, intentId) {
   if (!isHex || isHex === '0x' || isHex === '0x0') {
     return { found: false, reason: 'no_code' };
   }
-  // Find the base slot for the intents mapping by probing 0..15.
+  // Find the base slot for the intents mapping by probing 0..15 in parallel.
   const targetBuyer = '0xec89c40ca296f502cd033e07f18da5e01cdd197d'; // deployer EOA
+  const probeKeys = Array.from({ length: 16 }, (_, base) =>
+    ethers.solidityPackedKeccak256(['uint256', 'uint256'], [BigInt(intentId), BigInt(base)])
+  );
+  const probeVals = await Promise.all(probeKeys.map((k) => provider.getStorage(escrowAddr, k).catch(() => '0x' + '0'.repeat(64))));
   let baseSlot = null;
-  for (let base = 0; base < 16; base++) {
-    const key = ethers.solidityPackedKeccak256(['uint256', 'uint256'], [BigInt(intentId), BigInt(base)]);
-    const v = await provider.getStorage(escrowAddr, key);
+  for (let i = 0; i < 16; i++) {
+    const v = probeVals[i];
     if (v && v !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
-      // Match if low 20 bytes equal target OR if any non-zero address-looking
-      // content is here (we don't always know the buyer in advance).
+      // Match if low 20 bytes equal target (buyer is known) OR if the slot has
+      // any non-zero address-looking content (we don't always know the buyer in advance).
       if (v.slice(26).toLowerCase() === targetBuyer.slice(2) || /^(0x)?[0-9a-f]{40}$/i.test(v.slice(22))) {
-        baseSlot = base;
+        baseSlot = i;
         break;
       }
-      // Fallback: take the first non-zero slot, since an intent with non-zero
-      // buyer is the most common case.
-      baseSlot = base;
+      // Fallback: take the first non-zero slot (common case for buyer slot)
+      baseSlot = i;
       break;
     }
   }
@@ -147,12 +149,14 @@ async function readIntentFromStorage(provider, escrowAddr, intentId) {
 
   // Read slots 0..15 from baseSlot. For mappings, slot N is at
   // keccak256(key . baseSlot) + N (Solidity storage layout).
+  // Use parallel eth_getStorageAt (provider.send) to avoid 16 sequential round-trips
+  // — Vercel's 5-10s budget gets eaten by sequential reads on the public Base RPC.
   const baseKey = ethers.solidityPackedKeccak256(['uint256', 'uint256'], [BigInt(intentId), BigInt(baseSlot)]);
   const baseKeyBig = BigInt(baseKey);
+  const slotKeys = Array.from({ length: 16 }, (_, i) => '0x' + (baseKeyBig + BigInt(i)).toString(16));
+  const rawSlots = await Promise.all(slotKeys.map((s) => provider.send('eth_getStorageAt', [escrowAddr, s, 'latest']).catch(() => '0x' + '0'.repeat(64))));
   const slots = {};
-  for (let i = 0; i < 16; i++) {
-    slots[i] = await provider.getStorage(escrowAddr, baseKeyBig + BigInt(i));
-  }
+  rawSlots.forEach((v, i) => { slots[i] = v; });
 
   // Decode fields by raw byte slicing.
   const low20 = (s) => '0x' + s.slice(26).toLowerCase().padStart(40, '0');
