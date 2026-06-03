@@ -84,29 +84,28 @@ module.exports = async function handler(req, res) {
 
   const { ethers } = require('ethers');
   const escrow = new ethers.Contract(cfg.escrow, ESCROW_ABI, provider);
-  // The Base Mainnet public RPC caps eth_call batches at 10. ethers v6's
-  // auto-batcher groups every contract call in the same tick into one batch
-  // regardless of how we structure our JS, so we have to actually await
-  // between chunks to get them to be sent as separate requests.
-  const [feeBps, workTimeout, reviewPeriod, disputeWindow, minDisputeFee, maxReview, minWork] = await Promise.allSettled([
-    escrow.defaultFeeBps(),
-    escrow.defaultWorkTimeout(),
-    escrow.defaultReviewPeriod(),
-    escrow.defaultDisputeWindow(),
-    escrow.minDisputeFee(),
-    escrow.maxReviewPeriod(),
-    escrow.minWorkTimeout(),
-  ]);
-  // Force the auto-batcher to flush before issuing the second batch.
-  await provider.getBlockNumber().catch(() => null);
-  const [paused, feeRecipient, owner, zkVerifier, usdc] = await Promise.allSettled([
-    escrow.paused(),
-    escrow.feeRecipient(),
-    escrow.owner(),
-    escrow.zkVerifier(),
-    escrow.usdc(),
-  ]);
-  const reads = [feeBps, workTimeout, reviewPeriod, disputeWindow, minDisputeFee, maxReview, minWork, paused, feeRecipient, owner, zkVerifier, usdc];
+  // The Base Mainnet public RPC caps eth_call batches at 10, and ethers v6
+  // auto-batches anything queued in the same microtask. We serialize the
+  // reads to stay under the cap. (Cheap contract calls on Base; ~50ms each.)
+  async function safe(p) { try { return await p; } catch (e) { return { __err: (e && e.message || String(e)).slice(0, 200) }; } }
+  const feeBps        = { status: 'fulfilled', value: await safe(escrow.defaultFeeBps()) };
+  const workTimeout   = { status: 'fulfilled', value: await safe(escrow.defaultWorkTimeout()) };
+  const reviewPeriod  = { status: 'fulfilled', value: await safe(escrow.defaultReviewPeriod()) };
+  const disputeWindow = { status: 'fulfilled', value: await safe(escrow.defaultDisputeWindow()) };
+  const minDisputeFee = { status: 'fulfilled', value: await safe(escrow.minDisputeFee()) };
+  const maxReview     = { status: 'fulfilled', value: await safe(escrow.maxReviewPeriod()) };
+  const minWork       = { status: 'fulfilled', value: await safe(escrow.minWorkTimeout()) };
+  const paused        = { status: 'fulfilled', value: await safe(escrow.paused()) };
+  const feeRecipient  = { status: 'fulfilled', value: await safe(escrow.feeRecipient()) };
+  const owner         = { status: 'fulfilled', value: await safe(escrow.owner()) };
+  const zkVerifier    = { status: 'fulfilled', value: await safe(escrow.zkVerifier()) };
+  const usdc          = { status: 'fulfilled', value: await safe(escrow.usdc()) };
+  // Convert {__err} failures into the rejected shape the rest of the code expects.
+  function asSettled(r) {
+    if (r.value && r.value.__err) return { status: 'rejected', reason: new Error(r.value.__err) };
+    return r;
+  }
+  const reads = [asSettled(feeBps), asSettled(workTimeout), asSettled(reviewPeriod), asSettled(disputeWindow), asSettled(minDisputeFee), asSettled(maxReview), asSettled(minWork), asSettled(paused), asSettled(feeRecipient), asSettled(owner), asSettled(zkVerifier), asSettled(usdc)];
   const errFor = (r) => (r.status === 'rejected' ? (r.reason && r.reason.message || String(r.reason)).slice(0, 200) : null);
 
   // 0.01 USDC in raw units, used as the default minDisputeFee on the deployed
