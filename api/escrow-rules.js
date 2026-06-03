@@ -84,7 +84,10 @@ module.exports = async function handler(req, res) {
 
   const { ethers } = require('ethers');
   const escrow = new ethers.Contract(cfg.escrow, ESCROW_ABI, provider);
-  const reads = await Promise.allSettled([
+  // The Base Mainnet public RPC caps eth_call batches at 10. Split into two
+  // chunks. If this endpoint is called a lot, consider switching the chunks
+  // to a per-request rate limit or a real multicall contract.
+  const chunk1 = [
     escrow.defaultFeeBps(),
     escrow.defaultWorkTimeout(),
     escrow.defaultReviewPeriod(),
@@ -92,12 +95,20 @@ module.exports = async function handler(req, res) {
     escrow.minDisputeFee(),
     escrow.maxReviewPeriod(),
     escrow.minWorkTimeout(),
+  ];
+  const chunk2 = [
     escrow.paused(),
     escrow.feeRecipient(),
     escrow.owner(),
     escrow.zkVerifier(),
     escrow.usdc(),
+  ];
+  const [r1, r2] = await Promise.allSettled([
+    Promise.allSettled(chunk1),
+    Promise.allSettled(chunk2),
   ]);
+  const flat = (r) => r.status === 'fulfilled' ? r.value : [];
+  const reads = [...flat(r1), ...flat(r2)];
   const [feeBps, workTimeout, reviewPeriod, disputeWindow, minDisputeFee, maxReview, minWork, paused, feeRecipient, owner, zkVerifier, usdc] = reads;
   const errFor = (r) => (r.status === 'rejected' ? (r.reason && r.reason.message || String(r.reason)).slice(0, 200) : null);
 
