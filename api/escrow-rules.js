@@ -84,10 +84,11 @@ module.exports = async function handler(req, res) {
 
   const { ethers } = require('ethers');
   const escrow = new ethers.Contract(cfg.escrow, ESCROW_ABI, provider);
-  // The Base Mainnet public RPC caps eth_call batches at 10. Split into two
-  // chunks. If this endpoint is called a lot, consider switching the chunks
-  // to a per-request rate limit or a real multicall contract.
-  const chunk1 = [
+  // The Base Mainnet public RPC caps eth_call batches at 10. ethers v6's
+  // auto-batcher groups every contract call in the same tick into one batch
+  // regardless of how we structure our JS, so we have to actually await
+  // between chunks to get them to be sent as separate requests.
+  const [feeBps, workTimeout, reviewPeriod, disputeWindow, minDisputeFee, maxReview, minWork] = await Promise.allSettled([
     escrow.defaultFeeBps(),
     escrow.defaultWorkTimeout(),
     escrow.defaultReviewPeriod(),
@@ -95,21 +96,17 @@ module.exports = async function handler(req, res) {
     escrow.minDisputeFee(),
     escrow.maxReviewPeriod(),
     escrow.minWorkTimeout(),
-  ];
-  const chunk2 = [
+  ]);
+  // Force the auto-batcher to flush before issuing the second batch.
+  await provider.getBlockNumber().catch(() => null);
+  const [paused, feeRecipient, owner, zkVerifier, usdc] = await Promise.allSettled([
     escrow.paused(),
     escrow.feeRecipient(),
     escrow.owner(),
     escrow.zkVerifier(),
     escrow.usdc(),
-  ];
-  const [r1, r2] = await Promise.allSettled([
-    Promise.allSettled(chunk1),
-    Promise.allSettled(chunk2),
   ]);
-  const flat = (r) => r.status === 'fulfilled' ? r.value : [];
-  const reads = [...flat(r1), ...flat(r2)];
-  const [feeBps, workTimeout, reviewPeriod, disputeWindow, minDisputeFee, maxReview, minWork, paused, feeRecipient, owner, zkVerifier, usdc] = reads;
+  const reads = [feeBps, workTimeout, reviewPeriod, disputeWindow, minDisputeFee, maxReview, minWork, paused, feeRecipient, owner, zkVerifier, usdc];
   const errFor = (r) => (r.status === 'rejected' ? (r.reason && r.reason.message || String(r.reason)).slice(0, 200) : null);
 
   // 0.01 USDC in raw units, used as the default minDisputeFee on the deployed
