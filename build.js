@@ -41,6 +41,7 @@ const PAGES = [
 const ROOT_ASSETS = [
   'og-image.svg',
   'robots.txt',
+  'sitemap.xml',
 ];
 
 const DISCOVERY_FILES = [

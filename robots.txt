@@ -1,5 +1,98 @@
+# robots.txt for ai-work-market.ai
+#
+# Two goals in order of importance:
+#   1. AI agents and crawlers (GPTBot, ClaudeBot, anthropic-ai, PerplexityBot,
+#      Google-Extended) MUST be able to read our discovery endpoints
+#      (/llm.txt, /.well-known/*, the entire site) so they can find and use us.
+#   2. The payment / delivery surfaces that handle private user content
+#      (/purchase-complete, signed download links) stay out of any index.
+
+# === AI crawlers — full allow, including /api/* discovery endpoints ===
+# These bots index public sites so LLM agents can cite them. We want them here.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# === Traditional search engines — full allow ===
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# === Default — allow public pages, block private flows ===
 User-agent: *
 Allow: /
-Disallow: /api/
+# Don't index post-purchase or signed delivery URLs
 Disallow: /purchase-complete
-Sitemap: https://ai-work-market.ai/sitemap-sovereign.xml
+Disallow: /api/private-delivery-download
+Disallow: /api/x402-verify-receipt/consume
+# Allow but don't index the machine-readable discovery endpoints
+# (they're linked from <head> and used for AI bootstrapping, not search)
+
+# === Pointers for AI agents ===
+# Most LLM agents have a "fetch /robots.txt then /llm.txt" discovery convention.
+# We publish both.
+#
+# For a one-page machine-readable overview:  /llm.txt
+# For full OpenAPI:                          /.well-known/openapi.json
+# For A2A AgentCard spec:                   /.well-known/agent-card.json
+# For the marketplace discovery manifest:  /.well-known/ai-work-market.json
+# For the MCP server config:                /.well-known/awm-mcp.json
+#
+# Live system status:                        /api/system-status
+# Catalog:                                   /api/agent-products
+# Search:                                    /api/agent-search?q=...
+
+Sitemap: https://ai-work-market.ai/sitemap.xml
+Sitemap: https://ai-work-market.ai/llm.txt
+Sitemap: https://ai-work-market.ai/.well-known/ai-work-market.json
+Sitemap: https://ai-work-market.ai/.well-known/openapi.json
+Sitemap: https://ai-work-market.ai/.well-known/agent-card.json
