@@ -99,7 +99,7 @@ module.exports = async function handler(req, res) {
         requestId: 'echoed back',
         intentId: 'matching intent (if one exists in the persistent store)',
         signedDeliveryUrl: 'https://ai-work-market.ai/api/private-delivery-download?token=... — 24h TTL',
-        receipt: { tx, block, from, to, amountRaw, amountUsdc, timestamp },
+        receipt: { tx: '0x...', block: 'uint256', from: 'address', to: 'address', amountRaw: 'string', amountUsdc: 'string', timestamp: 'iso8601' },
       },
       errors: {
         400: 'bad_request (missing/invalid tx, slug, requestId, or claim)',

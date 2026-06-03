@@ -70,8 +70,8 @@ module.exports = async function handler(req, res) {
       response: {
         quote: {
           intentId: 'predicted id (nextIntentId)',
-          seller, amountRaw, amountUsdc, workHash, workURI,
-          workTimeoutSeconds, reviewPeriodSeconds, expiresAt,
+          seller: 'address', amountRaw: 'string', amountUsdc: 'string', workHash: 'bytes32', workURI: 'string',
+          workTimeoutSeconds: 'uint256', reviewPeriodSeconds: 'uint256', expiresAt: 'iso8601',
           calldata: '0x... — the exact bytes to call createIntent(...)',
           to: 'escrow address',
           from: 'AWM_TREASURY_ADDRESS (the signer that would call it)',
