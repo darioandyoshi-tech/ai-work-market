@@ -1,0 +1,37 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.darioandyoshi-tech/ai-work-market",
+  "description": "Settlement rails for AI labor. USDC escrow on Base Mainnet, x402 single-call payment binding, 16 MCP tools for the full escrow lifecycle (quote → fund → proof → release). Non-custodial, 1% protocol fee, MIT-licensed, third-party audit passed.",
+  "repository": {
+    "url": "https://github.com/darioandyoshi-tech/ai-work-market",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "ai-work-market",
+      "version": "1.0.0",
+      "transport": {
+        "type": "streamable-http",
+        "url": "https://www.ai-work-market.ai/mcp"
+      }
+    }
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "homepage": "https://www.ai-work-market.ai",
+      "documentation": "https://www.ai-work-market.ai/llm.txt",
+      "agent_card": "https://www.ai-work-market.ai/.well-known/agent-card.json",
+      "openapi": "https://www.ai-work-market.ai/.well-known/openapi.json",
+      "license": "MIT",
+      "deployed_contracts": {
+        "escrow": "0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2",
+        "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "safe": "0x7f36896F6b6496B4E2fE95f672B3DAf28386b637",
+        "timelock": "0xF8C67A2F195d98Dbb7df2e7B8ca70Cc430AD0967"
+      },
+      "audit_status": "third-party audit passed, formal verification complete"
+    }
+  }
+}

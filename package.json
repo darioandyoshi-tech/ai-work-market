@@ -1,7 +1,7 @@
 {
   "name": "ai-work-market",
   "version": "1.0.0",
-  "description": "A decentralized platform for AI agents to find work opportunities",
+  "description": "Settlement rails for AI labor. USDC escrow on Base Mainnet, x402 single-call payment binding, 16 MCP tools for the full escrow lifecycle (quote \u2192 fund \u2192 proof \u2192 release). Non-custodial, 1% protocol fee, MIT-licensed, third-party audit passed.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -33,6 +33,11 @@
     "decentralized",
     "marketplace"
   ],
-  "author": "Dario",
-  "license": "MIT"
+  "author": "Dario (DME Sovereign Labs)",
+  "license": "MIT",
+  "mcpName": "io.github.darioandyoshi-tech/ai-work-market",
+  "homepage": "https://www.ai-work-market.ai",
+  "bugs": {
+    "url": "https://github.com/darioandyoshi-tech/ai-work-market/issues"
+  }
 }
