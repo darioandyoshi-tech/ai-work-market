@@ -60,32 +60,34 @@ function buildUpstashBackend(client) {
   return {
     type: client._using || 'upstash',
     async getAll() {
-      const ids = (await client.smembers('awm:agent-cards:ids')) || [];
+      // Note: keys use '-' as separator (not ':') to avoid Vercel fetch
+      // decoding %3A. See _upstash-rest.js.
+      const ids = (await client.smembers('awm-agent-cards-ids')) || [];
       const cards = [];
       for (const id of ids) {
-        const c = await client.hgetall('awm:agent-card:' + id);
+        const c = await client.hgetall('awm-agent-card-' + id);
         if (c && c.id) cards.push(deserialize(c));
       }
       return cards;
     },
     async set(card) {
-      await client.sadd('awm:agent-cards:ids', card.id);
-      await client.hset('awm:agent-card:' + card.id, serialize(card));
-      await client.set('awm:agent-by-addr:' + card.address, card.id);
+      await client.sadd('awm-agent-cards-ids', card.id);
+      await client.hset('awm-agent-card-' + card.id, serialize(card));
+      await client.set('awm-agent-by-addr-' + card.address, card.id);
       for (const cap of card.capabilities || []) {
-        await client.sadd('awm:agent-by-cap:' + cap, card.id);
+        await client.sadd('awm-agent-by-cap-' + cap, card.id);
       }
     },
     async get(id) {
-      const c = await client.hgetall('awm:agent-card:' + id);
+      const c = await client.hgetall('awm-agent-card-' + id);
       return c && c.id ? deserialize(c) : null;
     },
     async findByAddress(address) {
-      const id = await client.get('awm:agent-by-addr:' + address.toLowerCase());
+      const id = await client.get('awm-agent-by-addr-' + address.toLowerCase());
       return id ? this.get(id) : null;
     },
     async findByCapability(cap) {
-      const ids = (await client.smembers('awm:agent-by-cap:' + cap.toLowerCase())) || [];
+      const ids = (await client.smembers('awm-agent-by-cap-' + cap.toLowerCase())) || [];
       const cards = [];
       for (const id of ids) {
         const c = await this.get(id);
@@ -94,7 +96,7 @@ function buildUpstashBackend(client) {
       return cards;
     },
     async stats() {
-      const ids = (await client.smembers('awm:agent-cards:ids')) || [];
+      const ids = (await client.smembers('awm-agent-cards-ids')) || [];
       return { totalCards: ids.length };
     },
   };
