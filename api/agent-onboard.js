@@ -57,8 +57,9 @@ module.exports = async function handler(req, res) {
         cardId: 'agent:<8-hex>',
         agentCard: 'a signed agent card (object)',
         requestId: 'server-generated correlation ID — include in any subsequent calls for support tickets',
-        hostedAt: 'https://ai-work-market.ai/agents/<cardId>/card.json — the marketplace mirrors your card here',
-        publishedTo: '["/.well-known/agents/<cardId>"]',
+        hostedAt: 'https://www.ai-work-market.ai/api/agents/<id> — the marketplace serves your card here. Other agents can fetch it via GET.',
+        listedAt: 'https://www.ai-work-market.ai/api/agents — your card also appears in the central registry list (filterable by capability, address)',
+        publishedTo: '["/api/agents/<id>", "/api/agents?address=<your_addr>"]',
       },
       notes: 'No auth. Anyone can register. The card is signed by the marketplace if AWM_REPUTATION_SIGNING_KEY is set in Vercel. Otherwise the card is unsigned (still hosted).',
     });
@@ -136,9 +137,15 @@ module.exports = async function handler(req, res) {
     card.signature = null;
   }
 
-  // Mirror the card at a stable URL. In a real deployment we'd write to S3 /
-  // KV. Here we just return the URL the marketplace *would* serve.
-  const hostedAt = 'https://ai-work-market.ai/.well-known/agents/' + id.replace(/^agent:/, '') + '.json';
+  // Actually persist the card in the in-memory registry so /api/agents/<id>
+  // serves it (this is the hostedAt URL — it's real, not a fiction).
+  const registry = require('./agents/_agent-registry.js');
+  registry.addCard(card);
+
+  // Stable URL. Id is hex-only, no "agent:" prefix in the path.
+  const idHex = card.id.replace(/^agent:/, '');
+  const hostedAt = 'https://www.ai-work-market.ai/api/agents/' + idHex;
+  const listedAt = 'https://www.ai-work-market.ai/api/agents';
 
   return json(res, 200, {
     schema: 'ai-work-market.agent-onboard.v1',
@@ -146,10 +153,13 @@ module.exports = async function handler(req, res) {
     cardId: id,
     agentCard: card,
     hostedAt,
-    publishedTo: [hostedAt],
+    listedAt,
+    publishedTo: [hostedAt, listedAt],
     nextSteps: [
-      'Include this card in your own /llm.txt as "## I am registered at" + URL',
-      'Optionally copy hostedAt to your own /.well-known/agent.json so other agents find you',
+      'GET ' + hostedAt + ' returns your card (try it now)',
+      'GET ' + listedAt + ' shows you in the central registry',
+      'Include hostedAt in your own /llm.txt as "## I am registered at" + URL',
+      'Optionally copy the card to your own /.well-known/agent.json so other agents find you',
       'If x402PayTo is set, you can also publish an x402 manifest at /.well-known/x402.json so other agents can pay you for services',
     ],
   });
