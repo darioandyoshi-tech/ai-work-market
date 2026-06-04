@@ -1,9 +1,0 @@
-[2026-05-26T08:01:42.316Z] === FEE MONITOR STARTED ===
-[2026-05-26T08:01:42.317Z] Monitoring contract: deployments/base-sepolia.json
-[2026-05-26T08:01:42.317Z] Check interval: 5s
-[2026-05-26T08:01:42.317Z] Fee threshold: 0.01 USDC
-[2026-05-26T08:01:42.318Z] Log file: ./logs/fee-monitor.test.log
-[2026-05-26T08:01:43.738Z] FEE ACCUMULATION: +0.0003 USDC (total: 0.0003 USDC)
-[2026-05-26T08:01:43.739Z] Fee check: 0.0003 USDC accumulated (0.0003 USDC in escrow)
-[2026-05-26T08:01:49.728Z] Fee check: 0.0003 USDC accumulated (0.0003 USDC in escrow)
-[2026-05-26T08:01:52.235Z] === FEE MONITOR STOPPED ===

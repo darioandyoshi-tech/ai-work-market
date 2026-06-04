@@ -473,10 +473,9 @@ contract AgentWorkEscrowZK is EIP712, ReentrancyGuard, Ownable2Step {
             reviewDeadline: 0,
             reviewPeriod: reviewPeriodSeconds,
             workHash: workHash,
-            workURI: workURI,
             status: Status.Funded,
-            proofURI: "",
-            disputeURI: ""
+            proofHash: bytes32(0),
+            disputeHash: bytes32(0)
         });
 
         usdc.safeTransferFrom(buyer, address(this), amount);

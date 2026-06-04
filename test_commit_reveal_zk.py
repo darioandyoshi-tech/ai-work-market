@@ -18,14 +18,20 @@ import json, os, sys, time
 from decimal import Decimal
 from eth_account import Account
 from web3 import Web3
-from web3.middleware import geth_poa_middleware
+try:
+    from web3.middleware import geth_poa_middleware
+except ImportError:
+    try:
+        from web3.geth import geth_poa_middleware
+    except ImportError:
+        geth_poa_middleware = None
 
 # === Configuration ===
 RPC_URL = "https://mainnet.base.org"
 CHAIN_ID = 8453
 USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
 ESCROW = "0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2"
-ADAPTER = os.environ.get("ADAPTER_ADDRESS", "0xC0038FB94e2d2ee1Eeb20B476C4d5322dF2A4ca9")
+ADAPTER = os.environ.get("ADAPTER_ADDRESS", "0xC0038FB94e2d2ee1Eeb20B476C4d5322dF2a4ca9")
 CIRCUITS_DIR = os.path.expanduser("~/ai-work-market/circuits")
 
 ERC20_ABI = [
