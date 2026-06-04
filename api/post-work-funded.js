@@ -156,6 +156,9 @@ module.exports = async function handler(req, res) {
 
   // --- Validate inputs ---
   if (!seller || !ethers.isAddress(seller)) return badRequest(res, 'seller must be a 0x-prefixed EVM address');
+  // Normalize to EIP-55 checksum (ethers v6 is strict; users often paste
+  // the checksum case from a block explorer).
+  try { seller = ethers.getAddress(seller); } catch (e) { return badRequest(res, 'seller is not a valid EVM address: ' + e.message); }
   const amountRaw = autoAmountFromArgs(body);
   if (!amountRaw || amountRaw === '0') return badRequest(res, 'amount must be a positive USDC number (e.g. "1.50" or "100")');
   if (!workURI) return badRequest(res, 'workURI required');

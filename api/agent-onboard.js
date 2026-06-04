@@ -75,10 +75,16 @@ module.exports = async function handler(req, res) {
 
   const { address, name, description, capabilities, x402PayTo, website, contact } = body;
   if (!address || !ethers.isAddress(address)) return badRequest(res, 'address must be a 0x-prefixed EVM address');
+  // Normalize to the EIP-55 checksum form so the registered card is
+  // portable across ethers v5/v6 and looks canonical to humans.
+  address = ethers.getAddress(address);
   if (!name || typeof name !== 'string' || name.length < 2 || name.length > 64) return badRequest(res, 'name must be 2-64 chars');
   if (description != null && (typeof description !== 'string' || description.length > 1024)) return badRequest(res, 'description must be string <=1024 chars');
   if (capabilities != null && (!Array.isArray(capabilities) || capabilities.some((c) => typeof c !== 'string' || c.length > 64))) return badRequest(res, 'capabilities must be string[] each <=64 chars');
-  if (x402PayTo != null && !ethers.isAddress(x402PayTo)) return badRequest(res, 'x402PayTo must be a valid address');
+  if (x402PayTo != null) {
+    if (!ethers.isAddress(x402PayTo)) return badRequest(res, 'x402PayTo must be a valid address');
+    x402PayTo = ethers.getAddress(x402PayTo);
+  }
   if (website != null && (typeof website !== 'string' || !/^https?:\/\//.test(website))) return badRequest(res, 'website must be http(s) URL');
 
   const id = cardId(address, name);
