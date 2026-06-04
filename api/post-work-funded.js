@@ -163,14 +163,12 @@ module.exports = async function handler(req, res) {
   if (!requestId) return badRequest(res, 'requestId required');
 
   // --- Read the live constants (replaces the missing defaultWorkTimeout) ---
+  // Base Mainnet caps eth_call batches at 10. Make 3 sequential small batches.
   const provider = new ethers.JsonRpcProvider(cfg.rpc, undefined, { staticNetwork: true });
   const escrow = new ethers.Contract(cfg.escrow, ESCROW_ABI, provider);
   let MIN_WT, MAX_WT, MIN_RP, MAX_RP, MAX_URI, BPS_DEN, MAX_FEE, nextIntentId, defaultFeeBps, feeRecipient, accumulatedFeesRaw;
   try {
-    [
-      MIN_WT, MAX_WT, MIN_RP, MAX_RP, MAX_URI, BPS_DEN, MAX_FEE,
-      nextIntentId, defaultFeeBps, feeRecipient, accumulatedFeesRaw,
-    ] = await Promise.all([
+    const c1 = await Promise.all([
       escrow.MIN_WORK_TIMEOUT(),
       escrow.MAX_WORK_TIMEOUT(),
       escrow.MIN_REVIEW_PERIOD(),
@@ -178,11 +176,21 @@ module.exports = async function handler(req, res) {
       escrow.MAX_URI_BYTES(),
       escrow.BPS_DENOMINATOR(),
       escrow.MAX_FEE_BPS(),
+    ]);
+    [MIN_WT, MAX_WT, MIN_RP, MAX_RP, MAX_URI, BPS_DEN, MAX_FEE] = c1;
+    // Small delay to avoid being rate-limited
+    await new Promise(r => setTimeout(r, 100));
+    const c2 = await Promise.all([
       escrow.nextIntentId(),
       escrow.defaultFeeBps(),
       escrow.feeRecipient(),
+    ]);
+    [nextIntentId, defaultFeeBps, feeRecipient] = c2;
+    await new Promise(r => setTimeout(r, 100));
+    const c3 = await Promise.all([
       escrow.accumulatedFees(),
     ]);
+    [accumulatedFeesRaw] = c3;
   } catch (e) {
     return json(res, 502, { error: 'rpc_read_failed', message: e.message, hint: 'Could not read constants from the deployed contract. Check RPC and verify the contract exists on chain ' + cfg.chainId });
   }
