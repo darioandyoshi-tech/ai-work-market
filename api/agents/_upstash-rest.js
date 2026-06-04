@@ -45,7 +45,13 @@ function makeUpstash(url, token) {
 
     // Every arg is b64-encoded (both keys and values).
     const path = '/' + command + '/' + args.map(encodePathArg).join('/');
-    const fullUrl = url + path;
+    // Use URL constructor to ensure the path is preserved exactly.
+    // Vercel's fetch implementation has been observed to mutate the URL
+    // string if it contains any unencoded special chars; URL parsing
+    // forces re-encoding which can break the path.
+    const u = new URL(url);
+    u.pathname = path;
+    const fullUrl = u.toString();
 
     const res = await fetch(fullUrl, {
       method,
