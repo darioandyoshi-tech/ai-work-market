@@ -1,50 +1,77 @@
 // api/agents/_upstash-rest.js
 // Tiny Upstash Redis REST client. No SDK install required — uses fetch.
-// Works in any Vercel serverless function. Falls back to no-op if env vars
-// are missing.
 //
-// Two ways to use:
-//   1. From env vars: const upstash = require('./_upstash-rest.js');
-//      // Reads UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN
-//   2. With explicit args: const upstash = makeUpstash(url, token);
+// Upstash REST API format (per https://upstash.com/docs/redis/api/rest):
+//   GET  https://<host>/<COMMAND>/<arg1>/<arg2>/...
+//   POST https://<host>/<COMMAND>/<arg1>/<arg2>/...   (with body for write commands)
+//
+// Auth: Authorization: Bearer <UPSTASH_REDIS_REST_TOKEN>
+//
+// All command args are URL-path encoded. Strings/numbers only.
 
 function makeUpstash(url, token) {
   if (!url) url = process.env.UPSTASH_REDIS_REST_URL;
   if (!token) token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  async function call(command, args) {
+  function encodePathArg(s) {
+    // Upstash wants URL-encoded path segments. encodeURIComponent encodes
+    // most special chars except some that we need to handle manually.
+    return encodeURIComponent(String(s));
+  }
+
+  async function call(method, command, args) {
     if (!url) throw new Error('UPSTASH_REDIS_REST_URL not set (env or arg)');
+    if (!token) throw new Error('UPSTASH_REDIS_REST_TOKEN not set (env or arg)');
     args = args || [];
-    const fullUrl = url + '/' + encodeURIComponent(JSON.stringify([command].concat(args)));
+
+    // Build path: /<COMMAND>/<arg1>/<arg2>/...
+    const path = '/' + command + args.map(encodePathArg).join('/');
+    const fullUrl = url + path;
+
     const res = await fetch(fullUrl, {
+      method,
       headers: {
         Authorization: 'Bearer ' + token,
-        'Content-Type': 'application/json',
       },
     });
-    if (!res.ok) throw new Error(`upstash ${command} returned ${res.status}: ${await res.text()}`);
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`upstash ${command} returned ${res.status}: ${text}`);
+    }
     const data = await res.json();
+    if (data.error) {
+      throw new Error(`upstash ${command} error: ${data.error}`);
+    }
     return data.result;
   }
 
   return {
-    get: (k) => call('GET', [k]),
-    set: (k, v) => call('SET', [k, typeof v === 'string' ? v : JSON.stringify(v)]),
+    _using: url ? url.replace(/\/\/.*@/, '//***@') : '(no url)',
+
+    // String ops
+    get: (k) => call('GET', 'GET', [k]),
+    set: (k, v) => call('POST', 'SET', [k, String(v)]),
+
+    // Hash ops
     hset: (k, obj) => {
       const entries = Object.entries(obj);
-      return call('HSET', [k].concat(entries.flat()));
+      // HSET key field1 value1 field2 value2 ...
+      return call('POST', 'HSET', [k, ...entries.flatMap(([f, v]) => [f, String(v)])]);
     },
     hgetall: async (k) => {
-      const arr = (await call('HGETALL', [k])) || [];
+      const arr = (await call('GET', 'HGETALL', [k])) || [];
       const out = {};
       for (let i = 0; i < arr.length; i += 2) out[arr[i]] = arr[i + 1];
       return out;
     },
-    smembers: (k) => call('SMEMBERS', [k]),
-    sadd: (k, v) => call('SADD', [k, typeof v === 'string' ? v : JSON.stringify(v)]),
-    // For introspection / debug
-    _using: url ? url.replace(/\/\/.*@/, '//***@') : '(no url)',
+
+    // Set ops
+    smembers: (k) => call('GET', 'SMEMBERS', [k]),
+    sadd: (k, v) => call('POST', 'SADD', [k, String(v)]),
+
+    // Utility
+    ping: () => call('GET', 'PING', []),
   };
 }
 
-module.exports = makeUpstash();
+module.exports = makeUpstash;
