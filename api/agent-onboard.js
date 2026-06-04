@@ -73,7 +73,7 @@ module.exports = async function handler(req, res) {
   try { body = await readBody(req); }
   catch (e) { return badRequest(res, e.message); }
 
-  const { address, name, description, capabilities, x402PayTo, website, contact } = body;
+  let { address, name, description, capabilities, x402PayTo, website, contact } = body;
   if (!address || !ethers.isAddress(address)) return badRequest(res, 'address must be a 0x-prefixed EVM address');
   // Normalize to the EIP-55 checksum form so the registered card is
   // portable across ethers v5/v6 and looks canonical to humans.
