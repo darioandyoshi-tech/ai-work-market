@@ -34,6 +34,12 @@ const NETWORKS = {
   },
 };
 
+// MINIMAL ESCROW_ABI: only the view functions that ACTUALLY EXIST on the
+// deployed bytecode at 0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2.
+// Verified 2026-06-04 via Sourcify full_match (extract the ABI from
+// https://repo.sourcify.dev/contracts/full_match/8453/<addr>/metadata.json).
+// Adding a function here that doesn't exist on-chain would silently
+// produce a null/empty result — keep this list accurate.
 const ESCROW_ABI = [
   'function usdc() view returns (address)',
   'function feeRecipient() view returns (address)',
@@ -42,11 +48,6 @@ const ESCROW_ABI = [
   'function accumulatedFees() view returns (uint256)',
   'function defaultFeeBps() view returns (uint96)',
   'function zkVerifier() view returns (address)',
-  'function defaultDisputeWindow() view returns (uint256)',
-  'function totalVolume() view returns (uint256)',
-  'function totalReleased() view returns (uint256)',
-  'function totalRefunded() view returns (uint256)',
-  'function totalDisputed() view returns (uint256)',
 ];
 
 const ERC20_ABI = [

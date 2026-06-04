@@ -19,21 +19,17 @@ const NETWORKS = {
   },
 };
 
+// MINIMAL ESCROW_ABI: only the view functions that ACTUALLY EXIST on the
+// deployed bytecode. Verified 2026-06-04 via Sourcify full_match.
+// We use `provider.call({ to, data })` + Interface.decodeFunctionResult
+// below (bypassing ethers v6's auto-batcher), so each function needs to
+// be in this array. Adding a function here that doesn't exist on-chain
+// would silently produce an empty result — keep this list accurate.
 const ESCROW_ABI = [
-  'function defaultDisputeWindow() view returns (uint256)',
   'function defaultFeeBps() view returns (uint96)',
-  'function defaultReviewPeriod() view returns (uint256)',
-  'function defaultWorkTimeout() view returns (uint256)',
-  'function minDisputeFee() view returns (uint256)',
-  'function maxReviewPeriod() view returns (uint256)',
-  'function minWorkTimeout() view returns (uint256)',
-  'function paused() view returns (bool)',
   'function owner() view returns (address)',
   'function feeRecipient() view returns (address)',
   'function zkVerifier() view returns (address)',
-  'function nextIntentId() view returns (uint256)',
-  'function accumulatedFees() view returns (uint256)',
-  'function usdc() view returns (address)',
 ];
 
 // Plain-English summary of the lifecycle. Updated manually when the contract
