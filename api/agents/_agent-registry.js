@@ -16,7 +16,10 @@ let _byCap = new Map();
 
 function serialize(card) {
   return {
-    id: card.id,
+    // Store id as hex only (no 'agent:' prefix) to avoid colons in
+    // Upstash HSET values, which Vercel fetch decodes (%3A → :) and
+    // breaks Upstash arg parsing.
+    id: String(card.id).replace(/^agent:/, ''),
     name: card.name,
     description: card.description || '',
     address: card.address,
@@ -60,34 +63,38 @@ function buildUpstashBackend(client) {
   return {
     type: client._using || 'upstash',
     async getAll() {
-      // Note: keys use '-' as separator (not ':') to avoid Vercel fetch
-      // decoding %3A. See _upstash-rest.js.
-      const ids = (await client.smembers('awm-agent-cards-ids')) || [];
+      // Note: keys use no separators (not ':' or '-') to avoid Vercel fetch
+      // decoding %3A. The card id itself is 'agent:abc...' but we strip
+      // the 'agent:' prefix and use only the hex. See _upstash-rest.js.
+      const ids = (await client.smembers('awmcards')) || [];
       const cards = [];
       for (const id of ids) {
-        const c = await client.hgetall('awm-agent-card-' + id);
+        const c = await client.hgetall('awmcard-' + id);
         if (c && c.id) cards.push(deserialize(c));
       }
       return cards;
     },
     async set(card) {
-      await client.sadd('awm-agent-cards-ids', card.id);
-      await client.hset('awm-agent-card-' + card.id, serialize(card));
-      await client.set('awm-agent-by-addr-' + card.address, card.id);
+      // Strip the 'agent:' prefix from card.id to avoid colons in keys.
+      const idHex = String(card.id).replace(/^agent:/, '');
+      await client.sadd('awmcards', idHex);
+      await client.hset('awmcard-' + idHex, serialize(card));
+      await client.set('awmaddr-' + String(card.address).toLowerCase(), idHex);
       for (const cap of card.capabilities || []) {
-        await client.sadd('awm-agent-by-cap-' + cap, card.id);
+        await client.sadd('awmcap-' + String(cap).toLowerCase(), idHex);
       }
     },
     async get(id) {
-      const c = await client.hgetall('awm-agent-card-' + id);
+      const idHex = String(id).replace(/^agent:/, '');
+      const c = await client.hgetall('awmcard-' + idHex);
       return c && c.id ? deserialize(c) : null;
     },
     async findByAddress(address) {
-      const id = await client.get('awm-agent-by-addr-' + address.toLowerCase());
-      return id ? this.get(id) : null;
+      const idHex = await client.get('awmaddr-' + String(address).toLowerCase());
+      return idHex ? this.get(idHex) : null;
     },
     async findByCapability(cap) {
-      const ids = (await client.smembers('awm-agent-by-cap-' + cap.toLowerCase())) || [];
+      const ids = (await client.smembers('awmcap-' + String(cap).toLowerCase())) || [];
       const cards = [];
       for (const id of ids) {
         const c = await this.get(id);
@@ -96,7 +103,7 @@ function buildUpstashBackend(client) {
       return cards;
     },
     async stats() {
-      const ids = (await client.smembers('awm-agent-cards-ids')) || [];
+      const ids = (await client.smembers('awmcards')) || [];
       return { totalCards: ids.length };
     },
   };
