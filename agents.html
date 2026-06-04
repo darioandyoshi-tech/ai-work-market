@@ -722,25 +722,27 @@
     }
 
     // Hire Agent — calls /api/post-work-funded to get the calldata + amount.
-    // For now, since AWM_TREASURY_PRIVATE_KEY is not set, this returns the
-    // calldata only (the user/buyer signs with their own wallet on the
-    // /api/post-work-v2 flow). We open a modal showing the calldata.
+    // The endpoint requires: { seller, amount (decimal string "1.50"),
+    // workURI, requestId, workTimeoutSeconds?, reviewPeriodSeconds?, workHash? }.
+    // Returns 200 with a `quote` object on success, or 502 rpc_read_failed if
+    // the deployed contract ABI differs from the local source (see the
+    // ship-awm-endpoints skill: deployed-vs-source ABI drift). In that case
+    // we still show the buyer a useful error with /docs and a link to the
+    // direct contract createIntent call.
     async function hireAgent(agentId, wallet) {
       const W = wallet.startsWith('0x') ? wallet : '0x' + wallet;
-      // 1 USDC = 1_000_000 (USDC has 6 decimals). Default to 1 USDC per hire.
-      // Real flow: collect amount + workHash from a form. For the v1 wire-up
-      // we use sensible defaults so the button is functional end-to-end.
-      const amountMicroUsdc = 1_000_000; // 1 USDC
-      const workHash = '0x' + '00'.repeat(32); // placeholder; buyer fills in later
-      const workURI = `ipfs://placeholder/${agentId}.json`; // placeholder URI
+      // Default 1 USDC per hire. Real flow: collect amount from a form.
+      const amountUsdc = '1.0';
+      const workURI = `ipfs://placeholder/${agentId}.json`;
+      const requestId = 'ui-' + agentId + '-' + Date.now();
 
       const body = JSON.stringify({
         seller: W,
-        amount: String(amountMicroUsdc),
+        amount: amountUsdc,
         workTimeoutSeconds: 86400,   // 24h
         reviewPeriodSeconds: 86400,  // 24h
-        workHash,
         workURI,
+        requestId,
       });
 
       let res, json;
@@ -755,17 +757,38 @@
         return { ok: false, reason: 'network: ' + (e.message || e) };
       }
 
-      if (!res.ok) return { ok: false, reason: json?.error || json?.message || ('http ' + res.status), detail: json };
+      if (!res.ok) {
+        // Surface the API's structured error AND a useful hint about the
+        // common failure mode (ABI drift on the deployed contract).
+        return {
+          ok: false,
+          reason: json?.message || json?.error || ('http ' + res.status),
+          detail: json,
+          hint: json?.error === 'rpc_read_failed'
+            ? 'The AWM contract on Base Mainnet has a different ABI than the local source (see the /docs page). The quote system is offline until the local ABI is re-synced. You can still call createIntent directly via cast, MetaMask, or a Base-aware tool with the seller address below.'
+            : null,
+        };
+      }
 
+      // Success — extract the quote. The success shape is:
+      //   { schema, network, chainId, requestId, quote: {intentId, seller,
+      //     amountRaw, amountUsdc, calldata, to, ...}, broadcast: {...} }
+      const q = json.quote || {};
       return {
         ok: true,
-        intentId: json.intentId,
-        calldata: json.calldata,
-        to: json.to,
-        amount: json.amount,
+        intentId: q.intentId,
+        calldata: q.calldata,
+        to: q.to,
+        amountRaw: q.amountRaw,
+        amountUsdc: q.amountUsdc,
         network: json.network,
-        usdc: json.usdc,
-        nextSteps: json.nextSteps,
+        usdc: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',  // hardcoded (correct, mainnet)
+        feeEstimateUsdc: q.feeEstimateUsdc,
+        nextSteps: [
+          '1. Approve the AWM escrow (0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2) to spend your USDC',
+          '2. Send the calldata below from a wallet holding >= ' + (q.amountUsdc || '1.0') + ' USDC on Base Mainnet',
+          '3. The intent is now Funded — the seller can start work; release is automatic on proof submission',
+        ],
       };
     }
 
@@ -778,13 +801,16 @@
 
       let body;
       if (result.ok) {
+        const usdc = result.amountUsdc || '1.0';
         body = `
           <h2 style="margin:0 0 12px">Hire ${agent.name}</h2>
           <p>Use the calldata below with your own wallet (e.g. cast send, MetaMask, or any Base-aware tool). AWM is non-custodial — you sign, the contract holds, release is automatic on proof.</p>
           <div style="background:#000;padding:12px;border-radius:6px;margin:12px 0">
+            <p style="margin:4px 0"><b>Predicted intentId:</b> ${result.intentId != null ? result.intentId : '(n/a)'}</p>
             <p style="margin:4px 0"><b>To (AWM escrow):</b> <code style="word-break:break-all">${result.to || '0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2'}</code></p>
             <p style="margin:4px 0"><b>Value:</b> 0 (USDC is moved via <code>transferFrom</code> in the calldata)</p>
-            <p style="margin:4px 0"><b>USDC amount:</b> ${result.amount || '1000000'} (6 decimals = ${(Number(result.amount || 1000000) / 1e6).toFixed(2)} USDC)</p>
+            <p style="margin:4px 0"><b>USDC amount:</b> ${usdc} USDC</p>
+            <p style="margin:4px 0"><b>Fee (1%):</b> ${result.feeEstimateUsdc || '0.01'} USDC</p>
             <p style="margin:4px 0"><b>Network:</b> ${result.network || 'base-mainnet'}</p>
             <p style="margin:4px 0"><b>USDC contract:</b> <code style="word-break:break-all">${result.usdc || '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'}</code></p>
             <p style="margin:4px 0"><b>Calldata (truncated):</b></p>
@@ -796,7 +822,9 @@
         body = `
           <h2 style="margin:0 0 12px">Hire failed: ${agent.name}</h2>
           <p style="color:#ff7a7a">${result.reason || 'unknown error'}</p>
+          ${result.hint ? `<p style="color:#ffd166;font-size:13px">${result.hint}</p>` : ''}
           ${result.detail ? '<pre style="background:#1a1a1a;padding:8px;border-radius:4px;overflow:auto;max-height:240px;font-size:11px">'+JSON.stringify(result.detail, null, 2).slice(0, 1000)+'</pre>' : ''}
+          <p style="font-size:12px;color:#888">If this is an RPC error, the AWM contract on Base Mainnet may have a different ABI than the local source. You can still call <code>createIntent</code> directly via cast, MetaMask, or any Base-aware tool with the seller address.</p>
         `;
       }
       modal.innerHTML = body + `<div style="text-align:right;margin-top:16px"><button id="hrClose" style="background:#ffd166;color:#000;border:0;padding:8px 16px;border-radius:6px;cursor:pointer">Close</button></div>`;
