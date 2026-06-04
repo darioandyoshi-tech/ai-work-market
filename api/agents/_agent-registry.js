@@ -1,14 +1,12 @@
 // api/agents/_agent-registry.js
-// Agent card registry. Tries Vercel KV first (most native), then Upstash REST
-// (direct), then in-memory fallback (single-instance only).
+// Agent card registry. Tries Vercel KV first (most native, set by Vercel
+// Marketplace Upstash integration as KV_REST_API_URL + KV_REST_API_TOKEN),
+// then Upstash REST (UPSTASH_REDIS_REST_URL + _TOKEN), then in-memory
+// fallback (single-instance only).
 //
-// Vercel Marketplace Upstash integration sets KV_REST_API_URL/KV_REST_API_TOKEN
-// env vars. Direct upstash.com signups set UPSTASH_REDIS_REST_URL/_TOKEN. We
-// support both.
-//
-// For Vercel KV without the @vercel/kv package, we fall back to using the
-// Upstash REST API directly against KV_REST_API_URL (which is just an Upstash
-// URL under the hood — same protocol, same DB).
+// IMPORTANT: To use Vercel KV env vars with the Upstash REST client, we
+// pass URL+token explicitly rather than reassigning process.env. The
+// latter triggers token-redaction in some tooling that mangles the file.
 
 let _backend = null;
 let _memory = new Map();
@@ -149,7 +147,7 @@ async function getBackend() {
   if (_backend) return _backend;
   if (_backend === false) return null;
 
-  // Priority 1: Vercel KV (uses KV_REST_API_URL + KV_REST_API_TOKEN, set by
+  // Priority 1: Vercel KV (KV_REST_API_URL + KV_REST_API_TOKEN, set by
   // Vercel Marketplace Upstash integration). Try the @vercel/kv SDK first.
   if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
     try {
@@ -157,13 +155,17 @@ async function getBackend() {
       _backend = buildVercelKVBackend(kv);
       return _backend;
     } catch (e) {
-      // @vercel/kv not installed. Fall through to Upstash REST against
-      // the same KV_REST_API_URL (which IS an Upstash endpoint).
+      // @vercel/kv not installed. Fall through to Upstash REST with the
+      // KV_REST_API_URL/KV_REST_API_TOKEN values passed directly.
     }
     try {
-      process.env.UPSTASH_REDIS_REST_URL = process.env.KV_REST_API_URL;
-      process.env.UPSTASH_REDIS_REST_TOKEN = process.env.KV_REST_API_TOKEN;
-      const upstash = require('./_upstash-rest.js');
+      // Build a fresh upstash client with the Vercel KV env vars, no
+      // process.env reassignment (which some tools mangle).
+      const makeUpstash = require('./_upstash-rest.js');
+      const upstash = makeUpstash(
+        process.env.KV_REST_API_URL,
+        process.env.KV_REST_API_TOKEN
+      );
       _backend = buildUpstashBackend(upstash);
       return _backend;
     } catch (e) {
@@ -174,7 +176,8 @@ async function getBackend() {
   // Priority 2: Direct Upstash (UPSTASH_REDIS_REST_URL + _TOKEN)
   if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
     try {
-      const upstash = require('./_upstash-rest.js');
+      const makeUpstash = require('./_upstash-rest.js');
+      const upstash = makeUpstash();
       _backend = buildUpstashBackend(upstash);
       return _backend;
     } catch (e) {
