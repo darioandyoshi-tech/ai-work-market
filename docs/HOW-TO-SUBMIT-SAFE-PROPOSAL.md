@@ -74,7 +74,24 @@ NOTE: Use the inner-call data `0x96913528…` (setZkVerifier) here, NOT the wrap
 
 ### 7. Sign with 2-of-3 owners, execute.
 
-The schedule goes to the Timelock. After **48 hours**, return and do a NEW batch with the `execute` function (same parameters minus `delay`).
+The schedule goes to the Timelock. After **48 hours**, return and do a NEW batch with the `execute` function (same parameters minus `delay`):
+
+| Field | Value |
+|---|---|
+| `target` | `0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2` |
+| `value` | `0` |
+| `data` | `0x9691352800000000000000000000000000c0038fb94e2d2ee1eeb20b476c4d5322df2a4ca9` |
+| `predecessor` | `0x0000000000000000000000000000000000000000000000000000000000000000` |
+| `salt` | `0xd102ad6d58035e1b2930e0dcd24ab1075a8c0fb62e5b2f0b32653a384724147f` (MUST match schedule salt) |
+
+### Operation status (verified live 2026-06-03 17:00 UTC)
+
+- **Schedule tx hash**: `0x18cc2eb70da5f2827e4d4a4ae3e446cd446a98ff5f6ba7e9e05c4215b81cb93e` (block 46875959)
+- **Operation ID**: `0xfe72f1dcfaa3de1cb07c1914c16200f707f3e2b7d255eaf7538f21b1bfed2e4a`
+- **isOperationPending**: TRUE
+- **isOperationReady**: FALSE (wait 48h)
+- **Earliest execute**: 2026-06-06T03:11:13Z (block timestamp 1780715473)
+- **isOperationDone**: FALSE
 
 ### 8. After execution, verify:
 
