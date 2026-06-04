@@ -116,12 +116,18 @@ module.exports = async function handler(req, res) {
     ],
   };
 
-  // Optionally sign with the marketplace key. If unset, card.signature is null
-  // and consumers should treat the card as self-attested.
+  // Optionally sign the card with the marketplace key. If unset, the
+  // card.signature is null and consumers treat the card as self-attested.
+  //
+  // AWM_REPUTATION_SIGNING_KEY must be a 0x-prefixed 64-hex-char EOA
+  // private key (the same format as AWM_TREASURY_PRIVATE_KEY). The
+  // previous version of this code used ethers.isAddress() which silently
+  // never matched, so signing was always off even when the env var was
+  // set. Now we accept a private key and derive the signer address.
   const signingKey = process.env.AWM_REPUTATION_SIGNING_KEY;
-  if (signingKey && ethers.isAddress(signingKey)) {
+  if (signingKey && /^0x[0-9a-fA-F]{64}$/.test(signingKey.trim())) {
     try {
-      const wallet = new ethers.Wallet(signingKey);
+      const wallet = new ethers.Wallet(signingKey.trim());
       const message = JSON.stringify({
         id: card.id,
         address: card.address,
@@ -133,6 +139,10 @@ module.exports = async function handler(req, res) {
     } catch (e) {
       card.signature = { error: e.message };
     }
+  } else if (signingKey) {
+    // Key is set but not in the right format. Surface this so the operator
+    // knows their env var is misconfigured rather than silently skipping.
+    card.signature = { error: 'AWM_REPUTATION_SIGNING_KEY is set but is not a 0x-prefixed 64-hex-char private key. Set it to an EOA private key, not an address.' };
   } else {
     card.signature = null;
   }
