@@ -15,6 +15,11 @@ let _byAddress = new Map();
 let _byCap = new Map();
 
 function serialize(card) {
+  // Note: we store pre-stringified JSON for arrays/objects. The @vercel/kv
+  // backend auto-parses these on read (returns real arrays), and our
+  // deserialize() handles both shapes via parseMaybe(). The upstash-rest
+  // and upstash-tcp backends return raw strings and need the JSON.parse
+  // path — so pre-stringifying here works for all backends.
   return {
     // Store id as hex only (no 'agent:' prefix) to avoid colons in
     // Upstash HSET values, which Vercel fetch decodes (%3A → :) and
