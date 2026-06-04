@@ -150,7 +150,7 @@ module.exports = async function handler(req, res) {
   let body;
   try { body = await readBody(req); }
   catch (e) { return badRequest(res, e.message); }
-  const { seller, workURI, workHash, deadlineHours, reviewHours, requestId } = body;
+  let { seller, workURI, workHash, deadlineHours, reviewHours, requestId } = body;
   const net = String(body.network || '').toLowerCase() === 'sepolia' ? 'sepolia' : 'mainnet';
   const cfg = NETWORKS[net];
 
