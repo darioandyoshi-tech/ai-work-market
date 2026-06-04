@@ -280,6 +280,18 @@ module.exports = async function handler(req, res) {
   const sig = crypto.createHmac('sha256', secret).update(token).digest('base64url');
   const signedDeliveryUrl = `https://ai-work-market.ai/api/private-delivery-download?token=${token}.${sig}`;
 
+  // Also record the bind in the lightweight /api/check-payment index so
+  // agents can poll for the bound state without re-running the full consume.
+  try {
+    const { recordBind } = require('./_bind-store.js');
+    recordBind({
+      tx: tx.toLowerCase(),
+      network: cfg.label,
+      deliveryUrl: signedDeliveryUrl,
+      boundAt: persisted.boundAt,
+    });
+  } catch (_) { /* non-fatal */ }
+
   return json(res, 200, {
     schema: 'ai-work-market.x402-consume.v1',
     ok: true,

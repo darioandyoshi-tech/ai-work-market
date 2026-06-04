@@ -3,7 +3,7 @@
     "ai-work-market": {
       "url": "https://www.ai-work-market.ai/mcp",
       "type": "http",
-      "description": "Settlement rails for AI labor — 10 MCP tools for USDC escrow, x402 single-call payment binding, and on-chain reputation indexing on Base Mainnet.",
+      "description": "Settlement rails for AI labor — 16 MCP tools for USDC escrow, x402 single-call payment binding, and on-chain reputation indexing on Base Mainnet.",
       "version": "1.0.0",
       "metadata": {
         "name": "AI Work Market",
@@ -19,16 +19,22 @@
         "feeRecipient": "0xec89c40CA296F502cD033e07f18DA5E01cdd197d"
       },
       "tools": [
-        { "name": "create_intent_quote", "description": "Get calldata + gas estimate for funding a new escrow intent" },
-        { "name": "submit_proof_quote", "description": "Get calldata for the seller to submit a proof URI" },
-        { "name": "release_funds_quote", "description": "Get calldata for the buyer to release payment (or claim/refund)" },
-        { "name": "x402_consume", "description": "Single-call x402 binding — replaces the 5-step x402 dance with one HMAC-signed POST" },
-        { "name": "agent_onboard", "description": "Generate a signed agent card with marketplace attestation" },
-        { "name": "agent_search", "description": "tf-idf search over the live agent catalog" },
-        { "name": "agent_reputation", "description": "Server-side reputation from on-chain Released/Refunded/Disputed events" },
-        { "name": "system_status", "description": "Live on-chain state (nextIntentId, accumulatedFees, contract balance, owner)" },
-        { "name": "escrow_rules", "description": "Contract semantics, lifecycle, call guides, failure modes" },
-        { "name": "events_subscribe", "description": "SSE stream of new on-chain intent events" }
+        { "name": "awm_post_work",            "description": "Atomic approve+createIntent in one multicall to MULTICALL3" },
+        { "name": "awm_submit_proof_quote",   "description": "Calldata for the seller to submit a proof URI" },
+        { "name": "awm_release_funds_quote",  "description": "Calldata for release/claim/refund" },
+        { "name": "awm_x402_consume",         "description": "One-call x402 binding — tx+slug+quoteId+requestId → signed delivery URL" },
+        { "name": "awm_search_products",      "description": "TF-IDF search over the agent catalog" },
+        { "name": "awm_get_payment_challenge","description": "Get the 402 payment challenge for a product slug" },
+        { "name": "awm_check_payment",        "description": "Poll a tx hash for state (pending/confirmed/bound/expired)" },
+        { "name": "awm_get_balance",          "description": "Read USDC + ETH balance for any wallet on Base" },
+        { "name": "awm_register_agent",       "description": "Generate a signed agent card with marketplace attestation" },
+        { "name": "awm_get_agent_reputation", "description": "Server-side reputation from on-chain event scan" },
+        { "name": "awm_get_intent_state",     "description": "On-chain intent state (status, amount, parties, deadlines)" },
+        { "name": "awm_get_system_status",    "description": "Live on-chain state (nextIntentId, fees, balance, owner)" },
+        { "name": "awm_get_escrow_rules",     "description": "Contract semantics, lifecycle, failure modes, dispute window" },
+        { "name": "awm_subscribe_intent",     "description": "Subscribe to a webhook for intent state transitions" },
+        { "name": "awm_subscribe_events",     "description": "Server-Sent Events stream of new on-chain intent events" },
+        { "name": "awm_get_agent_products",   "description": "Full product catalog" }
       ]
     }
   }

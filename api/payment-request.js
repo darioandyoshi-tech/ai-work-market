@@ -17,12 +17,27 @@ function linkFor(slug) {
 }
 
 function requestFor(req, product) {
-  const base = origin(req).replace('http://ai-work-market.vercel.app', 'https://ai-work-market.ai');
+  const base = origin(req).replace('http://ai-work-market.vercel.app', 'https://www.ai-work-market.ai');
   const link = linkFor(product.slug);
+
+  // Server-generated correlation IDs. The agent MUST include these in the
+  // x402-consume HMAC signature and the request body. Without them the
+  // signature is invalid and the consume is rejected.
+  const quoteId = 'qt_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  const requestId = 'rq_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  const challengeExpiresAt = Math.floor(Date.now() / 1000) + 600; // 10 min TTL
+
   return {
     schema: 'ai-work-market.payment-request.v1',
     paymentRequired: true,
     status: 402,
+    correlation: {
+      quoteId,
+      requestId,
+      challengeExpiresAt,
+      challengeExpiresAtISO: new Date(challengeExpiresAt * 1000).toISOString(),
+      hint: 'Include both quoteId and requestId in your POST /api/x402-consume body AND in the HMAC signature payload.',
+    },
     product: {
       id: product.slug,
       name: product.name,
