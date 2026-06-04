@@ -37,12 +37,19 @@ function serialize(card) {
 }
 
 function deserialize(s) {
-  let caps = [], sigs = [], servs = [];
-  // TEMP DEBUG: log what s.capabilities actually is
-  console.log('[deserialize] s.capabilities typeof:', typeof s.capabilities, 'value:', JSON.stringify(s.capabilities).slice(0,100));
-  try { caps = JSON.parse(s.capabilities || '[]'); } catch (e) { console.log('[deserialize] caps parse err:', e.message); }
-  try { sigs = JSON.parse(s.signature || 'null'); } catch (_) {}
-  try { servs = JSON.parse(s.services || '[]'); } catch (_) {}
+  // Defensive parse: @vercel/kv auto-parses values that look like JSON arrays
+  // or objects, so a stored '["a","b"]' comes back as a real array. A stored
+  // '"plain string"' comes back as a string. We accept both shapes.
+  const parseMaybe = (v, fallback) => {
+    if (v == null || v === '') return fallback;
+    if (Array.isArray(v)) return v;
+    if (typeof v === 'object') return v; // already parsed object (e.g. signature)
+    if (typeof v !== 'string') return fallback;
+    try { return JSON.parse(v); } catch (_) { return fallback; }
+  };
+  const caps  = parseMaybe(s.capabilities, []);
+  const sigs  = parseMaybe(s.signature,   null);
+  const servs = parseMaybe(s.services,    []);
   return {
     id: s.id,
     name: s.name,
