@@ -4,45 +4,43 @@
 //   GET  /api/webhook-subscribe?intentId=N  -> list active subs
 //   DELETE /api/webhook-subscribe?id=...   -> unsubscribe
 //
-// State is stored in a per-instance memory map; survives across hot reloads in
-// a single Vercel instance. For multi-region durability we'd want Vercel KV or
-// a tiny external store; that's outside scope for the v1.
+// Storage: Vercel KV via @vercel/kv (env vars KV_REST_API_URL + KV_REST_API_TOKEN).
+// Falls back to in-memory for local dev / single-instance testing.
 //
-// When the AWM event scanner sees a transition on the watched intent, it POSTs
-// { intentId, status, blockNumber, tx } to the registered URL with HMAC.
+// When the cron at /api/cron/webhook-deliverer sees a Released/Refunded/
+// Disputed/SubmittedProof event on the watched intent, it POSTs the
+// payload to your URL with an HMAC-SHA256 signature.
 
-const { getSubs, addSub, removeSub, listSubs } = require('./_webhook-store.js');
+const { addSub, listSubs, removeSub } = require('./_webhook-store.js');
 
 function json(res, status, body) {
-  res.status(status).setHeader('content-type', 'application/json');
-  res.send(JSON.stringify(body));
+  res.statusCode = status;
+  res.setHeader('content-type', 'application/json');
+  res.end(JSON.stringify(body));
 }
 
 module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
     const intentId = req.query && req.query.intentId;
-    if (!intentId) {
-      return json(res, 200, {
-        schema: 'ai-work-market.webhook-subscribe.v1',
-        subs: listSubs(),
-        hint: 'POST { url, intentId, secret? } to subscribe. DELETE ?id=SUBID to remove.',
-      });
-    }
+    const subs = await listSubs(intentId);
     return json(res, 200, {
       schema: 'ai-work-market.webhook-subscribe.v1',
-      intentId: String(intentId),
-      subs: listSubs().filter((s) => String(s.intentId) === String(intentId)),
+      intentId: intentId ? String(intentId) : null,
+      count: subs.length,
+      subs: subs.map((s) => ({ id: s.id, url: s.url, intentId: s.intentId, createdAt: s.createdAt, lastFiredAt: s.lastFiredAt, lastError: s.lastError, status: s.status })),
+      hint: 'POST { url, intentId, secret? } to subscribe. DELETE ?id=SUBID to remove.',
     });
   }
 
   if (req.method === 'DELETE') {
     const id = req.query && req.query.id;
     if (!id) return json(res, 400, { error: 'missing_id' });
-    const ok = removeSub(String(id));
+    const ok = await removeSub(String(id));
     return json(res, 200, { ok, removed: id });
   }
 
   if (req.method !== 'POST') {
+    res.setHeader('allow', 'GET, POST, DELETE');
     return json(res, 405, { error: 'method_not_allowed' });
   }
 
@@ -58,20 +56,16 @@ module.exports = async function handler(req, res) {
     return json(res, 400, { error: 'invalid_intentId', hint: 'intentId must be a number' });
   }
 
-  const sub = {
-    id: `sub_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+  const sub = await addSub({
     url,
     intentId,
     secret,
-    createdAt: new Date().toISOString(),
-    events: ['Released', 'Refunded', 'Disputed', 'Resolved'],
-  };
-  addSub(sub);
+  });
 
   return json(res, 201, {
     schema: 'ai-work-market.webhook-subscribe.v1',
     ok: true,
-    subscription: sub,
-    hint: 'AWM will POST { intentId, status, blockNumber, tx, signature } to your URL when the intent transitions. The signature is HMAC-SHA256 of the body using your secret. Verify it before trusting the payload.',
+    subscription: { id: sub.id, url: sub.url, intentId: sub.intentId, secret: sub.secret, createdAt: sub.createdAt, status: sub.status },
+    hint: 'AWM will POST { schema, deliveryId, event, intentId, blockNumber, txHash, ... } to your URL when the intent transitions. The X-AWM-Signature header is HMAC-SHA256 of the body using your secret. Verify it before trusting the payload.',
   });
 };
