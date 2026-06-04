@@ -1,12 +1,13 @@
 // api/agents/_agent-registry.js
-// Agent card registry. Tries Vercel KV first (most native, set by Vercel
-// Marketplace Upstash integration as KV_REST_API_URL + KV_REST_API_TOKEN),
-// then Upstash REST (UPSTASH_REDIS_REST_URL + _TOKEN), then in-memory
-// fallback (single-instance only).
+// Agent card registry. Tries in order:
+//   1. @vercel/kv SDK (requires KV_REST_API_URL + KV_REST_API_TOKEN + package install)
+//   2. Upstash REST (requires UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN)
+//   3. Upstash TCP via rediss:// URL (requires KV_URL or REDIS_URL, no npm install)
+//   4. In-memory fallback (single-instance only, NOT for production)
 //
-// IMPORTANT: To use Vercel KV env vars with the Upstash REST client, we
-// pass URL+token explicitly rather than reassigning process.env. The
-// latter triggers token-redaction in some tooling that mangles the file.
+// The TCP path is what we use when the Vercel Marketplace Upstash integration
+// sets rediss:// URLs (KV_URL, REDIS_URL) but no REST API token. We just need
+// host + password, which we can extract from the rediss:// URL.
 
 let _backend = null;
 let _memory = new Map();
@@ -55,36 +56,36 @@ function deserialize(s) {
   };
 }
 
-function buildUpstashBackend(upstash) {
+function buildUpstashBackend(client) {
   return {
-    type: 'upstash-rest',
+    type: client._using || 'upstash',
     async getAll() {
-      const ids = (await upstash.smembers('awm:agent-cards:ids')) || [];
+      const ids = (await client.smembers('awm:agent-cards:ids')) || [];
       const cards = [];
       for (const id of ids) {
-        const c = await upstash.hgetall('awm:agent-card:' + id);
+        const c = await client.hgetall('awm:agent-card:' + id);
         if (c && c.id) cards.push(deserialize(c));
       }
       return cards;
     },
     async set(card) {
-      await upstash.sadd('awm:agent-cards:ids', card.id);
-      await upstash.hset('awm:agent-card:' + card.id, serialize(card));
-      await upstash.set('awm:agent-by-addr:' + card.address, card.id);
+      await client.sadd('awm:agent-cards:ids', card.id);
+      await client.hset('awm:agent-card:' + card.id, serialize(card));
+      await client.set('awm:agent-by-addr:' + card.address, card.id);
       for (const cap of card.capabilities || []) {
-        await upstash.sadd('awm:agent-by-cap:' + cap, card.id);
+        await client.sadd('awm:agent-by-cap:' + cap, card.id);
       }
     },
     async get(id) {
-      const c = await upstash.hgetall('awm:agent-card:' + id);
+      const c = await client.hgetall('awm:agent-card:' + id);
       return c && c.id ? deserialize(c) : null;
     },
     async findByAddress(address) {
-      const id = await upstash.get('awm:agent-by-addr:' + address.toLowerCase());
+      const id = await client.get('awm:agent-by-addr:' + address.toLowerCase());
       return id ? this.get(id) : null;
     },
     async findByCapability(cap) {
-      const ids = (await upstash.smembers('awm:agent-by-cap:' + cap.toLowerCase())) || [];
+      const ids = (await client.smembers('awm:agent-by-cap:' + cap.toLowerCase())) || [];
       const cards = [];
       for (const id of ids) {
         const c = await this.get(id);
@@ -93,87 +94,40 @@ function buildUpstashBackend(upstash) {
       return cards;
     },
     async stats() {
-      const ids = (await upstash.smembers('awm:agent-cards:ids')) || [];
+      const ids = (await client.smembers('awm:agent-cards:ids')) || [];
       return { totalCards: ids.length };
     },
   };
 }
 
 function buildVercelKVBackend(kv) {
-  return {
-    type: 'vercel-kv',
-    async getAll() {
-      const ids = (await kv.smembers('awm:agent-cards:ids')) || [];
-      const cards = [];
-      for (const id of ids) {
-        const c = await kv.hgetall('awm:agent-card:' + id);
-        if (c && c.id) cards.push(deserialize(c));
-      }
-      return cards;
-    },
-    async set(card) {
-      await kv.sadd('awm:agent-cards:ids', card.id);
-      await kv.hset('awm:agent-card:' + card.id, serialize(card));
-      await kv.set('awm:agent-by-addr:' + card.address, card.id);
-      for (const cap of card.capabilities || []) {
-        await kv.sadd('awm:agent-by-cap:' + cap, card.id);
-      }
-    },
-    async get(id) {
-      const c = await kv.hgetall('awm:agent-card:' + id);
-      return c && c.id ? deserialize(c) : null;
-    },
-    async findByAddress(address) {
-      const id = await kv.get('awm:agent-by-addr:' + address.toLowerCase());
-      return id ? this.get(id) : null;
-    },
-    async findByCapability(cap) {
-      const ids = (await kv.smembers('awm:agent-by-cap:' + cap.toLowerCase())) || [];
-      const cards = [];
-      for (const id of ids) {
-        const c = await this.get(id);
-        if (c) cards.push(c);
-      }
-      return cards;
-    },
-    async stats() {
-      const ids = (await kv.smembers('awm:agent-cards:ids')) || [];
-      return { totalCards: ids.length };
-    },
-  };
+  return buildUpstashBackend({
+    get: (k) => kv.get(k),
+    set: (k, v) => kv.set(k, v),
+    hset: (k, obj) => kv.hset(k, obj),
+    hgetall: (k) => kv.hgetall(k),
+    smembers: (k) => kv.smembers(k),
+    sadd: (k, v) => kv.sadd(k, v),
+    _using: 'vercel-kv',
+  });
 }
 
 async function getBackend() {
   if (_backend) return _backend;
   if (_backend === false) return null;
 
-  // Priority 1: Vercel KV (KV_REST_API_URL + KV_REST_API_TOKEN, set by
-  // Vercel Marketplace Upstash integration). Try the @vercel/kv SDK first.
+  // Priority 1: @vercel/kv SDK with KV_REST_API_URL + KV_REST_API_TOKEN
   if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
     try {
       const { kv } = require('@vercel/kv');
       _backend = buildVercelKVBackend(kv);
       return _backend;
     } catch (e) {
-      // @vercel/kv not installed. Fall through to Upstash REST with the
-      // KV_REST_API_URL/KV_REST_API_TOKEN values passed directly.
-    }
-    try {
-      // Build a fresh upstash client with the Vercel KV env vars, no
-      // process.env reassignment (which some tools mangle).
-      const makeUpstash = require('./_upstash-rest.js');
-      const upstash = makeUpstash(
-        process.env.KV_REST_API_URL,
-        process.env.KV_REST_API_TOKEN
-      );
-      _backend = buildUpstashBackend(upstash);
-      return _backend;
-    } catch (e) {
-      console.warn('KV REST fallback failed:', e.message);
+      // package not installed; fall through
     }
   }
 
-  // Priority 2: Direct Upstash (UPSTASH_REDIS_REST_URL + _TOKEN)
+  // Priority 2: Upstash REST (UPSTASH_REDIS_REST_URL + _TOKEN)
   if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
     try {
       const makeUpstash = require('./_upstash-rest.js');
@@ -181,7 +135,22 @@ async function getBackend() {
       _backend = buildUpstashBackend(upstash);
       return _backend;
     } catch (e) {
-      console.warn('upstash init failed:', e.message);
+      // fall through
+    }
+  }
+
+  // Priority 3: Upstash via TCP/TLS using rediss:// URL (KV_URL or REDIS_URL)
+  const tcpUrl = process.env.REDIS_URL || process.env.KV_URL || process.env.UPSTASH_REDIS_URL_TCP;
+  if (tcpUrl && tcpUrl.startsWith('rediss://')) {
+    try {
+      const makeUpstashTcp = require('./_upstash-tcp.js');
+      const upstash = makeUpstashTcp(tcpUrl);
+      // Test the connection by PINGing
+      await upstash.ping();
+      _backend = buildUpstashBackend(upstash);
+      return _backend;
+    } catch (e) {
+      console.warn('upstash-tcp init failed:', e.message);
     }
   }
 
@@ -233,7 +202,7 @@ async function findByCapability(cap) {
 
 async function stats() {
   const backend = await getBackend();
-  if (backend) return { backend: backend.type, ...await backend.stats() };
+  if (backend) return { backend: backend.type, totalCards: (await backend.stats()).totalCards };
   return {
     backend: 'in-memory (NOT for production cross-instance use)',
     totalCards: _memory.size,
