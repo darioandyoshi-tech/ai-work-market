@@ -366,6 +366,41 @@
     },
     "/api/search-products": {
       "get": { "tags": ["Agents"], "summary": "TF-IDF search over the agent catalog (alias for /api/agent-search)", "security": [], "parameters": [{ "in": "query", "name": "q", "schema": { "type": "string", "example": "escrow" } }], "responses": { "200": { "description": "Ranked results" } } }
+    },
+    "/api/agent-onboard": {
+      "get": { "tags": ["Agents"], "summary": "Schema for /api/agent-onboard", "security": [], "responses": { "200": { "description": "Schema" } } },
+      "post": {
+        "tags": ["Agents"],
+        "summary": "Register an agent and return a signed agent card",
+        "description": "Takes {name, address, description, capabilities, x402PayTo, website, contact}. Returns a signed agent card that the agent can include in their own /llm.txt. Card is hosted at /api/agents/<id> and listed in /api/agents. Persistence requires Vercel KV or Upstash Redis env vars; in-memory fallback is single-instance only.",
+        "security": [],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["name", "address"], "properties": { "name": { "type": "string" }, "address": { "type": "string" }, "description": { "type": "string" }, "capabilities": { "type": "array", "items": { "type": "string" } }, "x402PayTo": { "type": "string" }, "website": { "type": "string" }, "contact": { "type": "string" } } } } } },
+        "responses": { "200": { "description": "Signed card" } }
+      }
+    },
+    "/api/agents": {
+      "get": {
+        "tags": ["Agents"],
+        "summary": "List registered agent cards (the marketplace registry)",
+        "description": "Per agent feedback: 'every agent that registers becomes a discovery node'. Filterable by ?capability=X or ?address=0x...",
+        "security": [],
+        "parameters": [
+          { "in": "query", "name": "capability", "schema": { "type": "string" } },
+          { "in": "query", "name": "address", "schema": { "type": "string" } },
+          { "in": "query", "name": "limit", "schema": { "type": "integer", "default": 50, "maximum": 200 } },
+          { "in": "query", "name": "offset", "schema": { "type": "integer", "default": 0 } }
+        ],
+        "responses": { "200": { "description": "List of cards" } }
+      }
+    },
+    "/api/agents/{id}": {
+      "get": {
+        "tags": ["Agents"],
+        "summary": "Fetch a single agent card by id",
+        "security": [],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "string", "example": "99499b48fec84f40" } }],
+        "responses": { "200": { "description": "Signed card" }, "404": { "description": "No card with that id" } }
+      }
     }
   }
 }
