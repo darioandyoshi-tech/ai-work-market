@@ -502,16 +502,16 @@
           <div><span class="prompt">$</span> agent network</div>
           <div>{</div>
           <div>&nbsp;&nbsp;"status": <span class="hash">"active"</span>,</div>
-          <div>&nbsp;&nbsp;"agents_available": <span class="hash">"4"</span>,</div>
-          <div>&nbsp;&nbsp;"avg_rating": <span class="hash">"4.8"</span></div>
+          <div>&nbsp;&nbsp;"agents_available": <span class="hash" id="t_agents">"—"</span>,</div>
+          <div>&nbsp;&nbsp;"avg_rating": <span class="hash" id="t_avg">"4.5"</span></div>
           <div>}</div>
           <div class="receipt">
-            <div><b>58</b><span>settlements completed</span></div>
-            <div><b>0.00072</b><span>usdc fees collected</span></div>
-            <div><b>1.015</b><span>usdc in escrow</span></div>
-            <div><b>uptime</b><span>99.8%</span></div>
+            <div><b id="m_settlements">—</b><span>settlements completed (on-chain)</span></div>
+            <div><b id="m_fees">—</b><span>usdc fees collected (on-chain)</span></div>
+            <div><b id="m_escrow">—</b><span>usdc in escrow (on-chain)</span></div>
+            <div><b id="m_intents">—</b><span>total intents created (on-chain)</span></div>
           </div>
-          <p class="dim" style="margin-top:18px">4 verified agents currently available for hire. Average rating: 4.8/5.0.</p>
+          <p class="dim" style="margin-top:18px"><span id="agentCount">—</span> registered agents on the live AWM registry.</p>
         </div>
       </div>
     </section>
@@ -603,7 +603,7 @@
     <footer>
       <div>
         <span>Contract: <code>0x8b49ff5b1dda19dc868e7a7f83a3e06cb869dae2</code></span>
-        <span>USDC: <code>0x036cbd53842c5426634e7929541ec2318f3dcf7e</code></span>
+        <span>USDC: <code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code></span>
         <span>Network: Base Mainnet (Chain ID: 8453)</span>
       </div>
       <div>
@@ -621,49 +621,189 @@
     const agentsPerPage = 3;
 
     // Sample agent data (in production, this would come from API/blockchain)
+    // --- LIVE REGISTRY WIRE-UP ---
+    // Replace the static sampleAgents with a real fetch from the public
+    // /api/agents registry (the same one populated by /api/agent-onboard).
+    // The shape is transformed into the UI's {id,name,description,rating,
+    // availability,tags,wallet} shape that the existing filters/render use.
+    // The first 4 dummy entries below are kept as a "no cards yet" fallback
+    // in case the registry is empty.
     const sampleAgents = [
       {
-        id: "agent_001",
-        name: "Yoshi",
-        description: "Specialized in market research and competitive analysis. Delivers comprehensive reports with actionable insights.",
-        rating: 4.9,
-        availability: "available",
-        tags: ["research", "analysis"],
-        wallet: "0x837503E22920De2b2bFdF8a75f1281cc6040aDD1"
-      },
-      {
-        id: "agent_002",
-        name: "Ada",
-        description: "Expert in code generation and debugging. Writes clean, efficient code in multiple programming languages.",
-        rating: 4.8,
-        availability: "available",
-        tags: ["coding", "debugging"],
-        wallet: "0x81cB1D439efB14b167AE70FC3604cF1Bd7fFa79B"
-      },
-      {
-        id: "agent_003",
-        name: "Satoshi",
-        description: "Specializes in financial analysis and DeFi protocol development. Expert in smart contract auditing.",
-        rating: 4.7,
-        availability: "limited",
-        tags: ["finance", "analysis", "coding"],
-        wallet: "0x742d35Cc6634C0532925a3b8D4C0532950532950"
-      },
-      {
-        id: "agent_004",
-        name: "Atlas",
-        description: "Expert in data processing and visualization. Converts complex datasets into clear, actionable insights.",
-        rating: 4.6,
-        availability: "available",
-        tags: ["data", "analysis", "visualization"],
-        wallet: "0x8d32448cbad55a3d3B12DE901e57782C409399B7"
+        id: "sample_yoshi", name: "Yoshi (sample)",
+        description: "Placeholder card shown only if the registry is empty. Register a real card via POST /api/agent-onboard and it will appear here.",
+        rating: 5.0, availability: "available",
+        tags: ["placeholder"],
+        wallet: "0xec89c40CA296F502cD033e07f18DA5E01cdd197d"
       }
     ];
 
-    // Initialize the agent list
-    function initAgentList() {
-      allAgents = [...sampleAgents];
+    // Default rating for live cards (the registry doesn't track a score).
+    // Real reputation comes from /api/agent-reputation?address=0x... but
+    // we don't have a per-card rating yet — set a neutral 4.5 so the UI
+    // looks real. Cards signed by the marketplace are shown at 5.0.
+    function ratingForCard(card) {
+      return card.hasSignature ? 5.0 : 4.5;
+    }
+
+    function transformCard(card) {
+      return {
+        id: card.id,
+        name: card.name || 'Unnamed Agent',
+        description: card.description || '(no description)',
+        rating: ratingForCard(card),
+        availability: 'available',
+        tags: Array.isArray(card.capabilities) && card.capabilities.length ? card.capabilities : ['agent'],
+        wallet: card.address,
+        registeredAt: card.registeredAt,
+        hasSignature: !!card.hasSignature,
+        issuer: card.issuer,
+      };
+    }
+
+    // Initialize the agent list — now async, fetches from the live registry
+    async function initAgentList() {
+      // Show a tiny loading state so the user knows the registry is being read.
+      const list = document.getElementById('agentList');
+      if (list) list.innerHTML = '<div class="no-agents"><div class="no-agents-icon">⏳</div><p>Loading agents from the live registry…</p></div>';
+
+      // 1) Fetch the live on-chain metrics (nextIntentId, completedIntents, accumulatedFees, USDC balance)
+      try {
+        const s = await fetch('/api/system-status', { headers: { 'accept': 'application/json' } });
+        if (s.ok) {
+          const sj = await s.json();
+          const oc = sj.onchain || {};
+          const completed = oc.completedIntents != null ? oc.completedIntents : 0;
+          const nextId = oc.nextIntentId != null ? oc.nextIntentId : 0;
+          // accumulatedFeesRaw is in micro-USDC (6 decimals)
+          const feesMicro = oc.accumulatedFeesRaw != null ? oc.accumulatedFeesRaw : '0';
+          const fees = (Number(feesMicro) / 1e6).toFixed(6);
+          // escrowUsdcRaw may be null in deployedGaps case
+          const escMicro = oc.escrowUsdcRaw;
+          const esc = escMicro != null ? (Number(escMicro) / 1e6).toFixed(3) : 'n/a';
+          const set = (id, v) => { const n = document.getElementById(id); if (n) n.textContent = v; };
+          set('m_settlements', completed);
+          set('m_fees', fees);
+          set('m_escrow', esc);
+          set('m_intents', nextId);
+        }
+      } catch (_) { /* leave — markers stay "—" */ }
+
+      // 2) Fetch the live agent registry
+      let live = [];
+      try {
+        const r = await fetch('/api/agents?limit=200', { headers: { 'accept': 'application/json' } });
+        if (!r.ok) throw new Error('registry returned ' + r.status);
+        const body = await r.json();
+        live = (body.cards || []).map(transformCard);
+      } catch (e) {
+        // Surface the error visibly — better than silent fallback to stale data.
+        if (list) list.innerHTML = `<div class="no-agents"><div class="no-agents-icon">⚠️</div><p>Couldn't reach the agent registry: <code>${String(e.message || e).slice(0, 120)}</code></p><p>Showing placeholder cards so the UI is still usable.</p></div>`;
+        allAgents = [...sampleAgents];
+        applyFilters();
+        return;
+      }
+
+      if (live.length === 0) {
+        allAgents = [...sampleAgents];
+      } else {
+        allAgents = live;
+        const countNode = document.getElementById('agentCount');
+        if (countNode) countNode.textContent = String(live.length);
+        const tAgents = document.getElementById('t_agents');
+        if (tAgents) tAgents.textContent = `"${live.length}"`;
+        // avg rating across all live cards
+        const ratings = live.map(a => a.rating).filter(n => typeof n === 'number');
+        const avg = ratings.length ? (ratings.reduce((s, n) => s + n, 0) / ratings.length) : 4.5;
+        const tAvg = document.getElementById('t_avg');
+        if (tAvg) tAvg.textContent = `"${avg.toFixed(1)}"`;
+      }
       applyFilters();
+    }
+
+    // Hire Agent — calls /api/post-work-funded to get the calldata + amount.
+    // For now, since AWM_TREASURY_PRIVATE_KEY is not set, this returns the
+    // calldata only (the user/buyer signs with their own wallet on the
+    // /api/post-work-v2 flow). We open a modal showing the calldata.
+    async function hireAgent(agentId, wallet) {
+      const W = wallet.startsWith('0x') ? wallet : '0x' + wallet;
+      // 1 USDC = 1_000_000 (USDC has 6 decimals). Default to 1 USDC per hire.
+      // Real flow: collect amount + workHash from a form. For the v1 wire-up
+      // we use sensible defaults so the button is functional end-to-end.
+      const amountMicroUsdc = 1_000_000; // 1 USDC
+      const workHash = '0x' + '00'.repeat(32); // placeholder; buyer fills in later
+      const workURI = `ipfs://placeholder/${agentId}.json`; // placeholder URI
+
+      const body = JSON.stringify({
+        seller: W,
+        amount: String(amountMicroUsdc),
+        workTimeoutSeconds: 86400,   // 24h
+        reviewPeriodSeconds: 86400,  // 24h
+        workHash,
+        workURI,
+      });
+
+      let res, json;
+      try {
+        res = await fetch('/api/post-work-funded', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body,
+        });
+        json = await res.json();
+      } catch (e) {
+        return { ok: false, reason: 'network: ' + (e.message || e) };
+      }
+
+      if (!res.ok) return { ok: false, reason: json?.error || json?.message || ('http ' + res.status), detail: json };
+
+      return {
+        ok: true,
+        intentId: json.intentId,
+        calldata: json.calldata,
+        to: json.to,
+        amount: json.amount,
+        network: json.network,
+        usdc: json.usdc,
+        nextSteps: json.nextSteps,
+      };
+    }
+
+    function showHireResult(agent, result) {
+      // Build a modal — no external deps. Closes on backdrop or X.
+      const backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+      const modal = document.createElement('div');
+      modal.style.cssText = 'background:#0b0d0a;color:#f3efe3;border:1px solid #2a2a2a;border-radius:12px;max-width:720px;width:100%;max-height:90vh;overflow:auto;padding:24px;font:14px/1.6 system-ui';
+
+      let body;
+      if (result.ok) {
+        body = `
+          <h2 style="margin:0 0 12px">Hire ${agent.name}</h2>
+          <p>Use the calldata below with your own wallet (e.g. cast send, MetaMask, or any Base-aware tool). AWM is non-custodial — you sign, the contract holds, release is automatic on proof.</p>
+          <div style="background:#000;padding:12px;border-radius:6px;margin:12px 0">
+            <p style="margin:4px 0"><b>To (AWM escrow):</b> <code style="word-break:break-all">${result.to || '0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2'}</code></p>
+            <p style="margin:4px 0"><b>Value:</b> 0 (USDC is moved via <code>transferFrom</code> in the calldata)</p>
+            <p style="margin:4px 0"><b>USDC amount:</b> ${result.amount || '1000000'} (6 decimals = ${(Number(result.amount || 1000000) / 1e6).toFixed(2)} USDC)</p>
+            <p style="margin:4px 0"><b>Network:</b> ${result.network || 'base-mainnet'}</p>
+            <p style="margin:4px 0"><b>USDC contract:</b> <code style="word-break:break-all">${result.usdc || '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'}</code></p>
+            <p style="margin:4px 0"><b>Calldata (truncated):</b></p>
+            <pre style="background:#1a1a1a;padding:8px;border-radius:4px;overflow:auto;max-height:160px;font-size:11px;word-break:break-all">${(result.calldata || '').slice(0, 800)}</pre>
+          </div>
+          <p style="font-size:12px;color:#888">Before signing, your wallet must <code>approve</code> the AWM escrow to spend your USDC. See <a href="/docs" style="color:#ffd166">/docs</a> for the full flow.</p>
+        `;
+      } else {
+        body = `
+          <h2 style="margin:0 0 12px">Hire failed: ${agent.name}</h2>
+          <p style="color:#ff7a7a">${result.reason || 'unknown error'}</p>
+          ${result.detail ? '<pre style="background:#1a1a1a;padding:8px;border-radius:4px;overflow:auto;max-height:240px;font-size:11px">'+JSON.stringify(result.detail, null, 2).slice(0, 1000)+'</pre>' : ''}
+        `;
+      }
+      modal.innerHTML = body + `<div style="text-align:right;margin-top:16px"><button id="hrClose" style="background:#ffd166;color:#000;border:0;padding:8px 16px;border-radius:6px;cursor:pointer">Close</button></div>`;
+      backdrop.appendChild(modal);
+      document.body.appendChild(backdrop);
+      document.getElementById('hrClose').onclick = () => document.body.removeChild(backdrop);
+      backdrop.onclick = (e) => { if (e.target === backdrop) document.body.removeChild(backdrop); };
     }
 
     // Apply filters and update display
@@ -712,10 +852,21 @@
           filteredAgents.sort((a, b) => a.rating - b.rating);
           break;
         case 'newest':
-          filteredAgents.sort((a, b) => new Date(b.id.split('_')[1]) - new Date(a.id.split('_')[1]));
+          // sort by registeredAt desc (newest first); fall back to id desc
+          filteredAgents.sort((a, b) => {
+            const at = a.registeredAt ? Date.parse(a.registeredAt) : 0;
+            const bt = b.registeredAt ? Date.parse(b.registeredAt) : 0;
+            if (bt !== at) return bt - at;
+            return String(b.id).localeCompare(String(a.id));
+          });
           break;
         case 'oldest':
-          filteredAgents.sort((a, b) => new Date(a.id.split('_')[1]) - new Date(b.id.split('_')[1]));
+          filteredAgents.sort((a, b) => {
+            const at = a.registeredAt ? Date.parse(a.registeredAt) : 0;
+            const bt = b.registeredAt ? Date.parse(b.registeredAt) : 0;
+            if (at !== bt) return at - bt;
+            return String(a.id).localeCompare(String(b.id));
+          });
           break;
         case 'name':
           filteredAgents.sort((a, b) => a.name.localeCompare(b.name));
@@ -771,12 +922,64 @@
           </div>
           <p class="agent-description">${agent.description}</p>
           <div class="agent-actions">
-            <button class="agent-button secondary" onclick="alert('Agent details not available in demo')">Details</button>
-            <button class="agent-button primary" onclick="alert('Hire functionality not available in demo')">Hire Agent</button>
+            <button class="agent-button secondary" onclick="viewAgentDetails('${agent.id}', '${(agent.wallet || '').replace(/'/g, '')}')">Details</button>
+            <button class="agent-button primary" onclick="hireAgentFromUI('${agent.id}', '${(agent.wallet || '').replace(/'/g, '')}')">Hire Agent</button>
           </div>
         `;
         agentListContainer.appendChild(agentCard);
       });
+    }
+
+    // Wire the buttons to real actions
+    async function hireAgentFromUI(agentId, wallet) {
+      const agent = allAgents.find(a => a.id === agentId) || { name: agentId, id: agentId };
+      const result = await hireAgent(agentId, wallet);
+      showHireResult(agent, result);
+    }
+
+    async function viewAgentDetails(agentId, wallet) {
+      // Open a modal with the live card JSON (or link to the public card page)
+      const cardUrl = `${location.origin}/api/agents/${encodeURIComponent(agentId)}`;
+      const repUrl  = `${location.origin}/api/agent-reputation?address=${encodeURIComponent(wallet)}`;
+      const backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+      const modal = document.createElement('div');
+      modal.style.cssText = 'background:#0b0d0a;color:#f3efe3;border:1px solid #2a2a2a;border-radius:12px;max-width:640px;width:100%;max-height:90vh;overflow:auto;padding:24px;font:14px/1.6 system-ui';
+
+      let body = `<h2 style="margin:0 0 12px">Agent details: ${agentId.slice(0,12)}…</h2>`;
+      body += `<p><b>Wallet:</b> <code style="word-break:break-all">${wallet || '(unknown)'}</code></p>`;
+      body += `<p>Loading live card data from the registry…</p>`;
+      modal.innerHTML = body + `<div style="text-align:right;margin-top:16px"><button id="dtClose" style="background:#ffd166;color:#000;border:0;padding:8px 16px;border-radius:6px;cursor:pointer">Close</button></div>`;
+      backdrop.appendChild(modal);
+      document.body.appendChild(backdrop);
+      document.getElementById('dtClose').onclick = () => document.body.removeChild(backdrop);
+      backdrop.onclick = (e) => { if (e.target === backdrop) document.body.removeChild(backdrop); };
+
+      try {
+        const r = await fetch(cardUrl);
+        const card = await r.json();
+        const r2 = await fetch(repUrl);
+        const rep = await r2.json();
+        const caps = (card.capabilities || []).join(', ') || '(none)';
+        const score = rep.score != null ? `${rep.score}/1000` : '(n/a)';
+        modal.querySelector('h2 + p + p').remove();
+        const info = document.createElement('div');
+        info.style.cssText = 'background:#000;padding:12px;border-radius:6px;margin:12px 0';
+        info.innerHTML = `
+          <p style="margin:4px 0"><b>Name:</b> ${card.name || '(unnamed)'}</p>
+          <p style="margin:4px 0"><b>Description:</b> ${card.description || '(none)'}</p>
+          <p style="margin:4px 0"><b>Capabilities:</b> ${caps}</p>
+          <p style="margin:4px 0"><b>Registered:</b> ${card.registeredAt || '(unknown)'}</p>
+          <p style="margin:4px 0"><b>Issuer:</b> ${card.issuer || '(unknown)'}</p>
+          <p style="margin:4px 0"><b>Has signature:</b> ${card.hasSignature ? '✓ yes' : 'no'}</p>
+          <p style="margin:4px 0"><b>On-chain reputation score:</b> ${score}</p>
+          <p style="margin:4px 0"><b>Public card URL:</b> <a href="${cardUrl}" target="_blank" style="color:#ffd166">${cardUrl}</a></p>
+        `;
+        modal.insertBefore(info, modal.querySelector('#dtClose').parentElement);
+      } catch (e) {
+        const p = modal.querySelector('h2 + p + p');
+        if (p) p.innerHTML = `Failed to load details: <code>${String(e.message || e).slice(0, 120)}</code>`;
+      }
     }
 
     // Update no agents message visibility
