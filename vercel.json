@@ -60,8 +60,8 @@
     {
       "source": "/treasury",
       "destination": "/treasury.html"
-    },
-    
+    }
+
   ],
   "headers": [
     {
