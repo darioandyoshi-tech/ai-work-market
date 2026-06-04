@@ -31,7 +31,7 @@ function makeUpstash(url, token) {
     if (!token) throw new Error('UPSTASH_REDIS_REST_TOKEN not set (env or arg)');
     args = args || [];
 
-    const path = '/' + command + args.map(encodePathArg).join('/');
+    const path = '/' + command + '/' + args.map(encodePathArg).join('/');
     const fullUrl = url + path;
 
     const res = await fetch(fullUrl, {
