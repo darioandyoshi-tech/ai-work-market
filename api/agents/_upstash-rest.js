@@ -1,28 +1,22 @@
 // api/agents/_upstash-rest.js
 // Tiny Upstash Redis REST client. No SDK install required — uses fetch.
 //
-// IMPORTANT: We use '-' as the separator in keys (not ':') because Vercel's
-// fetch implementation decodes '%3A' (URL-encoded colon) back to ':' before
-// sending the request to Upstash. Upstash then parses the URL incorrectly:
-// /SADD/awm%3Aagent-cards%3Aids becomes SADD awm:agent-cards:ids which
-// is treated as SADD with one key 'awm' and one member 'agent-cards:ids',
-// leading to "ERR wrong number of arguments for 'sadd' command".
-// Using '-' avoids the encoding dance entirely.
+// Upstash REST API format (https://upstash.com/docs/redis/api/rest):
+//   GET  https://<host>/<COMMAND>/<arg1>/<arg2>/...  (args in path)
+//   POST https://<host>/<COMMAND>                    (args in JSON body)
 //
-// Upstash REST API format:
-//   GET  https://<host>/<COMMAND>/<arg1>/<arg2>/...
-//   POST https://<host>/<COMMAND>/<arg1>/<arg2>/...
+// The body for POST is a JSON array of string args.
 //
 // Auth: Authorization: Bearer <token>
+//
+// We use '-' as the separator in keys (not ':') to avoid any URL encoding
+// issues with Vercel's fetch implementation.
 
 function makeUpstash(url, token) {
   if (!url) url = process.env.UPSTASH_REDIS_REST_URL;
   if (!token) token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   function encodePathArg(s) {
-    // Don't encode '-' or '_' or alphanumerics. We do need to encode some
-    // things (like '#' or '?' or '%') to avoid URL parsing issues, but we
-    // AVOID encoding ':' which Vercel's fetch layer will decode.
     return encodeURIComponent(String(s));
   }
 
@@ -31,15 +25,31 @@ function makeUpstash(url, token) {
     if (!token) throw new Error('UPSTASH_REDIS_REST_TOKEN not set (env or arg)');
     args = args || [];
 
-    const path = '/' + command + '/' + args.map(encodePathArg).join('/');
-    const fullUrl = url + path;
+    let fullUrl;
+    let fetchOpts;
 
-    const res = await fetch(fullUrl, {
-      method,
-      headers: {
-        Authorization: 'Bearer ' + token,
-      },
-    });
+    if (method === 'GET') {
+      // Path-based: /<COMMAND>/<arg1>/<arg2>/...
+      const path = '/' + command + '/' + args.map(encodePathArg).join('/');
+      fullUrl = url + path;
+      fetchOpts = {
+        method: 'GET',
+        headers: { Authorization: 'Bearer ' + token },
+      };
+    } else {
+      // Body-based: /<COMMAND> with body = JSON array of args
+      fullUrl = url + '/' + command;
+      fetchOpts = {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(args),
+      };
+    }
+
+    const res = await fetch(fullUrl, fetchOpts);
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`upstash ${command} returned ${res.status}: ${text}`);
