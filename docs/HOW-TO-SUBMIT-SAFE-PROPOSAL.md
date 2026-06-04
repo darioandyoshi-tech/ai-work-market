@@ -63,10 +63,12 @@ If the Safe app says "Contract ABI doesn't have any public methods":
 |---|---|
 | `target` (address) | `0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2` |
 | `value` (uint256) | `0` |
-| `data` (bytes) | `0xc5090346000000000000000000000000c0038fb94e2d2ee1eeb20b476c4d5322df2a4ca9` |
+| `data` (bytes) | `0x9691352800000000000000000000000000c0038fb94e2d2ee1eeb20b476c4d5322df2a4ca9` |
 | `predecessor` (bytes32) | `0x0000000000000000000000000000000000000000000000000000000000000000` |
-| `salt` (bytes32) | `0x5e2371f388eaa4872084110022a01f64e41f73568b042bce8b512c014b6f6dc3` |
+| `salt` (bytes32) | `0xd102ad6d58035e1b2930e0dcd24ab1075a8c0fb62e5b2f0b32653a384724147f` |
 | `delay` (uint256) | `172800` |
+
+NOTE: Use the inner-call data `0x96913528…` (setZkVerifier) here, NOT the wrapper `0xc5090346…` (which is the old v1 selector). The Safe app will encode the schedule() call wrapping this inner data automatically.
 
 ### 6. Add transaction → Create batch → Send batch
 
