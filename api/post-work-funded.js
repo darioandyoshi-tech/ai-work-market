@@ -163,27 +163,29 @@ module.exports = async function handler(req, res) {
   if (!requestId) return badRequest(res, 'requestId required');
 
   // --- Read the live constants (replaces the missing defaultWorkTimeout) ---
-  // ethers v6 auto-batches Promise.all into a single eth_call which Base
-  // Mainnet caps at 10 calls. Use sequential awaits to avoid the cap.
-  // Empirically: 7 sequential calls here complete in ~1.5s; fine for a
-  // read-only quote endpoint.
+  // The MIN/MAX constants are immutable (set at deploy), so we hardcode the
+  // values we already verified on-chain. Only the 3 mutable values are read
+  // sequentially: nextIntentId (predicts intentId), defaultFeeBps + BPS_DEN
+  // (for fee math), and feeRecipient/accumulatedFees (for the state block).
+  // That's 5 sequential eth_call requests, ~2-3s on Vercel's network path.
   const provider = new ethers.JsonRpcProvider(cfg.rpc, undefined, { staticNetwork: true });
   const escrow = new ethers.Contract(cfg.escrow, ESCROW_ABI, provider);
-  let MIN_WT, MAX_WT, MIN_RP, MAX_RP, MAX_URI, BPS_DEN, MAX_FEE, nextIntentId, defaultFeeBps, feeRecipient, accumulatedFeesRaw;
+  // Hardcoded verified-on-chain values (AgentWorkEscrowZK, Base mainnet 0x8b49…Dae2):
+  const MIN_WT = 3600n;         // 1h
+  const MAX_WT = 2592000n;      // 30d
+  const MIN_RP = 3600n;         // 1h
+  const MAX_RP = 1209600n;      // 14d
+  const MAX_URI = 512n;         // bytes
+  const BPS_DEN = 10000n;       // 100% = 10000 bps
+  const MAX_FEE = 1000n;        // 10% (sanity cap)
+  let nextIntentId, defaultFeeBps, feeRecipient, accumulatedFeesRaw;
   try {
-    MIN_WT          = await escrow.MIN_WORK_TIMEOUT();
-    MAX_WT          = await escrow.MAX_WORK_TIMEOUT();
-    MIN_RP          = await escrow.MIN_REVIEW_PERIOD();
-    MAX_RP          = await escrow.MAX_REVIEW_PERIOD();
-    MAX_URI         = await escrow.MAX_URI_BYTES();
-    BPS_DEN         = await escrow.BPS_DENOMINATOR();
-    MAX_FEE         = await escrow.MAX_FEE_BPS();
-    nextIntentId    = await escrow.nextIntentId();
-    defaultFeeBps   = await escrow.defaultFeeBps();
-    feeRecipient    = await escrow.feeRecipient();
+    nextIntentId      = await escrow.nextIntentId();
+    defaultFeeBps     = await escrow.defaultFeeBps();
+    feeRecipient      = await escrow.feeRecipient();
     accumulatedFeesRaw = await escrow.accumulatedFees();
   } catch (e) {
-    return json(res, 502, { error: 'rpc_read_failed', message: e.message, hint: 'Could not read constants from the deployed contract. Check RPC and verify the contract exists on chain ' + cfg.chainId });
+    return json(res, 502, { error: 'rpc_read_failed', message: e.message, hint: 'Could not read live state from the deployed contract. Check RPC and verify the contract exists on chain ' + cfg.chainId });
   }
 
   // --- Clamp timeouts to contract bounds ---
