@@ -30,21 +30,21 @@ function makeUpstash(url, token) {
     return Buffer.from(padded, 'base64').toString('utf8');
   }
 
-  // For path-based: pass keys (arg 0) as-is, base64-encode values.
-  // This is safe because:
-  //   - Keys have no ':' or '/' (registry uses safe key names)
-  //   - Values are base64, which has no special chars
-  function encodeKey(k) { return k; }
-  function encodeValue(v) { return b64encode(v); }
+  // For path-based: base64-encode EVERYTHING (keys and values) so that
+  // no part of the path contains ':' or '/' that Vercel fetch would decode.
+  // We use URL-safe base64 (with - and _ instead of + and /) and no padding.
+  // All chars in the result are URL-safe: A-Z, a-z, 0-9, -, _.
+  function encodePathArg(s) {
+    return b64encode(s);
+  }
 
   async function call(method, command, args) {
     if (!url) throw new Error('UPSTASH_REDIS_REST_URL not set (env or arg)');
     if (!token) throw new Error('UPSTASH_REDIS_REST_TOKEN not set (env or arg)');
     args = args || [];
 
-    // First arg is the key (raw), rest are values (b64-encoded)
-    const segments = args.map((a, i) => i === 0 ? encodeKey(a) : encodeValue(a));
-    const path = '/' + command + '/' + segments.join('/');
+    // Every arg is b64-encoded (both keys and values).
+    const path = '/' + command + '/' + args.map(encodePathArg).join('/');
     const fullUrl = url + path;
 
     const res = await fetch(fullUrl, {

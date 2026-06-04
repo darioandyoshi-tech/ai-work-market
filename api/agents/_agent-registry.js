@@ -64,8 +64,8 @@ function buildUpstashBackend(client) {
     type: client._using || 'upstash',
     async getAll() {
       // Note: keys use no separators (not ':' or '-') to avoid Vercel fetch
-      // decoding %3A. The card id itself is 'agent:abc...' but we strip
-      // the 'agent:' prefix and use only the hex. See _upstash-rest.js.
+      // decoding %3A. Keys are also b64-encoded by the client to dodge
+      // Vercel's %3A decoding in the URL path. See _upstash-rest.js.
       const ids = (await client.smembers('awmcards')) || [];
       const cards = [];
       for (const id of ids) {
