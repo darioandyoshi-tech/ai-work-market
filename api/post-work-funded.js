@@ -155,10 +155,15 @@ module.exports = async function handler(req, res) {
   const cfg = NETWORKS[net];
 
   // --- Validate inputs ---
-  if (!seller || !ethers.isAddress(seller)) return badRequest(res, 'seller must be a 0x-prefixed EVM address');
-  // Normalize to EIP-55 checksum (ethers v6 is strict; users often paste
-  // the checksum case from a block explorer).
-  try { seller = ethers.getAddress(seller); } catch (e) { return badRequest(res, 'seller is not a valid EVM address: ' + e.message); }
+  // Same leniency as /api/agent-onboard: accept any 0x+40-hex form and
+  // normalize via lowercase → getAddress(). The strict isAddress() check
+  // rejects valid addresses with the wrong EIP-55 mixed case, which is
+  // a usability problem for users who copy from a block explorer.
+  if (!seller || typeof seller !== 'string' || !/^0x[0-9a-fA-F]{40}$/.test(seller)) {
+    return badRequest(res, 'seller must be a 0x-prefixed 40-hex-char EVM address');
+  }
+  try { seller = ethers.getAddress(seller); }
+  catch (_) { seller = ethers.getAddress(seller.toLowerCase()); }
   const amountRaw = autoAmountFromArgs(body);
   if (!amountRaw || amountRaw === '0') return badRequest(res, 'amount must be a positive USDC number (e.g. "1.50" or "100")');
   if (!workURI) return badRequest(res, 'workURI required');

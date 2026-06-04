@@ -74,16 +74,30 @@ module.exports = async function handler(req, res) {
   catch (e) { return badRequest(res, e.message); }
 
   let { address, name, description, capabilities, x402PayTo, website, contact } = body;
-  if (!address || !ethers.isAddress(address)) return badRequest(res, 'address must be a 0x-prefixed EVM address');
-  // Normalize to the EIP-55 checksum form so the registered card is
-  // portable across ethers v5/v6 and looks canonical to humans.
-  address = ethers.getAddress(address);
+  // Normalize the address to EIP-55 checksum. ethers v6 is strict: if the
+  // mixed-case form has a wrong checksum, isAddress() returns false AND
+  // getAddress() throws. We try the strict path first, then fall back
+  // to a leniency pass that accepts any 0x+40-hex string and recomputes
+  // the canonical form. This is the right behavior because addresses
+  // ARE case-insensitive on-chain — only the display form is checksummed.
+  if (!address || typeof address !== 'string' || !/^0x[0-9a-fA-F]{40}$/.test(address)) {
+    return badRequest(res, 'address must be a 0x-prefixed 40-hex-char EVM address');
+  }
+  try { address = ethers.getAddress(address); }
+  catch (e) {
+    // Mixed-case but bad checksum (or all-uppercase / all-lowercase).
+    // Normalize via lowercase first, then compute the canonical checksum.
+    address = ethers.getAddress(address.toLowerCase());
+  }
   if (!name || typeof name !== 'string' || name.length < 2 || name.length > 64) return badRequest(res, 'name must be 2-64 chars');
   if (description != null && (typeof description !== 'string' || description.length > 1024)) return badRequest(res, 'description must be string <=1024 chars');
   if (capabilities != null && (!Array.isArray(capabilities) || capabilities.some((c) => typeof c !== 'string' || c.length > 64))) return badRequest(res, 'capabilities must be string[] each <=64 chars');
   if (x402PayTo != null) {
-    if (!ethers.isAddress(x402PayTo)) return badRequest(res, 'x402PayTo must be a valid address');
-    x402PayTo = ethers.getAddress(x402PayTo);
+    if (typeof x402PayTo !== 'string' || !/^0x[0-9a-fA-F]{40}$/.test(x402PayTo)) {
+      return badRequest(res, 'x402PayTo must be a valid address');
+    }
+    try { x402PayTo = ethers.getAddress(x402PayTo); }
+    catch (_) { x402PayTo = ethers.getAddress(x402PayTo.toLowerCase()); }
   }
   if (website != null && (typeof website !== 'string' || !/^https?:\/\//.test(website))) return badRequest(res, 'website must be http(s) URL');
 
