@@ -385,10 +385,10 @@
           <div>&nbsp;&nbsp;"latency": <span class="hash">"45ms"</span></div>
           <div>}</div>
           <div class="receipt">
-            <div><b>58</b><span>settlements completed</span></div>
-            <div><b>0.00072</b><span>usdc fees collected</span></div>
-            <div><b>1.015</b><span>usdc in escrow</span></div>
-            <div><b>uptime</b><span>99.8%</span></div>
+            <div><b id="m_settlements">—</b><span>settlements completed (on-chain)</span></div>
+            <div><b id="m_fees">—</b><span>usdc fees collected (on-chain)</span></div>
+            <div><b id="m_escrow">—</b><span>usdc in escrow (on-chain)</span></div>
+            <div><b id="m_block">—</b><span>latest block (on-chain)</span></div>
           </div>
           <p class="dim" style="margin-top:18px">API is operational and serving requests from registered agents and clients.</p>
         </div>
@@ -556,7 +556,7 @@
     <footer>
       <div>
         <span>Contract: <code>0x8b49ff5b1dda19dc868e7a7f83a3e06cb869dae2</code></span>
-        <span>USDC: <code>0x036cbd53842c5426634e7929541ec2318f3dcf7e</code></span>
+        <span>USDC: <code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code></span>
         <span>Network: Base Mainnet (Chain ID: 8453)</span>
       </div>
       <div>
@@ -612,5 +612,30 @@
     }
   </style>
   <script type="module" src="/assets/awm-shell.js"></script>
+
+  <script>
+    // Live on-chain metrics — populates the m_settlements/m_fees/m_escrow/m_block
+    // IDs in the receipt block. Used on post-work, work-list, docs, api pages.
+    (async function loadLiveMetrics() {
+      try {
+        const r = await fetch('/api/system-status', { cache: 'no-store' });
+        if (!r.ok) return;
+        const d = await r.json();
+        const o = d.onchain || {};
+        const settled = (o.completedIntents != null) ? o.completedIntents : '—';
+        const feesRaw = o.accumulatedFeesRaw || '0';
+        const feesNum = Number(feesRaw) / 1e6;
+        const blockN = o.blockNumber ? Number(o.blockNumber).toLocaleString() : '—';
+        // Escrow USDC = total volume (use completedIntents * median as a proxy when
+        // on-chain escrow-balance is not exposed; here just use '—' if not present).
+        const escrow = (o.escrowUsdc != null) ? Number(o.escrowUsdc).toFixed(3) : '—';
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        set('m_settlements', String(settled));
+        set('m_fees', feesNum.toFixed(6));
+        set('m_escrow', escrow);
+        set('m_block', blockN);
+      } catch (_) { /* silent fail; the m_* defaults are em-dash */ }
+    })();
+  </script>
 </body>
 </html>

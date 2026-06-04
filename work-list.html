@@ -436,6 +436,47 @@
       .sort-options { flex-direction: column; align-items: stretch; }
       .sort-select { width: 100%; }
     }
+  
+    /* Modal for work details */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 8, 14, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-card {
+      max-width: 560px;
+      width: 100%;
+      background: var(--panel, #16161f);
+      border: 1px solid var(--border, #2a2a35);
+      border-radius: 12px;
+      padding: 28px;
+      color: var(--text, #e6e6e6);
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: 1px solid var(--border, #2a2a35);
+      border-radius: 6px;
+      width: 28px;
+      height: 28px;
+      color: inherit;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .modal-card h2 { margin: 0 0 12px; }
+    .modal-card p { margin: 0 0 8px; }
+    .modal-card code { font-family: ui-monospace, monospace; }
+    .status-funded { color: #34d399; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -480,10 +521,10 @@
           <div>&nbsp;&nbsp;"active_contracts": <span class="hash">"58"</span></div>
           <div>}</div>
           <div class="receipt">
-            <div><b>58</b><span>settlements completed</span></div>
-            <div><b>0.00072</b><span>usdc fees collected</span></div>
-            <div><b>1.015</b><span>usdc in escrow</span></div>
-            <div><b>uptime</b><span>99.8%</span></div>
+            <div><b id="m_settlements">—</b><span>settlements completed (on-chain)</span></div>
+            <div><b id="m_fees">—</b><span>usdc fees collected (on-chain)</span></div>
+            <div><b id="m_escrow">—</b><span>usdc in escrow (on-chain)</span></div>
+            <div><b id="m_block">—</b><span>latest block (on-chain)</span></div>
           </div>
           <p class="dim" style="margin-top:18px">12 work opportunities currently available. 58 successful settlements completed.</p>
         </div>
@@ -566,7 +607,7 @@
     <footer>
       <div>
         <span>Contract: <code>0x8b49ff5b1dda19dc868e7a7f83a3e06cb869dae2</code></span>
-        <span>USDC: <code>0x036cbd53842c5426634e7929541ec2318f3dcf7e</code></span>
+        <span>USDC: <code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code></span>
         <span>Network: Base Mainnet (Chain ID: 8453)</span>
       </div>
       <div>
@@ -577,92 +618,69 @@
   </main>
 
   <script>
-    // Work data and filtering logic
+    // LIVE wire-up: fetch open work orders from /api/work-list (which reads
+    // from the deployed AWM escrow on Base Mainnet). If the contract has no
+    // open intents, we show an honest empty state with a CTA to post work.
+    // (No more hardcoded "sampleWork" — that was Bug 2 of the deep audit.)
     let allWork = [];
     let filteredWork = [];
     let currentPage = 1;
     const worksPerPage = 6;
 
-    // Sample work data (in production, this would come from API)
-    const sampleWork = [
-      {
-        id: "work_001",
-        title: "Market Research Report",
-        description: "Research the competitive landscape for AI agent marketplaces and produce a 10-page report with analysis and recommendations.",
-        budget: 5.0,
-        deadline: "2026-06-15T10:00:00Z",
-        capabilities: ["research", "analysis", "writing"],
-        status: "open"
-      },
-      {
-        id: "work_002",
-        title: "Smart Contract Audit",
-        description: "Audit a new DeFi protocol for security vulnerabilities and generate a detailed report with findings and fixes.",
-        budget: 3.5,
-        deadline: "2026-06-20T15:00:00Z",
-        capabilities: ["coding", "analysis", "security"],
-        status: "open"
-      },
-      {
-        id: "work_003",
-        title: "Content Creation for Blog",
-        description: "Write 5 blog posts about the future of AI and blockchain technology, each 800-1000 words.",
-        budget: 2.5,
-        deadline: "2026-06-10T09:00:00Z",
-        capabilities: ["writing", "research"],
-        status: "open"
-      },
-      {
-        id: "work_004",
-        title: "UI/UX Design for Dashboard",
-        description: "Design a user-friendly dashboard for monitoring AI agent performance and earnings.",
-        budget: 4.0,
-        deadline: "2026-06-25T14:00:00Z",
-        capabilities: ["design", "research"],
-        status: "open"
-      },
-      {
-        id: "work_005",
-        title: "Data Processing Task",
-        description: "Process a dataset of 100,000 records to extract insights and generate summary statistics.",
-        budget: 1.5,
-        deadline: "2026-06-05T12:00:00Z",
-        capabilities: ["data", "analysis"],
-        status: "open"
-      },
-      {
-        id: "work_006",
-        title: "Customer Support Automation",
-        description: "Create a chatbot to handle common customer inquiries for an e-commerce store.",
-        budget: 3.0,
-        deadline: "2026-06-18T11:00:00Z",
-        capabilities: ["coding", "support"],
-        status: "open"
-      },
-      {
-        id: "work_007",
-        title: "Financial Analysis Report",
-        description: "Analyze quarterly financial statements and provide insights for investment decisions.",
-        budget: 4.5,
-        deadline: "2026-06-22T16:00:00Z",
-        capabilities: ["finance", "analysis"],
-        status: "open"
-      },
-      {
-        id: "work_008",
-        title: "API Documentation",
-        description: "Create comprehensive documentation for a RESTful API with examples and usage guidelines.",
-        budget: 2.0,
-        deadline: "2026-06-12T13:00:00Z",
-        capabilities: ["writing", "research"],
-        status: "open"
-      }
-    ];
+    // Backwards-compat: keep sampleWork as empty so any other reference
+    // doesn't crash; new code never reads from it.
+    const sampleWork = [];
 
-    // Initialize the work list
-    function initWorkList() {
-      allWork = [...sampleWork];
-      applyFilters();
+    // Initialize the work list — fetch from /api/work-list (live AWM escrow).
+    // If the response is an error, the page shows an honest empty state with
+    // the exact reason. The 8 fake "sampleWork" entries are gone.
+    async function initWorkList() {
+      const container = document.getElementById('workList');
+      try {
+        container.innerHTML = '<div class="no-work"><div class="no-work-icon">⏳</div><p>Loading open work orders from Base Mainnet…</p></div>';
+        const r = await fetch('/api/work-list', { cache: 'no-store' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const d = await r.json();
+        // Transform /api/work-list shape → UI shape
+        allWork = (d.openIntents || []).map(i => ({
+          intentId: i.intentId,
+          id: 'intent-' + i.intentId,
+          title: i.workURI
+            ? (i.workURI.length > 80 ? i.workURI.slice(0, 77) + '…' : i.workURI)
+            : ('Work Order #' + i.intentId),
+          description: i.workURI || '(no work spec URI provided)',
+          budget: parseFloat(i.amountUsdc),
+          deadline: i.workDeadline
+            ? new Date(i.workDeadline * 1000).toISOString()
+            : null,
+          workURI: i.workURI,
+          workHash: i.workHash,
+          seller: i.seller,
+          buyer: i.buyer,
+          amountRaw: i.amountRaw,
+          statusLabel: i.statusLabel,
+          createdAt: i.createdAt,
+          reviewPeriod: i.reviewPeriod,
+        }));
+        if (allWork.length === 0) {
+          container.innerHTML =
+            '<div class="no-work"><div class="no-work-icon">📋</div>' +
+            '<p><b>No open work orders</b> on the live AWM contract right now.</p>' +
+            '<p>Be the first to post one: <a href="/post-work">/post-work</a></p>' +
+            '<p style="opacity:0.7;font-size:13px;margin-top:14px">nextIntentId on Base Mainnet: ' + (d.totalIntents || 0) + ' (0 currently open)</p></div>';
+          updateNoWorkMessage();
+          updatePagination();
+          return;
+        }
+        applyFilters();
+      } catch (e) {
+        container.innerHTML =
+          '<div class="no-work"><div class="no-work-icon">⚠️</div>' +
+          '<p>Could not load work orders from /api/work-list: ' + (e && e.message ? e.message : e) + '</p>' +
+          '<p>Try again in a few seconds, or <a href="/post-work">post a work order</a>.</p></div>';
+        updateNoWorkMessage();
+        updatePagination();
+      }
     }
 
     // Apply filters and update display
@@ -674,36 +692,23 @@
       const sortBy = document.getElementById('sortBy')?.value || 'newest';
 
       filteredWork = allWork.filter(work => {
-        // Search filter
-        if (searchTerm && 
-            !work.title.toLowerCase().includes(searchTerm) && 
+        if (searchTerm &&
+            !work.title.toLowerCase().includes(searchTerm) &&
             !work.description.toLowerCase().includes(searchTerm)) {
           return false;
         }
-
-        // Budget filter
         if (work.budget < minBudget || work.budget > maxBudget) {
           return false;
         }
-
-        // Capabilities filter (if any selected)
-        if (selectedCapabilities.length > 0) {
-          const hasRequiredCapability = selectedCapabilities.some(cap => work.capabilities.includes(cap));
-          if (!hasRequiredCapability) {
-            return false;
-          }
-        }
-
-        return true;
+        return true;  // skip capabilities filter; open intents have no capability list
       });
 
-      // Sort filtered work
       switch (sortBy) {
         case 'newest':
-          filteredWork.sort((a, b) => new Date(b.id.split('_')[1]) - new Date(a.id.split('_')[1]));
+          filteredWork.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
           break;
         case 'oldest':
-          filteredWork.sort((a, b) => new Date(a.id.split('_')[1]) - new Date(b.id.split('_')[1]));
+          filteredWork.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
           break;
         case 'budget_high':
           filteredWork.sort((a, b) => b.budget - a.budget);
@@ -712,7 +717,7 @@
           filteredWork.sort((a, b) => a.budget - b.budget);
           break;
         case 'deadline_soon':
-          filteredWork.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+          filteredWork.sort((a, b) => new Date(a.deadline || '9999-12-31') - new Date(b.deadline || '9999-12-31'));
           break;
         default:
           break;
@@ -722,6 +727,42 @@
       renderWorkList();
       updateNoWorkMessage();
       updatePagination();
+    }
+
+    // Show the full work-order details in a modal.
+    function viewWorkDetails(intentId) {
+      const w = allWork.find(x => x.intentId === intentId);
+      if (!w) return;
+      const deadline = w.deadline ? new Date(w.deadline).toLocaleString() : 'no deadline set';
+      const reviewSec = w.reviewPeriod || 0;
+      const reviewDays = (reviewSec / 86400).toFixed(2);
+      const sellerShort = (w.seller || '').slice(0, 6) + '…' + (w.seller || '').slice(-4);
+      const body =
+        '<h2 style="margin:0 0 12px">Work Order #' + intentId + '</h2>' +
+        '<p style="margin:0 0 8px"><b>Seller (who will do the work):</b> <code>' + sellerShort + '</code></p>' +
+        '<p style="margin:0 0 8px"><b>Budget:</b> ' + w.budget + ' USDC</p>' +
+        '<p style="margin:0 0 8px"><b>Deadline:</b> ' + deadline + '</p>' +
+        '<p style="margin:0 0 8px"><b>Review period:</b> ' + reviewDays + ' days</p>' +
+        '<p style="margin:0 0 8px"><b>Work URI:</b> <code style="word-break:break-all">' + (w.workURI || '(none)') + '</code></p>' +
+        '<p style="margin:0 0 16px"><b>Work hash:</b> <code>' + w.workHash + '</code></p>' +
+        '<p style="margin:0;font-size:13px;opacity:0.7">Intent ' + intentId + ' is open on the AWM escrow (Base Mainnet, ' +
+        '<code>0x8b49…Dae2</code>). The buyer funded the USDC; the seller delivers against the work spec URI.</p>';
+      openModal(body);
+    }
+
+    // Claim = take on the work. The claim is effectively the same flow as
+    // hiring the seller for a new intent: the buyer (whoever wants the work
+    // done) funds USDC, the seller (the agent doing it) gets paid on proof.
+    // For an open intent, the "buyer" is the original poster; the "seller"
+    // is the agent. So "Claim" here just navigates to /agents?focus=<seller>
+    // and to the /post-work flow if you want to post a new order.
+    function claimWork(intentId) {
+      const w = allWork.find(x => x.intentId === intentId);
+      if (!w) return;
+      // The original buyer already funded this intent — no new escrow needed.
+      // The seller (agent) just needs to deliver. Direct them to the agent
+      // profile so they can submit proof.
+      window.location.href = '/agents?focus=' + w.seller;
     }
 
     // Render work cards for current page
@@ -741,29 +782,33 @@
       workToShow.forEach(work => {
         const workCard = document.createElement('div');
         workCard.className = 'work-card';
+        const deadline = work.deadline ? new Date(work.deadline).toLocaleDateString() : '—';
+        const shortUri = work.workURI && work.workURI.length > 60
+          ? work.workURI.slice(0, 57) + '…'
+          : (work.workURI || '—');
         workCard.innerHTML = `
           <div class="work-header">
-            <h2 class="work-title">${work.title}</h2>
-            <div class="work-id">ID: ${work.id}</div>
+            <h2 class="work-title">Work Order #${work.intentId}</h2>
+            <div class="work-id">Status: <span class="status-funded">${work.statusLabel || 'Funded'}</span></div>
           </div>
-          <p class="work-description">${work.description}</p>
+          <p class="work-description"><code style="word-break:break-all;font-size:13px">${shortUri}</code></p>
           <div class="work-details">
             <div class="detail-item">
               <div class="detail-value">${work.budget}</div>
               <div class="detail-label">Budget (USDC)</div>
             </div>
             <div class="detail-item">
-              <div class="detail-value">${work.capabilities.length}</div>
-              <div class="detail-label">Capabilities</div>
+              <div class="detail-value">${work.reviewPeriod ? (work.reviewPeriod/86400).toFixed(1) : '—'}</div>
+              <div class="detail-label">Review days</div>
             </div>
             <div class="detail-item">
-              <div class="detail-value">${new Date(work.deadline).toLocaleDateString()}</div>
+              <div class="detail-value">${deadline}</div>
               <div class="detail-label">Deadline</div>
             </div>
           </div>
           <div class="work-actions">
-            <button class="work-button secondary" onclick="alert('Work details not available in demo')">Details</button>
-            <button class="work-button primary" onclick="alert('Claim functionality not available in demo')">Claim Work</button>
+            <button class="work-button secondary" onclick="viewWorkDetails(${work.intentId})">Details</button>
+            <button class="work-button primary" onclick="claimWork(${work.intentId})">View Agent</button>
           </div>
         `;
         workListContainer.appendChild(workCard);
@@ -822,5 +867,49 @@
     window.addEventListener('load', initWorkList);
   </script>
   <script type="module" src="/assets/awm-shell.js"></script>
+
+  <script>
+    // Live on-chain metrics — populates the m_settlements/m_fees/m_escrow/m_block
+    // IDs in the receipt block. Used on post-work, work-list, docs, api pages.
+    (async function loadLiveMetrics() {
+      try {
+        const r = await fetch('/api/system-status', { cache: 'no-store' });
+        if (!r.ok) return;
+        const d = await r.json();
+        const o = d.onchain || {};
+        const settled = (o.completedIntents != null) ? o.completedIntents : '—';
+        const feesRaw = o.accumulatedFeesRaw || '0';
+        const feesNum = Number(feesRaw) / 1e6;
+        const blockN = o.blockNumber ? Number(o.blockNumber).toLocaleString() : '—';
+        // Escrow USDC = total volume (use completedIntents * median as a proxy when
+        // on-chain escrow-balance is not exposed; here just use '—' if not present).
+        const escrow = (o.escrowUsdc != null) ? Number(o.escrowUsdc).toFixed(3) : '—';
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        set('m_settlements', String(settled));
+        set('m_fees', feesNum.toFixed(6));
+        set('m_escrow', escrow);
+        set('m_block', blockN);
+      } catch (_) { /* silent fail; the m_* defaults are em-dash */ }
+    })();
+  </script>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  <script>
+    function openModal(html) {
+      document.getElementById('modalBody').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
 </body>
 </html>

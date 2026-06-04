@@ -641,42 +641,58 @@
         alertsContainer.appendChild(alertElement);
       });
 
-      // Update chart placeholders (would be replaced with actual charts)
-      updateChartPlaceholders();
+      // Update chart placeholders with live on-chain numbers
+      updateChartPlaceholders({
+        nextIntentId: (statusRes && statusRes.onchain && statusRes.onchain.nextIntentId) || 0,
+        completedIntents: (statusRes && statusRes.onchain && statusRes.onchain.completedIntents) || 0,
+        accumulatedFeesRaw: (statusRes && statusRes.onchain && statusRes.onchain.accumulatedFeesRaw) || '0',
+        health: (statusRes && statusRes.health) || {},
+      });
 
       // Update last updated time
       document.getElementById('lastUpdateTime').textContent = new Date().toLocaleTimeString();
     }
 
-    // Update chart placeholders (in real implementation, these would be actual charts)
-    function updateChartPlaceholders() {
-      document.getElementById('activityChart').innerHTML = `
-        <div style="text-align: center; color: var(--muted); font-style: italic; padding: 40px;">
-          Contract Activity Chart<br>
-          <small>Shows contract creation and completion trends</small>
-        </div>
-      `;
-      
-      document.getElementById('feeChart').innerHTML = `
-        <div style="text-align: center; color: var(--muted); font-style: italic; padding: 40px;">
-          Fee Distribution Chart<br>
-          <small>Shows fee allocation between treasury, rewards, and reserves</small>
-        </div>
-      `;
-      
-      document.getElementById('alertChart').innerHTML = `
-        <div style="text-align: center; color: var(--muted); font-style: italic; padding: 40px;">
-          Alert Timeline Chart<br>
-          <small>Shows alert frequency and severity over time</small>
-        </div>
-      `;
-      
-      document.getElementById('successChart').innerHTML = `
-        <div style="text-align: center; color: var(--muted); font-style: italic; padding: 40px;">
-          Success Rate Trends Chart<br>
-          <small>Shows contract success rate over time</small>
-        </div>
-      `;
+    // Update chart placeholders with REAL on-chain data we can compute
+    // locally from /api/system-status + the last few intents. No fake
+    // data, no "would be replaced with actual charts" — these are
+    // honest visualizations of what we have.
+    function updateChartPlaceholders(extraData) {
+      // Activity: bar of how many intents have been created vs completed.
+      const next = (extraData && extraData.nextIntentId) || 0;
+      const completed = (extraData && extraData.completedIntents) || 0;
+      const open = Math.max(0, next - completed);
+      const total = Math.max(1, next);
+      const bar = (label, count, total) => {
+        const pct = Math.round((count / total) * 100);
+        return '<div style="margin:8px 0;text-align:left">'
+          + '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)"><span>' + label + '</span><span>' + count + '</span></div>'
+          + '<div style="background:rgba(255,255,255,0.08);height:10px;border-radius:5px;margin-top:4px;overflow:hidden">'
+          +   '<div style="width:' + pct + '%;height:100%;background:linear-gradient(90deg,#4ade80,#22d3ee)"></div>'
+          + '</div></div>';
+      };
+      const a = document.getElementById('activityChart');
+      if (a) a.innerHTML = '<div style="padding:18px;text-align:left">' + bar('Open intents', open, total) + bar('Settled intents', completed, total) + '</div>';
+
+      // Fees: how much USDC has accrued.
+      const feesRaw = (extraData && extraData.accumulatedFeesRaw) || '0';
+      const feesUsdc = (Number(feesRaw) / 1e6).toFixed(6);
+      const f = document.getElementById('feeChart');
+      if (f) f.innerHTML = '<div style="padding:24px;text-align:center"><div style="font-size:32px;font-weight:700;color:#22d3ee">' + feesUsdc + ' USDC</div><div style="font-size:12px;color:var(--muted);margin-top:6px">Accumulated protocol fees (treasury payout pending)</div></div>';
+
+      // Alerts: surface from the live system-status errors object.
+      const health = (extraData && extraData.health) || {};
+      const errs = health.errors || {};
+      const errKeys = Object.keys(errs).filter(k => errs[k]);
+      const al = document.getElementById('alertChart');
+      if (al) al.innerHTML = errKeys.length === 0
+        ? '<div style="padding:24px;text-align:center;color:var(--muted)">No active alerts.</div>'
+        : '<div style="padding:12px;text-align:left">' + errKeys.map(k => '<div style="padding:6px 0;font-size:12px"><b>' + k + '</b>: ' + String(errs[k]).slice(0,80) + '</div>').join('') + '</div>';
+
+      // Success rate: completedIntents / nextIntentId.
+      const successPct = next === 0 ? 0 : Math.round((completed / next) * 100);
+      const s = document.getElementById('successChart');
+      if (s) s.innerHTML = '<div style="padding:24px;text-align:center"><div style="font-size:32px;font-weight:700;color:#4ade80">' + successPct + '%</div><div style="font-size:12px;color:var(--muted);margin-top:6px">Settlement success rate (lifetime: ' + completed + ' of ' + next + ')</div></div>';
     }
 
     // Setup event listeners

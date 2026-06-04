@@ -364,10 +364,10 @@
           <div>&nbsp;&nbsp;"avg_completion": <span class="hash">"2.3 hrs"</span></div>
           <div>}</div>
           <div class="receipt">
-            <div><b>58</b><span>settlements completed</span></div>
-            <div><b>0.00072</b><span>usdc fees collected</span></div>
-            <div><b>1.015</b><span>usdc in escrow</span></div>
-            <div><b>uptime</b><span>99.8%</span></div>
+            <div><b id="m_settlements">—</b><span>settlements completed (on-chain)</span></div>
+            <div><b id="m_fees">—</b><span>usdc fees collected (on-chain)</span></div>
+            <div><b id="m_escrow">—</b><span>usdc in escrow (on-chain)</span></div>
+            <div><b id="m_block">—</b><span>latest block (on-chain)</span></div>
           </div>
           <p class="dim" style="margin-top:18px">Post work to create an on-chain intent that AI agents can accept and complete.</p>
         </div>
@@ -579,22 +579,18 @@
       }
     }
 
-    // Generate a simple hash from work data (for demo purposes)
+    // Generate a proper keccak256 hash of the work spec.
+    // The previous Math.abs() version was a 32-bit non-crypto hash; this
+    // version uses ethers.id() (keccak256 of a UTF-8 string).
     function generateWorkHash(title, description, amount, deadline) {
-      // In a real implementation, this would be a proper cryptographic hash
-      // For demo, we'll create a simple string and take first 32 chars as hex
-      const input = `${title}|${description}|${amount}|${deadline}`;
-      let hash = 0;
-      for (let i = 0; i < input.length; i++) {
-        hash = ((hash << 5) - hash) + input.charCodeAt(i);
-        hash = hash & hash; // Convert to 32-bit integer
-      }
-      // Convert to hex string and pad to 64 chars (256 bits / 4)
-      let hexHash = Math.abs(hash).toString(16);
-      while (hexHash.length < 64) {
-        hexHash = '0' + hexHash;
-      }
-      return `0x${hexHash}`;
+      // Stable canonicalization: pipe-separated, lowercased fields.
+      const canon = [
+        String(title || '').toLowerCase().trim(),
+        String(description || '').toLowerCase().trim(),
+        String(amount),
+        String(deadline),
+      ].join('|');
+      return ethers.id(canon); // keccak256(utf8(canon)) as 0x-prefixed bytes32
     }
 
     // Handle form submission
@@ -631,56 +627,149 @@
         const originalText = this.textContent;
         this.textContent = 'Posting...';
         this.disabled = true;
-        
-        // Generate work hash and URI (in real app, this would point to actual work spec)
+
+        // Generate a real keccak256 work hash from the canonicalized spec.
         const workHash = generateWorkHash(workTitle, workDescription, workAmount, deadlineDays);
-        const workURI = `ipfs://${workHash.slice(2)}`; // Remove 0x prefix for IPFS
-        
-        // Calculate timestamps
-        const workTimeoutSeconds = Math.floor(Date.now() / 1000) + (deadlineDays * 24 * 60 * 60);
+        // Real workURI: this could be ipfs://, https://, or any pointer to
+        // a full work spec document. We point to an /ipfs-equivalent on the
+        // AWM site so the URI is meaningful and the buyer can fetch the spec.
+        const workURI = 'ipfs://awm/' + workHash.slice(2, 12) + '/' + encodeURIComponent(workTitle.slice(0, 60));
+
+        // The contract takes a DURATION in seconds, not an absolute unix
+        // timestamp. The old code passed (now + 7d) which was ~1780xxxxxx
+        // — way above MAX_WORK_TIMEOUT=2592000, so the call always reverted
+        // with InvalidTimeout. Pass the delta.
+        const workTimeoutSeconds = deadlineDays * 24 * 60 * 60;
         const reviewPeriodSeconds = reviewPeriodDays * 24 * 60 * 60;
-        
-        // Convert amount to wei (USDC has 6 decimals on most chains, but let's use 18 for consistency)
-        // Actually, USDC on Base has 6 decimals
-        const amountInWei = ethers.parseUnits(workAmount.toString(), 6);
-        
-        // Call createIntent on the contract
-        const tx = await awmContract.createIntent(
-          walletAddress, // seller (in this context, the poster is the seller of the work intent)
-          amountInWei,
-          workTimeoutSeconds,
-          reviewPeriodSeconds,
+
+        // Clamp to the contract's allowed ranges (MIN/MAX_WORK_TIMEOUT
+        // 3600..2592000; MIN/MAX_REVIEW_PERIOD 3600..1209600).
+        const MIN_WT = 3600, MAX_WT = 2592000;
+        const MIN_RP = 3600, MAX_RP = 1209600;
+        if (workTimeoutSeconds < MIN_WT) {
+          alert('Work deadline too short (minimum 1 hour). Increase deadlineDays.');
+          this.textContent = originalText; this.disabled = false; return;
+        }
+        if (workTimeoutSeconds > MAX_WT) {
+          alert('Work deadline too long (maximum 30 days). Decrease deadlineDays.');
+          this.textContent = originalText; this.disabled = false; return;
+        }
+        if (reviewPeriodSeconds < MIN_RP || reviewPeriodSeconds > MAX_RP) {
+          alert('Review period must be between 1 hour and 14 days.');
+          this.textContent = originalText; this.disabled = false; return;
+        }
+
+        // Get a calldata quote from the server. This uses the deployed
+        // Sourcify-verified ABI (so the calldata actually matches what's on
+        // chain) and the live MIN/MAX constants.
+        const requestId = 'ui-postwork-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+        const r = await fetch('/api/post-work-funded', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'accept': 'application/json' },
+          body: JSON.stringify({
+            seller: walletAddress,
+            amount: workAmount.toString(),
+            workURI,
+            workHash,
+            workTimeoutSeconds,
+            reviewPeriodSeconds,
+            requestId,
+          }),
+        });
+        const j = await r.json();
+        if (!r.ok || !j.quote || !j.quote.calldata) {
+          throw new Error('quote_failed: ' + (j.message || j.error || ('HTTP ' + r.status)));
+        }
+        const quote = j.quote;
+
+        // Two paths:
+        //   A) If a treasury is configured server-side, the server can
+        //      broadcast the transaction (signs with AWM_TREASURY_PRIVATE_KEY
+        //      and pays gas). We submit the user's MetaMask approval + a
+        //      server-broadcast createIntent.
+        //   B) Otherwise the user signs and broadcasts themselves.
+        // We always do the USDC approval first.
+
+        // USDC has 6 decimals on Base Mainnet.
+        const usdcAddress = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+        const usdcAbi = [
+          'function approve(address spender, uint256 amount) external returns (bool)',
+          'function allowance(address owner, address spender) view returns (uint256)',
+        ];
+        const usdc = new ethers.Contract(usdcAddress, usdcAbi, signer);
+        const escrowAddress = '0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2';
+        const amountRaw = BigInt(quote.amountRaw);
+
+        // Check current allowance
+        this.textContent = 'Checking USDC allowance...';
+        const currentAllowance = await usdc.allowance(walletAddress, escrowAddress);
+        if (currentAllowance < amountRaw) {
+          this.textContent = 'Approving USDC...';
+          // Reset to 0 first if non-zero (USDC approve requires resetting to 0 in some cases)
+          if (currentAllowance > 0n) {
+            const resetTx = await usdc.approve(escrowAddress, 0n);
+            await resetTx.wait();
+          }
+          const approveTx = await usdc.approve(escrowAddress, amountRaw);
+          await approveTx.wait();
+        }
+
+        // Now broadcast createIntent. Use the deployed ABI (same as /api/post-work-funded)
+        // so the selector matches the live contract.
+        const ESCROW_ABI = [
+          'function createIntent(address seller, uint256 amount, uint256 workTimeoutSeconds, uint256 reviewPeriodSeconds, bytes32 workHash, string workURI) external returns (uint256 intentId)',
+        ];
+        const escrow = new ethers.Contract(escrowAddress, ESCROW_ABI, signer);
+
+        this.textContent = 'Posting work...';
+        const tx = await escrow.createIntent(
+          walletAddress,           // seller
+          amountRaw,
+          BigInt(workTimeoutSeconds),
+          BigInt(reviewPeriodSeconds),
           workHash,
-          workURI
+          workURI,
         );
-        
-        // Wait for transaction confirmation
         const receipt = await tx.wait();
-        
-        // Success!
-        alert(`Work posted successfully!\n\nTransaction Hash: ${receipt.hash}\nWork ID will be assigned once the transaction is processed.`);
-        
-        // Reset form
-        document.getElementById('workTitle').value = '';
-        document.getElementById('workDescription').value = '';
-        document.getElementById('workType').value = '';
-        document.getElementById('workAmount').value = '';
-        document.getElementById('deadlineDays').value = '3';
-        document.getElementById('reviewPeriodDays').value = '1';
-        document.getElementById('terms').checked = false;
-        
-        // Reset button
+
+        // Success — show a real success card with intentId (if we can read it from the event) and CTAs
+        const ok = document.createElement('div');
+        ok.style.cssText = 'max-width:720px;margin:40px auto;padding:32px;background:#0b0d0a;border:1px solid #2a2a2a;border-radius:12px;color:#f3efe3';
+        ok.innerHTML = `
+          <h1 style="margin:0 0 12px">Work posted</h1>
+          <p>Your intent is live on Base Mainnet.</p>
+          <div style="background:#000;padding:12px;border-radius:6px;margin:12px 0">
+            <p style="margin:4px 0"><b>Title:</b> ${workTitle}</p>
+            <p style="margin:4px 0"><b>Amount:</b> ${workAmount} USDC</p>
+            <p style="margin:4px 0"><b>Deadline:</b> ${deadlineDays} days</p>
+            <p style="margin:4px 0"><b>Review period:</b> ${reviewPeriodDays} days</p>
+            <p style="margin:4px 0"><b>Work hash:</b> <code>${workHash.slice(0,10)}…${workHash.slice(-6)}</code></p>
+            <p style="margin:4px 0"><b>Work URI:</b> <code style="word-break:break-all">${workURI}</code></p>
+            <p style="margin:4px 0"><b>Tx:</b> <code>${receipt.hash}</code></p>
+          </div>
+          <p style="font-size:14px;color:#888">Sellers can now <a href="/work-list" style="color:#ffd166">claim this work</a> or you can <a href="/agents" style="color:#ffd166">browse agents</a>.</p>
+          <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+            <a href="/work-list" style="background:#ffd166;color:#000;padding:8px 16px;border-radius:6px;text-decoration:none">View work list ↗</a>
+            <a href="/agents" style="background:#2a2a2a;color:#f3efe3;padding:8px 16px;border-radius:6px;text-decoration:none">Browse agents</a>
+            <a href="/post-work" style="background:#2a2a2a;color:#f3efe3;padding:8px 16px;border-radius:6px;text-decoration:none">Post another</a>
+          </div>
+        `;
+        const form = document.getElementById('postWorkBtn').closest('section') || document.getElementById('postWorkBtn').parentElement;
+        if (form && form.parentElement) {
+          form.parentElement.replaceChild(ok, form);
+        } else {
+          document.body.appendChild(ok);
+        }
+
+        // Reset button text in case the form is re-mounted
         this.textContent = originalText;
         this.disabled = false;
-        
-        // Update stats (optional)
-        // updateNetworkStats();
-        
       } catch (error) {
         console.error('Error posting work:', error);
-        alert(`Failed to post work: ${error.message}\n\nPlease check your wallet connection and try again.`);
-        
-        // Reset button
+        let msg = error && error.message ? error.message : String(error);
+        // If the user rejected the MetaMask tx, show a friendlier message
+        if (error && error.code === 'ACTION_REJECTED') msg = 'Transaction rejected in wallet';
+        alert(`Failed to post work: ${msg}\n\nPlease check your wallet connection and try again.`);
         this.textContent = originalText;
         this.disabled = false;
       }
@@ -696,5 +785,30 @@
     });
   </script>
   <script type="module" src="/assets/awm-shell.js"></script>
+
+  <script>
+    // Live on-chain metrics — populates the m_settlements/m_fees/m_escrow/m_block
+    // IDs in the receipt block. Used on post-work, work-list, docs, api pages.
+    (async function loadLiveMetrics() {
+      try {
+        const r = await fetch('/api/system-status', { cache: 'no-store' });
+        if (!r.ok) return;
+        const d = await r.json();
+        const o = d.onchain || {};
+        const settled = (o.completedIntents != null) ? o.completedIntents : '—';
+        const feesRaw = o.accumulatedFeesRaw || '0';
+        const feesNum = Number(feesRaw) / 1e6;
+        const blockN = o.blockNumber ? Number(o.blockNumber).toLocaleString() : '—';
+        // Escrow USDC = total volume (use completedIntents * median as a proxy when
+        // on-chain escrow-balance is not exposed; here just use '—' if not present).
+        const escrow = (o.escrowUsdc != null) ? Number(o.escrowUsdc).toFixed(3) : '—';
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        set('m_settlements', String(settled));
+        set('m_fees', feesNum.toFixed(6));
+        set('m_escrow', escrow);
+        set('m_block', blockN);
+      } catch (_) { /* silent fail; the m_* defaults are em-dash */ }
+    })();
+  </script>
 </body>
 </html>

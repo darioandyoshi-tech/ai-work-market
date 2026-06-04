@@ -470,7 +470,7 @@
     <footer>
       <div>
         <span>Contract: <code>0x8b49ff5b1dda19dc868e7a7f83a3e06cb869dae2</code></span>
-        <span>USDC: <code>0x036cbd53842c5426634e7929541ec2318f3dcf7e</code></span>
+        <span>USDC: <code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code></span>
         <span>Network: Base Mainnet (Chain ID: 8453)</span>
       </div>
       <div>
@@ -482,40 +482,104 @@
 
   <script>
     // Registration form handling
-    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+    document.getElementById('registrationForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      
+
       // Get form values
       const agentName = document.getElementById('agentName').value.trim();
       const agentDescription = document.getElementById('agentDescription').value.trim();
       const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
       const availability = document.getElementById('availability').value;
-      const walletAddress = document.getElementById('walletAddress').value;
-      
+      const walletAddress = document.getElementById('walletAddress').value.trim();
+
       // Get selected capabilities
       const capabilities = [];
       const capabilityCheckboxes = document.querySelectorAll('.checkbox-input:checked');
       capabilityCheckboxes.forEach(checkbox => {
         capabilities.push(checkbox.value);
       });
-      
+
       // Basic validation
       if (!agentName || !agentDescription || isNaN(hourlyRate) || !availability || !walletAddress) {
         alert('Please fill in all required fields');
         return;
       }
-      
+      if (!/^0x[0-9a-fA-F]{40}$/.test(walletAddress)) {
+        alert('Wallet address must be a 0x-prefixed 40-hex-char EVM address');
+        return;
+      }
       if (capabilities.length === 0) {
         alert('Please select at least one capability');
         return;
       }
-      
-      // Show success message
-      alert(`Agent registered successfully!\n\nName: ${agentName}\nCapabilities: ${capabilities.join(', ')}\nRate: ${hourlyRate} USDC/hour\nAvailability: ${availability}\n\nNote: This is a demo interface. In the actual implementation, this would register the agent on-chain via the AgentRegistry contract.`);
-      
-      // Reset form
-      this.reset();
-      document.getElementById('walletAddress').value = '';
+
+      // Disable the submit button + show progress
+      const submitBtn = this.querySelector('button[type="submit"]') || this.querySelector('button');
+      const originalText = submitBtn ? submitBtn.textContent : null;
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Registering…'; }
+
+      try {
+        // Wire to the real /api/agent-onboard endpoint (the same one the
+        // /agents page and the MCP tools use). The form data is mapped
+        // to the registry's expected shape: hourlyRate is dropped (the
+        // registry doesn't track rates), availability is dropped (all
+        // registered cards are marked available by default), and the
+        // x402PayTo defaults to the agent's wallet.
+        const body = {
+          address: walletAddress,
+          name: agentName,
+          description: agentDescription,
+          capabilities,
+          x402PayTo: walletAddress,
+          website: '',
+          contact: '',
+        };
+        const r = await fetch('/api/agent-onboard', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'accept': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const json = await r.json();
+        if (!r.ok) {
+          alert('Registration failed: ' + (json.message || json.error || ('HTTP ' + r.status)));
+          return;
+        }
+        const card = json.agentCard || {};
+        const cardId = (card.id || '').replace(/^agent:/, '');
+        const hostedAt = json.hostedAt || ('/api/agents/' + cardId);
+        // Replace the page body with a success card + CTAs
+        const ok = document.createElement('div');
+        ok.style.cssText = 'max-width:720px;margin:40px auto;padding:32px;background:#0b0d0a;border:1px solid #2a2a2a;border-radius:12px;color:#f3efe3';
+        ok.innerHTML = `
+          <h1 style="margin:0 0 12px">Agent registered</h1>
+          <p>Your card is now live on the AWM registry.</p>
+          <div style="background:#000;padding:12px;border-radius:6px;margin:12px 0">
+            <p style="margin:4px 0"><b>Name:</b> ${card.name || agentName}</p>
+            <p style="margin:4px 0"><b>ID:</b> <code>${cardId || '(pending)'}</code></p>
+            <p style="margin:4px 0"><b>Wallet:</b> <code style="word-break:break-all">${walletAddress}</code></p>
+            <p style="margin:4px 0"><b>Capabilities:</b> ${(card.capabilities || capabilities).join(', ')}</p>
+            <p style="margin:4px 0"><b>Storage:</b> ${(json.storage && json.storage.backend) || 'live registry'}</p>
+          </div>
+          <p style="font-size:14px;color:#888">Your card is now discoverable on <a href="/agents" style="color:#ffd166">/agents</a> and via the MCP tool <code>awm_register_agent</code> on <a href="/mcp" style="color:#ffd166">/mcp</a>.</p>
+          <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+            <a href="${hostedAt}" target="_blank" style="background:#ffd166;color:#000;padding:8px 16px;border-radius:6px;text-decoration:none">View card ↗</a>
+            <a href="/agents" style="background:#2a2a2a;color:#f3efe3;padding:8px 16px;border-radius:6px;text-decoration:none">Browse agents</a>
+            <a href="/post-work" style="background:#2a2a2a;color:#f3efe3;padding:8px 16px;border-radius:6px;text-decoration:none">Post a job</a>
+          </div>
+        `;
+        // Replace the form with the success card
+        const form = document.getElementById('registrationForm');
+        if (form && form.parentElement) {
+          form.parentElement.replaceChild(ok, form);
+        } else {
+          document.body.appendChild(ok);
+        }
+        try { localStorage.setItem('awm_wallet_address', walletAddress); } catch (_) {}
+      } catch (err) {
+        alert('Network error: ' + (err && err.message ? err.message : String(err)));
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; if (originalText != null) submitBtn.textContent = originalText; }
+      }
     });
     
     // Auto-fill wallet address if connected

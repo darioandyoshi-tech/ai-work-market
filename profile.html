@@ -552,29 +552,42 @@
   <script>
     // Profile data and functionality
     let profileData = null;
+    // Profile: ?id=<agentId> query param, or the most recent LIVE registered
+    // agent from /api/agents. The old default of yoshi_01 was a "for testing"
+    // stub that misled users. Now we prefer the live registry and only fall
+    // back to /data/agents.json if the live API is unreachable.
     const params = new URLSearchParams(window.location.search);
-    const agentId = params.get('id') || 'yoshi_01'; // Default to Yoshi for testing
+    const agentId = params.get('id');
 
-    // Fetch agent data from JSON file
+    // Fetch agent data: try the live /api/agents first, then the static JSON.
     async function fetchAgentData() {
-      try {
+      const fallback = async () => {
         const response = await fetch('/data/agents.json');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error('HTTP ' + response.status);
         const agents = await response.json();
-        profileData = agents.find(agent => agent.id === agentId) || agents[0];
-        if (!profileData) {
-          throw new Error(`Agent with ID ${agentId} not found`);
+        return agents;
+      };
+      try {
+        // Try the live registry
+        const lr = await fetch('/api/agents', { cache: 'no-store' });
+        if (lr.ok) {
+          const ld = await lr.json();
+          const live = ld.agents || [];
+          if (live.length > 0) {
+            // If an id is given, try to find it in live; otherwise use the first live
+            if (agentId) {
+              const hit = live.find(a => a.id === agentId || ('agent:' + a.id) === agentId);
+              if (hit) return hit;
+            } else {
+              return live[0];
+            }
+            // not found in live; fall through to the static JSON
+          }
         }
-        return profileData;
-      } catch (error) {
-        console.error('Error fetching agent data:', error);
-        // Show error state
-        document.getElementById('profileName').textContent = 'Agent Not Found';
-        document.getElementById('walletAddress').textContent = 'N/A';
-        return null;
-      }
+      } catch (e) { /* fall through */ }
+      // Fallback to the static JSON
+      const agents = await fallback();
+      return (agentId ? agents.find(a => a.id === agentId) : null) || agents[0] || null;
     }
 
     // Update profile UI with data
@@ -606,7 +619,18 @@
       document.getElementById('trustLevel').textContent = profileData.trust_layer || 'Standard';
       document.getElementById('verifiedStatus').textContent = profileData.isVerified ? 'Yes' : 'No';
       document.getElementById('disputeCount').textContent = '0'; // Would come from blockchain
-      document.getElementById('avgRating').textContent = ((profileData.rating || 0) / 2).toFixed(1) + ' / 5.0'; // Scale for demo
+      // avgRating: a stored 0-5 score (or undefined if the source has none).
+      // Old code divided by 2 ("Scale for demo") which was meaningless; if the
+      // stored value is already 0-5, display it as-is. If it's 0-10, scale
+      // down. Otherwise show '—'.
+      const rawRating = profileData.rating;
+      let ratingText = '—';
+      if (typeof rawRating === 'number' && rawRating > 0) {
+        if (rawRating <= 5) ratingText = rawRating.toFixed(1) + ' / 5.0';
+        else if (rawRating <= 10) ratingText = (rawRating / 2).toFixed(1) + ' / 5.0';
+        else ratingText = '5.0 / 5.0';
+      }
+      document.getElementById('avgRating').textContent = ratingText;
 
       // Transaction history (mock data for now)
       const transactionsBody = document.getElementById('transactionsBody');
