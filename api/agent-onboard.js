@@ -137,10 +137,12 @@ module.exports = async function handler(req, res) {
     card.signature = null;
   }
 
-  // Actually persist the card in the in-memory registry so /api/agents/<id>
-  // serves it (this is the hostedAt URL — it's real, not a fiction).
+  // Actually persist the card in the registry (Vercel KV or Upstash preferred,
+  // in-memory fallback). The hostedAt URL will serve this card on the next
+  // request from any serverless instance.
   const registry = require('./agents/_agent-registry.js');
-  registry.addCard(card);
+  await registry.addCard(card);
+  const storage = await registry.stats();
 
   // Stable URL. Id is hex-only, no "agent:" prefix in the path.
   const idHex = card.id.replace(/^agent:/, '');
@@ -155,6 +157,7 @@ module.exports = async function handler(req, res) {
     hostedAt,
     listedAt,
     publishedTo: [hostedAt, listedAt],
+    storage,
     nextSteps: [
       'GET ' + hostedAt + ' returns your card (try it now)',
       'GET ' + listedAt + ' shows you in the central registry',
