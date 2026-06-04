@@ -56,7 +56,12 @@
     {
       "source": "/purchase-complete",
       "destination": "/purchase-complete.html"
-    }
+    },
+    {
+      "source": "/treasury",
+      "destination": "/treasury.html"
+    },
+    
   ],
   "headers": [
     {

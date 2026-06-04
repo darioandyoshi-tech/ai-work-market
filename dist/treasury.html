@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AWM Treasury — Operator Dashboard</title>
+  <meta name="description" content="Operator view of AWM treasury and reputation signer state.">
+  <link rel="stylesheet" href="/assets/awm-shell.css">
+  <style>
+    main { max-width: 920px; margin: 40px auto; padding: 0 24px; }
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+    .card { background: #16161f; border: 1px solid #2a2a35; border-radius: 10px; padding: 20px; }
+    .card h2 { margin: 0 0 12px; font-size: 16px; }
+    .kv { display: grid; grid-template-columns: 140px 1fr; gap: 6px 12px; font-size: 14px; font-family: ui-monospace, monospace; }
+    .ok { color: #4ade80; }
+    .warn { color: #fbbf24; }
+    .fail { color: #f87171; }
+    .notice { padding: 12px 16px; border-radius: 8px; background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24; margin: 16px 0; font-size: 14px; }
+    .ok-notice { padding: 12px 16px; border-radius: 8px; background: rgba(74, 222, 128, 0.08); border: 1px solid rgba(74, 222, 128, 0.3); color: #4ade80; margin: 16px 0; font-size: 14px; }
+    code { font-family: ui-monospace, monospace; }
+    .cta { display: inline-block; margin-top: 12px; background: #4ade80; color: #000; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; }
+    .cta.secondary { background: #2a2a35; color: #f3efe3; margin-left: 8px; }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AWM Treasury & Reputation Signer</h1>
+    <p style="opacity:0.7">Read-only diagnostics. This page never shows private keys.</p>
+
+    <div class="notice" id="topNotice" style="display:none"></div>
+
+    <div class="row">
+      <div class="card">
+        <h2>Treasury (AWM_TREASURY_PRIVATE_KEY)</h2>
+        <div class="kv">
+          <div>Key set:</div><div id="t-key">—</div>
+          <div>Address:</div><div id="t-addr">—</div>
+          <div>ETH (gas):</div><div id="t-eth">—</div>
+          <div>USDC:</div><div id="t-usdc">—</div>
+        </div>
+        <button class="cta" id="runTest" style="background:#22d3ee;color:#000;margin-top:16px">Run dry-run test</button>
+        <p style="font-size:12px;opacity:0.7;margin-top:8px">Dry-run signs a test message and checks balances. No transaction is sent.</p>
+      </div>
+
+      <div class="card">
+        <h2>Reputation Signer (AWM_REPUTATION_SIGNING_KEY)</h2>
+        <div class="kv">
+          <div>Key set:</div><div id="r-key">—</div>
+          <div>Address:</div><div id="r-addr">—</div>
+        </div>
+        <p style="font-size:13px;opacity:0.7;margin-top:12px">When set, every new agent card from <code>/api/agent-onboard</code> is signed EIP-191 by this address. Signing is gas-free.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <h2>Warnings &amp; Recommendations</h2>
+      <div id="warnings">Loading…</div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <h2>Runbook</h2>
+      <p>Setup, key generation, and rotation instructions are in the repo at <code>docs/TREASURY_RUNBOOK.md</code>.</p>
+      <a class="cta" href="https://vercel.com/dme1/ai-work-market/settings/environment-variables" target="_blank" rel="noopener">Vercel env vars ↗</a>
+      <a class="cta secondary" href="/api/treasury/status" target="_blank" rel="noopener">View raw status JSON</a>
+    </div>
+  </main>
+
+  <script>
+    async function loadStatus() {
+      const out = document.getElementById('topNotice');
+      try {
+        const r = await fetch('/api/treasury/status', { cache: 'no-store' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const d = await r.json();
+        // Treasury card
+        document.getElementById('t-key').innerHTML = d.treasury.keyConfigured
+          ? '<span class="ok">✓ set</span> (format: ' + d.treasury.keyShape.formatHint + ')'
+          : '<span class="fail">✗ not set</span>';
+        document.getElementById('t-addr').textContent = d.treasury.address || '—';
+        document.getElementById('t-eth').innerHTML = d.treasury.eth != null
+          ? d.treasury.eth + ' ETH'
+          : '—';
+        document.getElementById('t-usdc').textContent = d.treasury.usdc != null
+          ? d.treasury.usdc + ' USDC'
+          : '—';
+        // Reputation card
+        document.getElementById('r-key').innerHTML = d.reputationSigner.keyConfigured
+          ? '<span class="ok">✓ set</span> (format: ' + d.reputationSigner.keyShape.formatHint + ')'
+          : '<span class="fail">✗ not set</span>';
+        document.getElementById('r-addr').textContent = d.reputationSigner.address || '—';
+        // Warnings
+        const w = d.warnings || [];
+        const recs = d.recommendations || [];
+        const wDiv = document.getElementById('warnings');
+        if (w.length === 0 && recs.length === 0) {
+          wDiv.innerHTML = '<p class="ok">No warnings. Configuration looks healthy.</p>';
+        } else {
+          wDiv.innerHTML =
+            (w.length ? '<h3 style="margin:8px 0 4px;font-size:14px">Warnings</h3><ul style="margin:0 0 12px">' + w.map(s => '<li style="margin:4px 0">' + s + '</li>').join('') + '</ul>' : '') +
+            (recs.length ? '<h3 style="margin:8px 0 4px;font-size:14px">Recommendations</h3><ul style="margin:0">' + recs.map(s => '<li style="margin:4px 0">' + s + '</li>').join('') + '</ul>' : '');
+        }
+        // Top notice
+        if (d.treasury.keyConfigured && d.treasury.usdc === '0.000000' && d.treasury.eth === '0.0') {
+          out.style.display = 'block';
+          out.className = 'notice';
+          out.innerHTML = 'Treasury key is set but the address has 0 USDC and 0 ETH. Broadcasting will fail. Fund the address at <code>' + d.treasury.address + '</code> on Base Mainnet.';
+        } else if (d.treasury.keyConfigured) {
+          out.style.display = 'block';
+          out.className = 'ok-notice';
+          out.innerHTML = 'Treasury is live. Address <code>' + d.treasury.address + '</code> will broadcast on behalf of buyers. Balances: ' + d.treasury.usdc + ' USDC, ' + d.treasury.eth + ' ETH.';
+        } else {
+          out.style.display = 'block';
+          out.className = 'notice';
+          out.innerHTML = 'Treasury is not configured. <code>/api/post-work-funded</code> returns calldata only; users sign and broadcast themselves. See runbook to enable.';
+        }
+      } catch (e) {
+        out.style.display = 'block';
+        out.className = 'notice';
+        out.textContent = 'Failed to load /api/treasury/status: ' + e.message;
+      }
+    }
+    document.getElementById('runTest').addEventListener('click', async () => {
+      const btn = document.getElementById('runTest');
+      btn.textContent = 'Running…';
+      btn.disabled = true;
+      try {
+        const r = await fetch('/api/treasury/test', { method: 'POST', cache: 'no-store' });
+        const j = await r.json();
+        alert('Dry-run result: ' + j.overall.toUpperCase() + '\n\n' + j.checks.map(c => '  ' + (c.ok ? '✓' : '✗') + ' ' + c.name + (c.detail ? ' — ' + c.detail : '')).join('\n') + (j.summary ? '\n\n' + j.summary : ''));
+      } catch (e) {
+        alert('Dry-run failed: ' + e.message);
+      } finally {
+        btn.textContent = 'Run dry-run test';
+        btn.disabled = false;
+      }
+    });
+    loadStatus();
+    setInterval(loadStatus, 30000); // refresh every 30s
+  </script>
+</body>
+</html>

@@ -35,6 +35,7 @@ const PAGES = [
   'monitor.html',
   'profile.html',
   'work_posting_interface.html',
+  'treasury.html',
   'api.html',
 ];
 
