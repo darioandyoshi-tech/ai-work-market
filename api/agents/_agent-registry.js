@@ -38,7 +38,9 @@ function serialize(card) {
 
 function deserialize(s) {
   let caps = [], sigs = [], servs = [];
-  try { caps = JSON.parse(s.capabilities || '[]'); } catch (_) {}
+  // TEMP DEBUG: log what s.capabilities actually is
+  console.log('[deserialize] s.capabilities typeof:', typeof s.capabilities, 'value:', JSON.stringify(s.capabilities).slice(0,100));
+  try { caps = JSON.parse(s.capabilities || '[]'); } catch (e) { console.log('[deserialize] caps parse err:', e.message); }
   try { sigs = JSON.parse(s.signature || 'null'); } catch (_) {}
   try { servs = JSON.parse(s.services || '[]'); } catch (_) {}
   return {
