@@ -1,16 +1,14 @@
 // api/agents/_upstash-rest.js
 // Tiny Upstash Redis REST client. No SDK install required — uses fetch.
 //
-// Upstash REST API format (https://upstash.com/docs/redis/api/rest):
-//   GET  https://<host>/<COMMAND>/<arg1>/<arg2>/...  (args in path)
-//   POST https://<host>/<COMMAND>                    (args in JSON body)
+// Verified format: Upstash REST takes args in the URL path for both GET
+// and POST. The body-based format (JSON array in body) is NOT supported
+// by this Upstash instance.
 //
-// The body for POST is a JSON array of string args.
+//   GET  https://<host>/<COMMAND>/<arg1>/<arg2>/...
+//   POST https://<host>/<COMMAND>/<arg1>/<arg2>/...
 //
-// Auth: Authorization: Bearer <token>
-//
-// We use '-' as the separator in keys (not ':') to avoid any URL encoding
-// issues with Vercel's fetch implementation.
+// Auth: Authorization: Bearer <...
 
 function makeUpstash(url, token) {
   if (!url) url = process.env.UPSTASH_REDIS_REST_URL;
@@ -25,31 +23,15 @@ function makeUpstash(url, token) {
     if (!token) throw new Error('UPSTASH_REDIS_REST_TOKEN not set (env or arg)');
     args = args || [];
 
-    let fullUrl;
-    let fetchOpts;
+    const path = '/' + command + '/' + args.map(encodePathArg).join('/');
+    const fullUrl = url + path;
 
-    if (method === 'GET') {
-      // Path-based: /<COMMAND>/<arg1>/<arg2>/...
-      const path = '/' + command + '/' + args.map(encodePathArg).join('/');
-      fullUrl = url + path;
-      fetchOpts = {
-        method: 'GET',
-        headers: { Authorization: 'Bearer ' + token },
-      };
-    } else {
-      // Body-based: /<COMMAND> with body = JSON array of args
-      fullUrl = url + '/' + command;
-      fetchOpts = {
-        method: 'POST',
-        headers: {
-          Authorization: 'Bearer ' + token,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(args),
-      };
-    }
-
-    const res = await fetch(fullUrl, fetchOpts);
+    const res = await fetch(fullUrl, {
+      method,
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    });
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`upstash ${command} returned ${res.status}: ${text}`);
