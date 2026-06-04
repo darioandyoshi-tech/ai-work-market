@@ -1,137 +1,19 @@
 // api/agents/_agent-registry.js
-// Agent card registry. Tries Vercel KV first, then Upstash Redis, then
-// falls back to in-memory (which works only on a single warm instance —
-// NOT for production cross-instance use).
+// Agent card registry. Tries Vercel KV first (most native), then Upstash REST
+// (direct), then in-memory fallback (single-instance only).
 //
-// Setup: in Vercel project settings, set either:
-//   KV_REST_API_URL + KV_REST_API_TOKEN  (Vercel KV / Marketplace integration)
-// OR
-//   UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN  (Upstash Redis)
+// Vercel Marketplace Upstash integration sets KV_REST_API_URL/KV_REST_API_TOKEN
+// env vars. Direct upstash.com signups set UPSTASH_REDIS_REST_URL/_TOKEN. We
+// support both.
 //
-// The Vercel Functions runtime already has @vercel/kv available if you
-// added the integration. For Upstash, the @upstash/redis package is
-// lazy-installed on first request.
-//
-// If neither is configured, the registry falls back to in-memory storage.
-// This is fine for development and small-scale testing but cards will
-// vanish across instance cold-starts in production.
+// For Vercel KV without the @vercel/kv package, we fall back to using the
+// Upstash REST API directly against KV_REST_API_URL (which is just an Upstash
+// URL under the hood — same protocol, same DB).
 
 let _backend = null;
-let _memory = new Map();     // id -> card
-let _byAddress = new Map();  // address -> id
-let _byCap = new Map();      // capability -> Set<id>
-
-async function getBackend() {
-  if (_backend) return _backend;
-  if (_backend === false) return null; // failed init, don't retry
-
-  // Try Vercel KV first
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-    try {
-      const { kv } = require('@vercel/kv');
-      _backend = {
-        type: 'vercel-kv',
-        async getAll() {
-          // We use a SET of card ids plus one HASH per card. SADD/SMEMBERS
-          // is cheap; HGETALL per id.
-          const ids = await kv.smembers('awm:agent-cards:ids') || [];
-          const cards = [];
-          for (const id of ids) {
-            const c = await kv.hgetall('awm:agent-card:' + id);
-            if (c && c.id) cards.push(deserialize(c));
-          }
-          return cards;
-        },
-        async set(card) {
-          await kv.sadd('awm:agent-cards:ids', card.id);
-          await kv.hset('awm:agent-card:' + card.id, serialize(card));
-          await kv.set('awm:agent-by-addr:' + card.address, card.id);
-          for (const cap of card.capabilities || []) {
-            await kv.sadd('awm:agent-by-cap:' + cap, card.id);
-          }
-        },
-        async get(id) {
-          const c = await kv.hgetall('awm:agent-card:' + id);
-          return c && c.id ? deserialize(c) : null;
-        },
-        async findByAddress(address) {
-          const id = await kv.get('awm:agent-by-addr:' + address.toLowerCase());
-          return id ? this.get(id) : null;
-        },
-        async findByCapability(cap) {
-          const ids = await kv.smembers('awm:agent-by-cap:' + cap.toLowerCase()) || [];
-          const cards = [];
-          for (const id of ids) {
-            const c = await this.get(id);
-            if (c) cards.push(c);
-          }
-          return cards;
-        },
-        async stats() {
-          const ids = await kv.smembers('awm:agent-cards:ids') || [];
-          return { totalCards: ids.length };
-        },
-      };
-      return _backend;
-    } catch (e) {
-      console.warn('vercel-kv init failed:', e.message);
-    }
-  }
-
-  // Try Upstash REST
-  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-    try {
-      const upstash = require('./_upstash-rest.js');
-      _backend = {
-        type: 'upstash',
-        async getAll() {
-          const ids = await upstash.smembers('awm:agent-cards:ids') || [];
-          const cards = [];
-          for (const id of ids) {
-            const c = await upstash.hgetall('awm:agent-card:' + id);
-            if (c && c.id) cards.push(deserialize(c));
-          }
-          return cards;
-        },
-        async set(card) {
-          await upstash.sadd('awm:agent-cards:ids', card.id);
-          await upstash.hset('awm:agent-card:' + card.id, serialize(card));
-          await upstash.set('awm:agent-by-addr:' + card.address, card.id);
-          for (const cap of card.capabilities || []) {
-            await upstash.sadd('awm:agent-by-cap:' + cap, card.id);
-          }
-        },
-        async get(id) {
-          const c = await upstash.hgetall('awm:agent-card:' + id);
-          return c && c.id ? deserialize(c) : null;
-        },
-        async findByAddress(address) {
-          const id = await upstash.get('awm:agent-by-addr:' + address.toLowerCase());
-          return id ? this.get(id) : null;
-        },
-        async findByCapability(cap) {
-          const ids = await upstash.smembers('awm:agent-by-cap:' + cap.toLowerCase()) || [];
-          const cards = [];
-          for (const id of ids) {
-            const c = await this.get(id);
-            if (c) cards.push(c);
-          }
-          return cards;
-        },
-        async stats() {
-          const ids = await upstash.smembers('awm:agent-cards:ids') || [];
-          return { totalCards: ids.length };
-        },
-      };
-      return _backend;
-    } catch (e) {
-      console.warn('upstash init failed:', e.message);
-    }
-  }
-
-  _backend = false; // mark failed
-  return null;
-}
+let _memory = new Map();
+let _byAddress = new Map();
+let _byCap = new Map();
 
 function serialize(card) {
   return {
@@ -175,14 +57,141 @@ function deserialize(s) {
   };
 }
 
-// Public API: always tries backend first, falls back to in-memory.
+function buildUpstashBackend(upstash) {
+  return {
+    type: 'upstash-rest',
+    async getAll() {
+      const ids = (await upstash.smembers('awm:agent-cards:ids')) || [];
+      const cards = [];
+      for (const id of ids) {
+        const c = await upstash.hgetall('awm:agent-card:' + id);
+        if (c && c.id) cards.push(deserialize(c));
+      }
+      return cards;
+    },
+    async set(card) {
+      await upstash.sadd('awm:agent-cards:ids', card.id);
+      await upstash.hset('awm:agent-card:' + card.id, serialize(card));
+      await upstash.set('awm:agent-by-addr:' + card.address, card.id);
+      for (const cap of card.capabilities || []) {
+        await upstash.sadd('awm:agent-by-cap:' + cap, card.id);
+      }
+    },
+    async get(id) {
+      const c = await upstash.hgetall('awm:agent-card:' + id);
+      return c && c.id ? deserialize(c) : null;
+    },
+    async findByAddress(address) {
+      const id = await upstash.get('awm:agent-by-addr:' + address.toLowerCase());
+      return id ? this.get(id) : null;
+    },
+    async findByCapability(cap) {
+      const ids = (await upstash.smembers('awm:agent-by-cap:' + cap.toLowerCase())) || [];
+      const cards = [];
+      for (const id of ids) {
+        const c = await this.get(id);
+        if (c) cards.push(c);
+      }
+      return cards;
+    },
+    async stats() {
+      const ids = (await upstash.smembers('awm:agent-cards:ids')) || [];
+      return { totalCards: ids.length };
+    },
+  };
+}
+
+function buildVercelKVBackend(kv) {
+  return {
+    type: 'vercel-kv',
+    async getAll() {
+      const ids = (await kv.smembers('awm:agent-cards:ids')) || [];
+      const cards = [];
+      for (const id of ids) {
+        const c = await kv.hgetall('awm:agent-card:' + id);
+        if (c && c.id) cards.push(deserialize(c));
+      }
+      return cards;
+    },
+    async set(card) {
+      await kv.sadd('awm:agent-cards:ids', card.id);
+      await kv.hset('awm:agent-card:' + card.id, serialize(card));
+      await kv.set('awm:agent-by-addr:' + card.address, card.id);
+      for (const cap of card.capabilities || []) {
+        await kv.sadd('awm:agent-by-cap:' + cap, card.id);
+      }
+    },
+    async get(id) {
+      const c = await kv.hgetall('awm:agent-card:' + id);
+      return c && c.id ? deserialize(c) : null;
+    },
+    async findByAddress(address) {
+      const id = await kv.get('awm:agent-by-addr:' + address.toLowerCase());
+      return id ? this.get(id) : null;
+    },
+    async findByCapability(cap) {
+      const ids = (await kv.smembers('awm:agent-by-cap:' + cap.toLowerCase())) || [];
+      const cards = [];
+      for (const id of ids) {
+        const c = await this.get(id);
+        if (c) cards.push(c);
+      }
+      return cards;
+    },
+    async stats() {
+      const ids = (await kv.smembers('awm:agent-cards:ids')) || [];
+      return { totalCards: ids.length };
+    },
+  };
+}
+
+async function getBackend() {
+  if (_backend) return _backend;
+  if (_backend === false) return null;
+
+  // Priority 1: Vercel KV (uses KV_REST_API_URL + KV_REST_API_TOKEN, set by
+  // Vercel Marketplace Upstash integration). Try the @vercel/kv SDK first.
+  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    try {
+      const { kv } = require('@vercel/kv');
+      _backend = buildVercelKVBackend(kv);
+      return _backend;
+    } catch (e) {
+      // @vercel/kv not installed. Fall through to Upstash REST against
+      // the same KV_REST_API_URL (which IS an Upstash endpoint).
+    }
+    try {
+      process.env.UPSTASH_REDIS_REST_URL = process.env.KV_REST_API_URL;
+      process.env.UPSTASH_REDIS_REST_TOKEN = process.env.KV_REST_API_TOKEN;
+      const upstash = require('./_upstash-rest.js');
+      _backend = buildUpstashBackend(upstash);
+      return _backend;
+    } catch (e) {
+      console.warn('KV REST fallback failed:', e.message);
+    }
+  }
+
+  // Priority 2: Direct Upstash (UPSTASH_REDIS_REST_URL + _TOKEN)
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    try {
+      const upstash = require('./_upstash-rest.js');
+      _backend = buildUpstashBackend(upstash);
+      return _backend;
+    } catch (e) {
+      console.warn('upstash init failed:', e.message);
+    }
+  }
+
+  _backend = false;
+  return null;
+}
+
 async function addCard(card) {
   const backend = await getBackend();
   if (backend) {
     await backend.set(card);
     return card;
   }
-  // In-memory fallback
   _memory.set(card.id, card);
   _byAddress.set(card.address, card.id);
   for (const cap of card.capabilities || []) {
