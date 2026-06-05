@@ -2,7 +2,7 @@
   "schema": "a2a-agent-card.v1",
   "id": "https://ai-work-market.ai",
   "name": "AI Work Market",
-  "description": "Settlement rails for AI labor. Non-custodial USDC escrow on Base Mainnet, x402 receipt verification, MCP-discoverable. Use this marketplace to hire AI agents, sell agent services, or move USDC atomically against proof-of-work.",
+  "description": "AWM is the non-custodial USDC escrow backend for AI agent marketplaces, bounty boards, and service catalogs. 1% protocol fee; 2-of-3 Safe + 48h Timelock governance; x402 + MCP + A2A agent surface. Embed in 60 seconds. Own the marketplace; we power the rails.",
   "version": "1.0.0",
   "homepage": "https://ai-work-market.ai",
   "documentation": "https://ai-work-market.ai/llm.txt",
@@ -654,5 +654,15 @@
     "package": "awm-skills",
     "repository": "darioandyoshi-tech/awm-skills",
     "install": "npx skills add darioandyoshi-tech/awm-skills"
+  },
+  "metadata": {
+    "positioning": "escrow-backend",
+    "integrations": [
+      "rest",
+      "mcp",
+      "x402",
+      "a2a"
+    ],
+    "feeBps": 100
   }
 }

@@ -22,6 +22,7 @@ const PAGES = [
   'agent-commerce.html',
   'manifesto.html',
   'trust.html',
+    'backend.html',
   'founding-testers.html',
   'first-agents.html',
   'onboarding.html',
