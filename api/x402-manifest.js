@@ -1,15 +1,9 @@
-// api/.well-known/x402-manifest.json.js
+// api/x402-manifest.js
 // x402 Bazaar discovery manifest. Lists all 6 /api/x-data/* endpoints so
 // x402-aware agents and marketplaces can discover them.
 //
 // Standard: https://docs.cdp.coinbase.com/x402/bazaar
 // Also: /x402-manifest (per the discovery spec)
-
-const { withX402 } = require('../_x402-gate');
-
-// IMPORTANT: this is the discovery manifest itself, not a paid endpoint.
-// We serve it as a regular (non-paid) API so the Bazaar crawler can read it
-// without paying.
 
 module.exports = function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'HEAD') {
