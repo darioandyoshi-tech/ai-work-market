@@ -114,7 +114,8 @@ if (fs.existsSync(wellKnownDir)) {
 }
 
 // use-cases subdirectory
-copyDir(path.join(ROOT, 'use-cases'), path.join(distDir, 'use-cases'));
+if (fs.existsSync('public')) copyDir(path.join(ROOT, 'public'), distDir);
+  copyDir(path.join(ROOT, 'use-cases'), path.join(distDir, 'use-cases'));
 
 // assets/ subdirectory (wallet connect, shared client scripts)
 copyDir(path.join(ROOT, 'assets'), path.join(distDir, 'assets'));
