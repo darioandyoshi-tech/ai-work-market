@@ -13,7 +13,7 @@ const { withX402 } = require('../_x402-gate');
 const handler = withX402(
   {
     price: '$0.01',
-    network: 'sepolia',
+    network: 'mainnet',
     description: 'Web search via DuckDuckGo. Up to 10 results per call with title, URL, snippet.',
     extra: { category: 'data', source: 'duckduckgo', tags: ['search', 'web', 'research'] },
   },

@@ -34,7 +34,7 @@ const REPUTATION_ABI = [
 const handler = withX402(
   {
     price: '$0.01',
-    network: 'sepolia',
+    network: 'mainnet',
     description: 'AWM work contract verifier. Returns on-chain state + agent reputations + a release/dispute/wait decision. $0.01 per call.',
     extra: { category: 'awm', tags: ['awm', 'verify', 'release', 'dispute', 'decision'] },
   },

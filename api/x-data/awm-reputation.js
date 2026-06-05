@@ -31,7 +31,7 @@ const REPUTATION_ABI = [
 const handler = withX402(
   {
     price: '$0.005',
-    network: 'sepolia',
+    network: 'mainnet',
     description: 'AWM agent reputation. Returns on-chain reputation score, completed intents as buyer/seller, dispute count, first/last activity. $0.005 per call.',
     extra: { category: 'awm', tags: ['awm', 'reputation', 'agent'] },
   },

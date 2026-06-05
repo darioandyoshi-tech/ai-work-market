@@ -88,7 +88,7 @@ async function readIntent(network, id) {
 const handler = withX402(
   {
     price: '$0.001',
-    network: 'sepolia',
+    network: 'mainnet',
     description: 'AWM intent lookup. Read any AWM work contract on Base Mainnet by intent ID. Returns raw storage + parsed fields.',
     extra: { category: 'awm', tags: ['awm', 'escrow', 'intent', 'lookup'] },
   },

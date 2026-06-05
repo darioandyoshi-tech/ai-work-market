@@ -78,7 +78,7 @@ async function fetchFeed(feed, max) {
 const handler = withX402(
   {
     price: '$0.02',
-    network: 'sepolia',
+    network: 'mainnet',
     description: 'News + auto-summary from top RSS sources. Topics: crypto, tech, ai, world, business. Up to 10 items per call.',
     extra: { category: 'data', source: 'rss-aggregator', tags: ['news', 'rss', 'research'] },
   },

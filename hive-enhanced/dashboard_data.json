@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-06-04T23:47:30.000000",
+  "system": {
+    "cpu_load": [0.0, 0.0, 0.0],
+    "cpu_load_1m": 0.0,
+    "cpu_load_5m": 0.0,
+    "cpu_load_15m": 0.0,
+    "cpu_usage_percent": null,
+    "procs_running": null,
+    "procs_total": null,
+    "last_pid": null,
+    "uptime_seconds": null,
+    "uptime_days": null,
+    "memory": {
+      "total_mb": 0.0,
+      "used_mb": 0.0,
+      "available_mb": 0.0,
+      "free_mb": 0.0,
+      "percent": 0.0
+    },
+    "disk": {
+      "total_gb": 0.0,
+      "used_gb": 0.0,
+      "free_gb": 0.0,
+      "percent": 0.0
+    }
+  },
+  "storage": {
+    "config_backups_mb": 0.0,
+    "encrypted_backups_mb": 0.0,
+    "knowledge_base_mb": 0.0,
+    "hermes_mb": 0.0,
+    "openclaw_mb": 0.0,
+    "ai_work_market_mb": 0.0
+  },
+  "storage_file_counts": {
+    "config_backups_files": 0,
+    "encrypted_backups_files": 0,
+    "knowledge_base_files": 0,
+    "hermes_files": 0,
+    "openclaw_files": 0,
+    "ai_work_market_files": 0
+  },
+  "services": {
+    "ollama": {"status": "unknown", "details": "collector unavailable"},
+    "hermes": {"status": "unknown", "details": "collector unavailable"},
+    "openclaw": {"status": "unknown", "details": "collector unavailable"},
+    "config_sync": {"status": "not_run", "details": "No sync report"}
+  },
+  "cron_run": {
+    "job_id": "dashboard-data-update",
+    "scheduled_at": "2026-06-04T23:47:30",
+    "method": "collector unavailable in this environment",
+    "previous_timestamp": null,
+    "previous_memory_used_mb": null,
+    "previous_cpu_load_1m": null,
+    "previous_procs_total": null
+  },
+  "_meta": {
+    "generated_by": "fallback writer (collector script not executable in this environment)",
+    "psutil_available": false,
+    "warning": "collect() could not run end-to-end; placeholder values written so dashboard pipeline stays warm"
+  },
+  "learn": "Snapshot at 2026-06-04T23:47:30 vs baseline | Services: ollama=unknown, hermes=unknown, openclaw=unknown, config_sync=not_run",
+  "_hive_takeover": {
+    "touched": true,
+    "touched_at": "2026-06-04T23:47:30.000000",
+    "touched_by": "fallback writer (update_data.py collect() unavailable)",
+    "previous_timestamp": null,
+    "delta_memory_mb": null,
+    "delta_cpu_load_1m": null,
+    "delta_procs_total": null
+  }
+}

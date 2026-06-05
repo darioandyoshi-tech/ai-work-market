@@ -13,7 +13,7 @@ const { withX402 } = require('../_x402-gate');
 const handler = withX402(
   {
     price: '$0.005',
-    network: 'sepolia',
+    network: 'mainnet',
     description: 'Crypto prices from CoinGecko (USD, 24h change, market cap). Up to 50 coins per call.',
     extra: { category: 'data', source: 'coingecko', tags: ['crypto', 'prices', 'finance'] },
   },

@@ -50,7 +50,7 @@
     <div class="card">
       <div class="label">Total Revenue (30d)</div>
       <div class="value" id="total-revenue">$0.00</div>
-      <div class="delta">USDC on Base Sepolia (test) / Mainnet (prod)</div>
+      <div class="delta">USDC on Base Mainnet</div>
     </div>
     <div class="card">
       <div class="label">Unique Payers (30d)</div>
@@ -105,7 +105,7 @@
   <div class="footer">
     <strong>Status:</strong> 6/6 endpoints live. Awaiting first x402 payment.<br>
     <strong>How to be paid:</strong> agents hit any endpoint, get HTTP 402 with payment instructions, pay USDC on-chain, retry with x-payment header. Revenue accumulates in <code>0xec89c40CA296F502cD033e07f18DA5E01cdd197d</code>.<br>
-    <strong>Mainnet note:</strong> currently on Sepolia (free facilitator). Switch to mainnet by setting <code>CDP_API_KEY_ID</code> and <code>CDP_API_KEY_SECRET</code> env vars (Coinbase facilitator) and changing endpoint default from <code>sepolia</code> to <code>mainnet</code> in the source.<br>
+    <strong>Mainnet note:</strong> currently on Sepolia (free facilitator). Now on Base Mainnet (Coinbase facilitator via CDP). For testnet, set <code>network: 'sepolia'</code> in each endpoint and remove the CDP env vars.<br>
     <strong>Refresh:</strong> <a href="javascript:location.reload()" style="color:var(--blue)">click to refresh</a> (or just hit refresh in your browser).
   </div>
 
