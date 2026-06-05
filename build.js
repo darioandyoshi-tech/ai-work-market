@@ -75,6 +75,9 @@ for (const file of PAGES) {
   const src = path.join(ROOT, file);
   const dst = path.join(distDir, file);
   if (fs.existsSync(src)) {
+    // Create parent directory for nested files (e.g. blog/awm-vs-x402.html)
+    const dstParent = path.dirname(dst);
+    if (!fs.existsSync(dstParent)) fs.mkdirSync(dstParent, { recursive: true });
     copyFile(src, dst);
   } else {
     console.warn('Warning: missing', file);
