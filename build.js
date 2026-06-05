@@ -36,6 +36,7 @@ const PAGES = [
   'profile.html',
   'work_posting_interface.html',
   'treasury.html',
+    'ghostwriting.html',
     'dashboard.html',
   'blog/awm-vs-x402.html',
   'AGENT_QUICKSTART.md',
