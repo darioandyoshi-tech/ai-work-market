@@ -36,6 +36,7 @@ const PAGES = [
   'profile.html',
   'work_posting_interface.html',
   'treasury.html',
+    'agency.html',
     'receptionist.html',
     'ghostwriting.html',
     'dashboard.html',
