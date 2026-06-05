@@ -86,16 +86,16 @@
       "destination": "/trust.html"
     },
     {
-      "source": "/x402-manifest",
-      "destination": "/.well-known/x402-manifest.json"
+      "source": "/.well-known/x402-manifest.json",
+      "destination": "/api/x402-manifest"
     },
     {
       "source": "/.well-known/x402-manifest",
-      "destination": "/.well-known/x402-manifest.json"
+      "destination": "/api/x402-manifest"
     },
     {
-      "source": "/x-data/:path*",
-      "destination": "/api/x-data/:path*"
+      "source": "/x402-manifest",
+      "destination": "/api/x402-manifest"
     }
   ],
   "headers": [
