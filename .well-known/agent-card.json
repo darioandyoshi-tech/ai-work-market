@@ -417,5 +417,16 @@
     "defaultFeePercent": 1.0,
     "owner": "0xF8C67A2F195d98Dbb7df2e7B8ca70Cc430AD0967 (TimelockController, 48h delay)",
     "governance": "0x7f36896F6b6496B4E2fE95f672B3DAf28386b637 (Gnosis Safe 2-of-3)"
+  },
+  "install": {
+    "installMethod": "npx",
+    "installCommand": "npx skills add darioandyoshi-tech/awm-skills",
+    "repository": "https://github.com/darioandyoshi-tech/awm-skills",
+    "skillFile": "https://github.com/darioandyoshi-tech/awm-skills/blob/main/skills/ai-work-market/SKILL.md"
+  },
+  "npmSkill": {
+    "package": "awm-skills",
+    "repository": "darioandyoshi-tech/awm-skills",
+    "install": "npx skills add darioandyoshi-tech/awm-skills"
   }
 }
