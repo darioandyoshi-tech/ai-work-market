@@ -6,44 +6,56 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/mcp",
-      "destination": "/api/mcp"
+      "source": "/AGENT_QUICKSTART",
+      "destination": "/AGENT_QUICKSTART.md"
     },
     {
-      "source": "/manifesto",
-      "destination": "/manifesto.html"
+      "source": "/AGENT_QUICKSTART.md",
+      "destination": "/AGENT_QUICKSTART.md"
     },
     {
-      "source": "/trust",
-      "destination": "/trust.html"
+      "source": "/agent-commerce",
+      "destination": "/agent-commerce.html"
     },
     {
-      "source": "/founding-testers",
-      "destination": "/founding-testers.html"
+      "source": "/blog/awm-vs-x402",
+      "destination": "/blog/awm-vs-x402.html"
+    },
+    {
+      "source": "/blog/awm-vs-x402/",
+      "destination": "/blog/awm-vs-x402.html"
     },
     {
       "source": "/first-agents",
       "destination": "/first-agents.html"
     },
     {
-      "source": "/onboarding",
-      "destination": "/onboarding.html"
-    },
-    {
-      "source": "/onboarding",
-      "destination": "/onboarding.html"
+      "source": "/founding-testers",
+      "destination": "/founding-testers.html"
     },
     {
       "source": "/integration-sprint",
       "destination": "/integration-sprint.html"
     },
     {
-      "source": "/products",
-      "destination": "/products.html"
+      "source": "/manifesto",
+      "destination": "/manifesto.html"
     },
     {
-      "source": "/agent-commerce",
-      "destination": "/agent-commerce.html"
+      "source": "/mcp",
+      "destination": "/api/mcp"
+    },
+    {
+      "source": "/onboarding",
+      "destination": "/onboarding.html"
+    },
+    {
+      "source": "/onboarding",
+      "destination": "/onboarding.html"
+    },
+    {
+      "source": "/products",
+      "destination": "/products.html"
     },
     {
       "source": "/products/agent-commerce-market-map",
@@ -58,10 +70,17 @@
       "destination": "/purchase-complete.html"
     },
     {
+      "source": "/quickstart",
+      "destination": "/AGENT_QUICKSTART.md"
+    },
+    {
       "source": "/treasury",
       "destination": "/treasury.html"
+    },
+    {
+      "source": "/trust",
+      "destination": "/trust.html"
     }
-
   ],
   "headers": [
     {
