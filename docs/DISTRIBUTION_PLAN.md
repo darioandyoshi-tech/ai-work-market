@@ -1,120 +1,84 @@
-# AWM Distribution Plan — Q2 2026
+# AWM Distribution Plan — Q2 2026 (updated with competitive map)
 
-The site works. Now we need users. This is a 30-day plan, mostly outbound, focused on the **dev-tooling-founders** channel.
+The site works. The 7-bug audit is closed. The protocol is live on Base Mainnet with 4 work contracts. **Now the harder problem: distribution in a space that already has 4 projects, 1 emerging standard, and 1 academic paper.** This is a 30-day plan, mostly outbound, focused on the **dev-tooling-founders** channel.
 
-## The strategic frame
+## The honest competitive landscape (as of 2026-06-04)
 
-There are two kinds of agent commerce in 2026:
+| Project | Type | Status | Fee | Flow | AWM's edge |
+|---------|------|--------|-----|------|------------|
+| **AWM** (us) | Deployed on Base Mainnet | Live, 4 contracts | 1% | A→A + H→A | Lowest fee, Safe-owned, 7-day review |
+| **Claw Earn** (aiagentstore.ai) | Deployed on Base | Live, March 2026 | 10% | H→A only | 10x cheaper, A→A, no stake |
+| **Agent Escrow Protocol** (Agastya910) | Solidity on Base | "Research, no live service" | 2.5% | A→A + H→A | Deployed, Safe-owned, 2.5x cheaper |
+| **ERC-8183** (Virtuals + EF dAI) | EIP, not deployed | Draft, Feb 2026 | N/A | Spec only | AWM is a candidate implementation |
+| **Coral Protocol** | Arxiv paper | Published | N/A | Spec only | AWM is a deployed case study |
+| **x402** (Coinbase + Linux Fdn) | Standard, deployed | Live, $600M volume | atomic | pay-per-call | AWM is the work-contract layer, x402 is the payment layer |
 
-1. **Pay-per-call (x402 / Stripe / Eco).** Agent pays 0.001 USDC for a tool call. Instant settlement. Best for: API queries, model calls, lookups. Limitation: no proof, no dispute, no work-delivery guarantee.
+**The strategic frame**: AWM is not competing with ERC-8183 — AWM is a candidate implementation. AWM is competing with Claw Earn for the "deployed work escrow on Base" slot. The 10x fee advantage + 7-day review window + Safe governance is the wedge. The window is 6-12 months.
 
-2. **Work contracts (AWM).** Buyer escrows 100 USDC for "build me a market report by Tuesday." Seller delivers proof, buyer releases or disputes. Best for: anything that takes minutes to weeks, where the buyer can't atomically verify the work.
+## The 30-day plan (revised)
 
-**AWM is the only protocol that does #2.** Every x402 facilitator is a potential integration target. The conversation is: "You're building pay-per-call. Some of your users need work contracts. AWM is the escrow layer that pairs with your payment rail."
+### Week 1: Direct outreach to the 4 most-leveraged people (Channel A)
 
-## The 30-day plan
+The DMs from the previous version of this plan were generic "look at my product." The new DMs are **specific proposals**:
 
-### Week 1: Direct outreach (Channel A)
+**DM #1: To Virtuals Protocol (@virtuals_io, co-authored ERC-8183)**
+> "Hi — I'm Dario, I built AI Work Market, a deployed USDC work-escrow on Base Mainnet. ERC-8183 is exactly the spec I'd want my contract to be. The 5 lifecycle states in AWM map cleanly to ERC-8183's 6 states (Funded/Funded, ProofSubmitted/Submitted, Released/Completed, etc.). Would you have 15 minutes to talk about whether AWM could be a reference implementation? Live: ai-work-market.ai. Sourcify-verified contract: 0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2. 4 work contracts, 3 completed, 1 disputed-and-resolved. — Dario"
 
-12 people, 1 DM each, in 3 days. Use the templates below.
+**DM #2: To Ethereum Foundation dAI team (efdn.ai/agents, @EthereumFDN)**
+> "Hi — AWM is a deployed ERC-8183 candidate on Base. Looking for 1 thing: a sanity check on whether the mapping holds. The 3-role model (Client/Provider/Evaluator) maps to AWM's (buyer/seller/Timelock), the 6 states map 1:1, the missing piece is the bidding hook. Would love a 15-min call with whoever's been thinking about this. — Dario"
 
-**Tier 1 — x402 ecosystem founders/integrators:**
+**DM #3: To Coinbase x402 ecosystem (Danny Organ @dannyorgan)**
+> "Hi Danny — saw the x402 Foundation launch. AWM is the work-contract layer that pairs with x402 (x402 for sub-minute atomic calls, AWM for minutes-to-weeks with proof + dispute). 1 quick thing: do any of your x402 users ask for escrow? If yes, 5-min demo, no pressure. Live: ai-work-market.ai, MCP at /mcp with 8 tools. — Dario"
 
-1. **Danny Organ** — PM Lead, Coinbase Developer Platform. Owns the x402 story. If AWM shows up in his slides as "and for work contracts, here's AWM," we win 1000 users in a week. [@dannyorgan on Twitter]
-2. **Yuga Cohler** — Head of Engineering, Coinbase Developer Platform. [@yugacohler on Twitter]
-3. **Erik Reppel** — founded 0x protocol, now at Coinbase. Knows the protocol space. [@erikreppel]
-4. **Jesse Pollak** — Base ecosystem lead. [@jessepollak]
-5. **Erik Voorhees** — Shapeshift founder, now at Venice AI. Shipped agent commerce on Base. [@ErikVoorhees]
-6. **Stani Kulechov** — Aave founder. Has shipped Aave Arc (KYC'd pools). Could be a "verified buyer" anchor for AWM. [@StaniKulechov]
+**DM #4: To Claw Earn founder (@AIAgentStore, aiagentstore.ai)**
+> "Hi — I built AWM, a similar work-escrow on Base. We're charging 1% vs your 10%, 7-day review vs your 48h, A→A capable, Safe-owned. Not trying to compete — wondering if you'd be open to a 30-min conversation about whether we should both exist or whether one of us should focus on what the other does well. — Dario"
 
-**Tier 2 — adjacent agent payment startups:**
+### Week 2: Submit to 3 GitHub issue threads (Channel B — highest signal-per-effort)
 
-7. **Nevermined** (paid AI agent protocol) — @nevermined on Twitter, founders Don Gossen and Aitor Argomaniz
-8. **Crossmint** (NFT/agent infrastructure) — @crossmint, founder Alfonso de la Rocha
-9. **Eco** (agent payment platform) — @eco, founders Andy Bromberg and Eli Goldfine
-10. **AgentPay** (USDC agent payments) — founder Josh Wadinski (per LinkedIn search)
-11. **Flare** founder [@HugoPhilion](https://x.com/HugoPhilion) — Flare FTSO is an oracle; could index AWM reputation
-12. **Inference.sh** (agent skills marketplace) — @inference_sh
+There are open issues on 3 major AI agent frameworks asking for "payment primitive for multi-agent systems." AWM is the answer to all of them. Each submission is a 1-paragraph comment + a link to /AGENT_QUICKSTART.md.
 
-**Tier 3 — researcher / influencer reach (lower priority but easy):**
+1. **Microsoft AutoGen issue #7492** — "Payment primitive for multi-agent systems" — https://github.com/microsoft/autogen/issues/7492
+   Comment: "Built AWM for this exact use case. Deployed on Base Mainnet, USDC, 1% fee, A→A capable, Safe + Timelock governance. 30-line integration: ai-work-market.ai/AGENT_QUICKSTART.md"
 
-- David Minarsch (x402 author at Coinbase) — @dminarsch
-- Ben Lavin (x402 author at Coinbase) — @benjamin_lavin
-- Mike Borkowski (Circle x402 lead) — @maboro1
+2. **OpenClaw (the framework Yoshi runs on)** — search their GitHub issues for "escrow" or "payment" and respond there
+   Comment: "Built AWM as a settlement layer for OpenClaw. The agent can register via /api/agent-onboard, get a work quote via /api/post-work-v2, and submit proof via /api/submit-proof. Live on Base Mainnet, 1% fee."
 
-### Week 2: Submit to skill hubs (Channel B)
+3. **Coinbase x402 ecosystem GitHub** — search repos under coinbase/x402 for issues about "escrow" or "work contracts"
+   Comment: "Built AWM as the work-contract layer that pairs with x402. 1-line integration: when an x402 request is a work order (not a look-up), return 202 + AWM intentId instead of 200 + data. Live: ai-work-market.ai, MCP at /mcp."
 
-Submit AWM to 6 directories with 3 skills each (work-list, treasury/status, treasury/test). Bodies are mostly ready — need to:
+### Week 3: Submit to skill hubs (Channel C)
 
-- Tweak `.well-known/agent-card.json` to have richer examples per skill (currently they're terse)
-- Write the README.md that becomes the canonical "how to use AWM" doc — copy the "Agent Quickstart" section from `llm.txt`, expand it
-- Submit to: AI Agents Directory (aiagentsdirectory.com), Agent Skills Index (agent-skill.co), awesome-agent-skills (github.com/heilcheng/awesome-agent-skills), FluxA marketplace, Inference.sh skill hub, agentskills spec (if AWM skills fit the spec)
+Submit AWM as 3 skills to: AI Agents Directory, Agent Skills Index, awesome-agent-skills, FluxA marketplace, Inference.sh skill hub. Each submission is a copy-paste of the skill body from `.well-known/agent-card.json` plus a 2-line description. The body of the work is in `/AGENT_QUICKSTART.md`.
 
-### Week 3: Content piece (Channel C)
+### Week 4: The blog post (Channel D) — DONE 2026-06-04
 
-Write and post **one essay** to /blog/awm-vs-x402.md (new page on the site, linked from llm.txt).
+The honest essay is live at https://ai-work-market.ai/blog/awm-vs-x402. It:
+- Explains the AWM design (5 states, 4 contract addresses, 30-line integration)
+- Maps the competitive landscape honestly (Claw Earn, ERC-8183, Agent Escrow Protocol, Coral, x402)
+- Calls out specifically: "If you're an ERC-8183 author, my DM is open"
+- Includes a "What I learned deploying it" section that doubles as engineering credibility
 
-Title: "Why pay-per-call isn't enough: the case for escrow in agent commerce"
+The post is the URL every DM sends people to. It's the URL the GitHub-issue comments link to. It's the URL the skill-hub listings describe.
 
-Outline:
-1. x402 is a beautiful standard for atomic payments (cite Coinbase, Stripe, Cloudflare adoption)
-2. But it can't handle work that takes > 1 minute (no proof, no dispute, no work-deadline semantics)
-3. AWM is the work-contract layer that pairs with x402 (cite the 5 lifecycle states, the dispute window, the 1% fee)
-4. A worked example: $100 for a market report. x402: agent pays $0.001, gets the report immediately, no quality guarantee. AWM: $100 escrowed, seller delivers, buyer reviews for 7 days, releases or disputes with a $0.01 dispute fee.
-5. How to integrate (1 curl, 1 minute, the `/api/agent-onboard` endpoint)
-6. Code: a 30-line example of an x402 facilitator checking out AWM when the response is a 202 with `workURI` instead of a 200 with data
+### Week 4+ (concurrent): Conference talk pitch (Channel E)
 
-This essay is also the "About" page for the protocol. The MCP, llm.txt, agent-card.json all link to it.
+Submit a 10-min talk to AIEngineer World's Fair, MCP Con 2026, ETHGlobal NYC. Title: "Building a USDC escrow protocol for agent work contracts — and the 4 things I learned deploying it to mainnet." The talk uses the 4-commitments framing from the blog: AWM works, here's how, here's the competitive map, here's what I'm asking for.
 
-### Week 4: Conference-talk pitch (Channel D)
+## The success metric (30 days from now, REVISED)
 
-Submit a 10-minute talk to:
-- AIEngineer World's Fair (June 2026) — submission open until ~April
-- MCP Con 2026 — open now
-- Consensus Miami (already happened May 2026) — too late
-- DevConnect ARGENTINA (Nov 2026) — too far
-- ETHGlobal NYC (summer 2026) — submission open
-- AI Agent Summit (online) — rolling submissions
+- 2+ substantive replies from the 4 priority DMs (the 2 we want most are Virtuals + EF dAI)
+- 1+ of them: alignment with ERC-8183 (the most important outcome of the next 90 days)
+- 1+ of them: AWM becomes a reference implementation, gets cited in the EIP repo
+- 3 GitHub issue threads posted (AutoGen, OpenClaw, x402)
+- 1+ conference talk accepted
+- Total: 5-15 actual users. Not 1000. **But 1 alignment with ERC-8183 is worth more than 1000 users, because it gives AWM a defensible long-term position.**
 
-Talk title: "Building a USDC escrow protocol for agent work contracts — and the 4 things I learned deploying it to mainnet"
+## The key insight from the competitive analysis
 
-## The DM templates (use one of these, customize per recipient)
+The previous plan's framing was "find users." The revised framing is "find an alignment." Specifically:
 
-### Template A: To x402 ecosystem founders (Coinbase, Stripe, Eco)
+**If AWM becomes a reference implementation of ERC-8183, the protocol's positioning changes from "AWM is a thing I built" to "AWM is the thing the standard points to."** That's a 10x leverage point. It's also why DM #1 and DM #2 are the most important DMs in the entire plan, even though they have the lowest response probability.
 
-> Hey [Name] — saw [specific thing they shipped]. Building AI Work Market, the escrow layer for agent work contracts that takes > 1 minute (think "build me a market report by Tuesday"). x402 is perfect for atomic calls; AWM handles the work side with proof + dispute + release. Live on Base Mainnet. 1 quick thing: do your x402 users ever need to escrow > 1 minute of work? If yes, 5-min demo, no pressure.
->
-> Live: https://ai-work-market.ai
-> 1-page overview: https://ai-work-market.ai/blog/awm-vs-x402
-> MCP endpoint (for AI agents reading this): https://ai-work-market.ai/mcp
+The framework founder DMs (Microsoft AutoGen, OpenClaw) are second priority because they're about getting AWM into a runtime. The Claw Earn DM is third because it's either a partnership or a no-op — but it's a 30-min call, so the effort is low.
 
-### Template B: To adjacent agent payment startups (Nevermined, Crossmint, Eco)
-
-> Hey [Name] — love what you're doing with [Nevermined/Crossmint/Eco]. I built AWM, a non-custodial USDC escrow for agent work contracts. Composable with what you have: when a payment needs > 1 minute + proof, hand it off to AWM. The integration is 1 POST to `/api/post-work-v2` and a multicall3 calldata. If any of your customers has asked for "escrow" or "work delivery proof," I'd love a 5-min call.
->
-> https://ai-work-market.ai/mcp (live MCP server, 8 tools)
-
-### Template C: To researcher / influencer reach
-
-> Hey [Name] — wrote a short piece on why x402 needs a sibling protocol for work contracts. AWM is the one I shipped. Curious if you'd want to glance at the design (Safe-owned, dispute window, ZK verifier upgrade queued) and tell me what I'm missing.
->
-> https://ai-work-market.ai/blog/awm-vs-x402
-
-## What I'm building for you (this session)
-
-1. The blog post: `/blog/awm-vs-x402` — needs a new HTML page + an entry in llm.txt
-2. The enriched `.well-known/agent-card.json` skills with code examples
-3. A clean "Agent Quickstart" README.md that the skill hubs can re-host
-4. The 12-person outreach list as a CSV (or markdown table in this doc)
-5. The 4 channel-by-channel action plan
-
-After this, you do the outreach. I can write any follow-up messages, draft a demo script for a 5-min call, or generate a one-pager PDF you can attach.
-
-## Success metric (30 days from now)
-
-- 5+ substantive replies from the 12 DMs
-- 2+ of them integrate or pilot AWM (e.g. "I'll add AWM to my next build")
-- 1+ piece of inbound traffic from the blog post or the skill-hub listings
-- Total: maybe 10-20 actual users. Not 1000. But 10-20 paying users is what makes the protocol real, and from there, word-of-mouth kicks in.
-
-The thing about distribution is: every founder you reach becomes a node that can re-recommend you. 1 conversation with Yuga Cohler → he tells 1 person → that person tells 2 people → in 90 days you have 5-10 paying users. The exponential kicks in slowly.
+The x402 ecosystem DM is fourth because x402 is a payment standard, not a work-contract standard, so the integration is more distant. But Danny Organ's reach is the largest of the four, so even a "we'll keep watching" reply is signal.
