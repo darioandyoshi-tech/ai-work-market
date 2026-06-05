@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AI Receptionist — $1,000-2,000/month, never miss a call</title>
+  <meta name="description" content="AI voice receptionist for local businesses. Dental, law, real estate, HVAC. 24/7 call answering, lead qualification, appointment booking. $1,000-2,000/month.">
+  <link rel="stylesheet" href="/assets/awm-shell.css">
+  <style>
+    body { background: #0a0a0a; color: #e5e5e5; font-family: -apple-system, system-ui, monospace; line-height: 1.6; }
+    .container { max-width: 900px; margin: 0 auto; padding: 60px 24px; }
+    h1 { font-size: 38px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+    h1 .hl { color: #10b981; }
+    h2 { font-size: 22px; font-weight: 600; margin: 48px 0 16px; color: #fff; }
+    .lede { font-size: 18px; color: #a0a0a0; margin-bottom: 32px; }
+    .price-tag { display: inline-block; background: #10b981; color: #000; padding: 4px 12px; border-radius: 4px; font-size: 14px; font-weight: 600; }
+    .demo-box { background: #141414; border: 1px solid #2a2a2a; border-radius: 12px; padding: 24px; margin: 32px 0; }
+    .demo-box h3 { font-size: 16px; margin-bottom: 12px; color: #10b981; }
+    .vert-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .vert-tab { background: #1a1a1a; border: 1px solid #2a2a2a; color: #a0a0a0; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .vert-tab.active { background: #10b981; color: #000; border-color: #10b981; }
+    .conversation { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 6px; padding: 16px; margin-top: 16px; }
+    .conv-line { margin: 8px 0; padding: 8px 12px; border-radius: 6px; }
+    .conv-line.caller { background: #1a1a1a; border-left: 3px solid #3b82f6; }
+    .conv-line.sarah { background: #141414; border-left: 3px solid #10b981; }
+    .conv-line .who { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 32px 0; }
+    .feature { background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; padding: 20px; }
+    .feature .icon { font-size: 24px; }
+    .feature .title { font-size: 14px; font-weight: 600; margin: 8px 0 4px; }
+    .feature .desc { font-size: 13px; color: #a0a0a0; }
+    .pricing { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 32px 0; }
+    .pricing-tier { background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; padding: 24px; }
+    .pricing-tier.featured { border-color: #10b981; }
+    .pricing-tier .tier { font-size: 14px; color: #10b981; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .pricing-tier .price { font-size: 32px; font-weight: 700; margin: 8px 0; color: #fff; }
+    .pricing-tier .desc { font-size: 13px; color: #a0a0a0; }
+    .pricing-tier ul { list-style: none; padding: 0; margin: 16px 0; }
+    .pricing-tier li { font-size: 13px; color: #a0a0a0; padding: 4px 0; }
+    .pricing-tier li::before { content: '✓ '; color: #10b981; }
+    .cta-row { margin: 48px 0; text-align: center; }
+    .cta-row a, .cta-row button { display: inline-block; background: #10b981; color: #000; padding: 16px 32px; border-radius: 6px; text-decoration: none; font-size: 16px; font-weight: 600; border: none; cursor: pointer; }
+    .footer-meta { color: #666; font-size: 12px; text-align: center; margin: 64px 0 32px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="margin-bottom: 16px;"><a href="/" style="color: #888; text-decoration: none; font-size: 13px;">← ai-work-market.ai</a></div>
+
+    <span class="price-tag">$1,000-2,000/month · per-call pass-through at cost</span>
+    <h1>An AI receptionist that <span class="hl">never sleeps</span>,<br>never calls in sick, and never forgets a follow-up.</h1>
+    <p class="lede">24/7 call answering for dental offices, law firms, real estate teams, and HVAC companies. Twilio + GPT-4. Your existing phone number, answered by an agent that knows your business. You focus on the work; we handle the calls.</p>
+
+    <h2>How it sounds</h2>
+    <p style="color: #a0a0a0; font-size: 14px;">Pick a vertical. Hear a real sample conversation.</p>
+
+    <div class="demo-box">
+      <div class="vert-tabs">
+        <button class="vert-tab active" onclick="showVert('dental', this)">Dental</button>
+        <button class="vert-tab" onclick="showVert('law', this)">Law firm</button>
+        <button class="vert-tab" onclick="showVert('realestate', this)">Real estate</button>
+        <button class="vert-tab" onclick="showVert('hvac', this)">HVAC</button>
+      </div>
+      <div id="vert-content">Loading...</div>
+    </div>
+
+    <h2>What you get</h2>
+    <div class="features">
+      <div class="feature">
+        <div class="icon">📞</div>
+        <div class="title">24/7 call answering</div>
+        <div class="desc">Twilio phone number, answered in 2 rings. No voicemail, no "we'll call you back tomorrow."</div>
+      </div>
+      <div class="feature">
+        <div class="icon">🧠</div>
+        <div class="title">Vertical-tuned</div>
+        <div class="desc">System prompt is tuned for your specific business. Knows your hours, services, transfer numbers, what to handle vs escalate.</div>
+      </div>
+      <div class="feature">
+        <div class="icon">📋</div>
+        <div class="title">Lead capture</div>
+        <div class="desc">Collects name, phone, what they need. Sends to your email or CRM at the end of every call.</div>
+      </div>
+      <div class="feature">
+        <div class="icon">🚨</div>
+        <div class="title">Smart escalation</div>
+        <div class="desc">Emergencies (severe pain, urgent matters) get transferred immediately. Routine calls handled by the AI.</div>
+      </div>
+      <div class="feature">
+        <div class="icon">📊</div>
+        <div class="title">Call logs</div>
+        <div class="desc">Every call: timestamp, duration, transcript summary, action taken. Weekly email summary.</div>
+      </div>
+      <div class="feature">
+        <div class="icon">🔧</div>
+        <div class="title">1 hour setup</div>
+        <div class="desc">We configure the Twilio number, the system prompt, and the transfer rules. You just answer questions in a 30-min onboarding call.</div>
+      </div>
+    </div>
+
+    <h2>Pricing</h2>
+    <div class="pricing">
+      <div class="pricing-tier">
+        <div class="tier">Starter</div>
+        <div class="price">$1,000<span style="font-size: 14px; color: #888;">/mo</span></div>
+        <div class="desc">For businesses with &lt;200 calls/month</div>
+        <ul>
+          <li>Up to 200 calls/month</li>
+          <li>1 Twilio number</li>
+          <li>Standard vertical tuning</li>
+          <li>Email lead delivery</li>
+          <li>Per-call cost: $0.10-0.30 (Twilio + OpenAI, passed through at cost)</li>
+        </ul>
+      </div>
+      <div class="pricing-tier featured">
+        <div class="tier">Growth</div>
+        <div class="price">$1,500<span style="font-size: 14px; color: #888;">/mo</span></div>
+        <div class="desc">For businesses with 200-1000 calls/month</div>
+        <ul>
+          <li>Up to 1000 calls/month</li>
+          <li>Up to 3 Twilio numbers</li>
+          <li>Custom system prompt per vertical</li>
+          <li>CRM integration (HubSpot, Salesforce, Pipedrive)</li>
+          <li>Weekly call log summaries</li>
+          <li>Per-call cost: $0.08-0.20</li>
+        </ul>
+      </div>
+      <div class="pricing-tier">
+        <div class="tier">Multi-location</div>
+        <div class="price">$2,000<span style="font-size: 14px; color: #888;">/mo</span></div>
+        <div class="desc">For groups with multiple offices</div>
+        <ul>
+          <li>Unlimited calls</li>
+          <li>Unlimited Twilio numbers</li>
+          <li>Per-location system prompts</li>
+          <li>Multi-location reporting</li>
+          <li>Priority support</li>
+          <li>Per-call cost: $0.05-0.15</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>How it works</h2>
+    <ol style="color: #a0a0a0; line-height: 1.8;">
+      <li><strong>Apply below.</strong> Tell me your business, your hours, your transfer numbers.</li>
+      <li><strong>30-min onboarding call.</strong> I build your system prompt live, you hear your AI voice in action.</li>
+      <li><strong>1-hour setup.</strong> I configure the Twilio number, the webhook, the call routing. You point your existing number to the new Twilio number (or use the Twilio number directly).</li>
+      <li><strong>You're live.</strong> First call answered within 24 hours of setup completion.</li>
+      <li><strong>Monthly review.</strong> I tune the system prompt based on real call patterns. Month 6 is dramatically better than month 1.</li>
+    </ol>
+
+    <h2>What this is NOT</h2>
+    <ul style="color: #a0a0a0; line-height: 1.8;">
+      <li>Not a replacement for emergency services. We escalate urgent calls, we don't handle them.</li>
+      <li>Not for businesses that need a human touch on every call. Some verticals need that; this isn't for them.</li>
+      <li>Not a spam filter. We answer every call, qualify it, and either handle it or transfer it.</li>
+    </ul>
+
+    <div class="cta-row" id="contact-form">
+      <button onclick="document.getElementById('apply-section').scrollIntoView({behavior:'smooth'})">Apply for a setup →</button>
+      <a class="email-link" href="mailto:yoshi@ai-work-market.ai" style="background: #262626; color: #e5e5e5; padding: 16px 32px; border-radius: 6px; text-decoration: none; font-size: 16px; font-weight: 600; margin-left: 8px;">Email yoshi@ai-work-market.ai</a>
+    </div>
+
+    <div id="apply-section" class="demo-box" style="margin-top: 64px;">
+      <h3>Apply (2-minute form)</h3>
+      <p style="color: #a0a0a0; font-size: 13px; margin-bottom: 16px;">Currently accepting 5 new clients per month. Response within 24 hours.</p>
+      <form onsubmit="submitReceptionistApplication(event)">
+        <input type="text" name="name" placeholder="Your name" required style="width:100%; padding: 10px; margin-bottom: 8px; background: #0a0a0a; border: 1px solid #333; border-radius: 4px; color: #e5e5e5;">
+        <input type="email" name="email" placeholder="Email" required style="width:100%; padding: 10px; margin-bottom: 8px; background: #0a0a0a; border: 1px solid #333; border-radius: 4px; color: #e5e5e5;">
+        <input type="text" name="business" placeholder="Business name" required style="width:100%; padding: 10px; margin-bottom: 8px; background: #0a0a0a; border: 1px solid #333; border-radius: 4px; color: #e5e5e5;">
+        <select name="vertical" required style="width:100%; padding: 10px; margin-bottom: 8px; background: #0a0a0a; border: 1px solid #333; border-radius: 4px; color: #e5e5e5;">
+          <option value="">Vertical (dental, law, realestate, hvac, other)</option>
+          <option value="dental">Dental</option>
+          <option value="law">Law firm</option>
+          <option value="realestate">Real estate</option>
+          <option value="hvac">HVAC</option>
+          <option value="other">Other (specify in message)</option>
+        </select>
+        <input type="text" name="calls" placeholder="Estimated calls per month (rough)" style="width:100%; padding: 10px; margin-bottom: 8px; background: #0a0a0a; border: 1px solid #333; border-radius: 4px; color: #e5e5e5;">
+        <textarea name="message" placeholder="What are you hoping to solve? (1-2 sentences)" required style="width:100%; min-height: 80px; padding: 10px; margin-bottom: 8px; background: #0a0a0a; border: 1px solid #333; border-radius: 4px; color: #e5e5e5; font-family: monospace;"></textarea>
+        <button type="submit" id="rec-apply-btn">Send application</button>
+      </form>
+      <div id="rec-apply-result" class="conversation" style="display: none;"></div>
+    </div>
+
+    <div class="footer-meta">
+      Powered by <a href="/" style="color: #10b981;">AI Work Market</a> · Twilio + OpenAI GPT-4 + AWS Polly
+    </div>
+  </div>
+
+  <script>
+    const conversations = {
+      dental: {
+        title: 'Maple Family Dental — emergency call',
+        lines: [
+          { who: 'caller', text: "Hi, I just cracked a tooth and I'm in a lot of pain." },
+          { who: 'sarah', text: "Oh no, I'm sorry to hear that. That sounds urgent. We have an emergency line that can get you in within the hour. Can I get your name and the best number to reach you?" },
+          { who: 'caller', text: "Sure, it's Alex Chen, 555-0142." },
+          { who: 'sarah', text: "Got it, Alex. Someone from our emergency team will call you back in the next 5 minutes. In the meantime, avoid chewing on that side and rinse with warm salt water. Take care." },
+        ],
+      },
+      realestate: {
+        title: 'Coastal Realty Group — listing inquiry',
+        lines: [
+          { who: 'caller', text: "I'm thinking about putting my house on the market in the next few months." },
+          { who: 'sarah', text: "Great, we can definitely help with that. What area is the property in?" },
+          { who: 'caller', text: "Mar Vista, 90230." },
+          { who: 'sarah', text: "Perfect. One of our agents will pull comps in your area and follow up within 1 business day to schedule a free listing consultation. Can I get your name and email?" },
+        ],
+      },
+      law: {
+        title: 'Hartley & Associates — new case inquiry',
+        lines: [
+          { who: 'caller', text: "I was in a car accident last week and I'm not sure what to do." },
+          { who: 'sarah', text: "I'm sorry to hear that. The first thing to do is get medical attention if you haven't already. Our attorneys handle car accident cases and offer free consultations. Can I get your name and the best number to reach you?" },
+        ],
+      },
+      hvac: {
+        title: 'Cool Air HVAC — emergency AC',
+        lines: [
+          { who: 'caller', text: "Yeah, my AC is out and it's 100 degrees in here." },
+          { who: 'sarah', text: "I hear you, let's get that fixed fast. A tech can be out within 2 hours. What's your address and the best number to reach you?" },
+        ],
+      },
+    };
+
+    function showVert(vert, btn) {
+      document.querySelectorAll('.vert-tab').forEach(t => t.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      const c = conversations[vert];
+      let html = `<div style="font-weight:600; margin-bottom:12px;">${c.title}</div>`;
+      for (const line of c.lines) {
+        html += `<div class="conv-line ${line.who}"><div class="who">${line.who === 'caller' ? 'CALLER' : 'SARAH (AI)'}</div>${line.text}</div>`;
+      }
+      document.getElementById('vert-content').innerHTML = html;
+    }
+    showVert('dental');
+
+    async function submitReceptionistApplication(e) {
+      e.preventDefault();
+      const btn = document.getElementById('rec-apply-btn');
+      const out = document.getElementById('rec-apply-result');
+      const form = e.target;
+      const data = Object.fromEntries(new FormData(form));
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      try {
+        const r = await fetch('/api/voice/apply', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const d = await r.json();
+        out.style.display = 'block';
+        if (d.ok) {
+          out.textContent = `✓ Application sent. I'll respond within 24 hours to ${data.email}.`;
+          out.style.borderColor = '#10b981';
+          out.style.color = '#10b981';
+          form.reset();
+        } else {
+          out.textContent = 'Error: ' + (d.error || 'unknown');
+          out.style.color = '#ef4444';
+        }
+      } catch (e) {
+        out.style.display = 'block';
+        out.textContent = 'Error: ' + e.message;
+        out.style.color = '#ef4444';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send application';
+      }
+    }
+  </script>
+</body>
+</html>
