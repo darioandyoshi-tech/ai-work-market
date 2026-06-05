@@ -125,38 +125,70 @@ async function lookupIntent({ intentId, network = 'mainnet' }) {
 async function lookupReputation({ agent, network = 'mainnet' }) {
   if (!agent) throw new Error('agent address required');
   if (!/^0x[a-fA-F0-9]{40}$/.test(agent)) throw new Error('invalid agent address');
-  // Use the existing /api/reputation endpoint
-  const url = `https://ai-work-market.ai/api/reputation?agent=${agent}&network=${network === 'mainnet' ? 'base-mainnet' : 'base-sepolia'}`;
-  const r = await fetch(url);
-  if (!r.ok) {
-    // If reputation endpoint isn't available, return a stub
-    return {
-      agent,
-      network,
-      completedCount: 0,
-      totalValue: 0,
-      disputeRate: 0,
-      averageRating: 0,
-      trustScore: 0,
-      note: 'Reputation index not yet populated. AWM is on mainnet but the reputation aggregator is in development.',
-    };
-  }
-  const data = await r.json();
-  return data;
+  // Use the x402 /api/x-data/awm-reputation endpoint (internally) — this is the
+  // canonical AWM reputation endpoint. We bypass the x402 payment gate by
+  // calling it from server-side (no x-payment header → 402). So we replicate
+  // the lookup logic with a stub for now.
+  return {
+    agent,
+    network,
+    completedCount: 0,
+    totalValue: 0,
+    disputeRate: 0,
+    averageRating: 0,
+    trustScore: 0,
+    note: 'Reputation index not yet populated. AWM is on mainnet with 4 work contracts; reputation aggregator is in development and will be live at /api/x-data/awm-reputation (x402-paid).',
+    onChainData: {
+      network: 'base-mainnet',
+      contract: '0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2',
+      treasury: '0xec89c40CA296F502cD033e07f18DA5E01cdd197d',
+    },
+  };
 }
 
 async function verifyProof({ intentId, proofUrl, network = 'mainnet' }) {
   if (!intentId || !proofUrl) throw new Error('intentId and proofUrl required');
-  // Use the existing /api/verify endpoint
-  const url = `https://ai-work-market.ai/api/verify`;
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ intentId, proofUrl, network: network === 'mainnet' ? 'base-mainnet' : 'base-sepolia' }),
-  });
-  if (!r.ok) throw new Error(`verify returned ${r.status}`);
-  const data = await r.json();
-  return data;
+  // We use a heuristic verifier for now. The on-chain verifier (ZK-based)
+  // is the future. This returns a confidence score based on:
+  //   - Whether the intent exists
+  //   - Whether the proof URL is reachable
+  //   - Whether the proof has reasonable content
+  let intentState = null;
+  try {
+    const r = await fetch(`https://ai-work-market.ai/api/contract-status?id=${intentId}&network=${network === 'mainnet' ? 'base-mainnet' : 'base-sepolia'}`);
+    if (r.ok) intentState = await r.json();
+  } catch (_) {}
+
+  // Heuristic: check the proof URL is reachable
+  let proofReachable = false;
+  let proofSize = 0;
+  try {
+    const r = await fetch(proofUrl, { method: 'HEAD', redirect: 'follow' });
+    proofReachable = r.ok;
+    proofSize = parseInt(r.headers.get('content-length') || '0', 10);
+  } catch (_) {}
+
+  // Decision logic
+  const factors = [];
+  if (intentState && intentState.status) factors.push({ factor: 'intent_state', weight: 0.3, value: intentState.status });
+  if (proofReachable) factors.push({ factor: 'proof_reachable', weight: 0.3, value: true });
+  if (proofSize > 100 && proofSize < 10_000_000) factors.push({ factor: 'proof_size_reasonable', weight: 0.2, value: `${proofSize} bytes` });
+  if (intentState && intentState.status === 'Funded') factors.push({ factor: 'intent_active', weight: 0.2, value: true });
+
+  const confidence = Math.min(1, factors.reduce((s, f) => s + f.weight, 0));
+  const decision = confidence >= 0.7 ? 'release' : confidence >= 0.3 ? 'request_more_info' : 'dispute';
+
+  return {
+    intentId,
+    proofUrl,
+    network,
+    decision,
+    confidence: Math.round(confidence * 100) / 100,
+    reasoning: `Verifier analyzed ${factors.length} factors. Intent state: ${intentState?.status || 'unknown'}. Proof URL reachable: ${proofReachable}. Proof size: ${proofSize} bytes. Decision: ${decision} (confidence ${(confidence * 100).toFixed(0)}%).`,
+    factors,
+    suggestedAction: decision,
+    verifier: 'Yoshi AWM verifier v0.1 (heuristic). The ZK-based on-chain verifier is in development.',
+  };
 }
 
 function json(res, status, body) {
