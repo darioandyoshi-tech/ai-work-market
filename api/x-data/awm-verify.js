@@ -147,5 +147,3 @@ const handler = withX402(
 );
 
 module.exports = handler;
-module.exports.GET = handler;
-module.exports.POST = handler;
