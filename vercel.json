@@ -6,6 +6,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
       "source": "/AGENT_QUICKSTART",
       "destination": "/AGENT_QUICKSTART.md"
     },

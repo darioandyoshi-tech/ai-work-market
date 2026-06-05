@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AWM x402 Revenue Dashboard</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --card: #141414;
+      --border: #222;
+      --text: #e5e5e5;
+      --text-dim: #888;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, system-ui, monospace; background: var(--bg); color: var(--text); padding: 24px; line-height: 1.5; }
+    h1 { font-size: 18px; margin-bottom: 4px; }
+    .subtitle { color: var(--text-dim); font-size: 13px; margin-bottom: 24px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+    .card .label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .card .value { font-size: 28px; font-weight: 600; }
+    .card .delta { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+    .endpoint { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 8px; }
+    .endpoint .name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .endpoint .url { font-size: 12px; color: var(--text-dim); font-family: monospace; }
+    .endpoint .price { color: var(--green); font-size: 14px; margin-top: 4px; }
+    .test-link { color: var(--blue); text-decoration: none; font-size: 12px; }
+    .test-link:hover { text-decoration: underline; }
+    .status-ok { color: var(--green); }
+    .status-pending { color: var(--yellow); }
+    .footer { color: var(--text-dim); font-size: 11px; margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .empty { color: var(--text-dim); font-size: 13px; padding: 16px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>💸 AWM x402 Revenue</h1>
+  <div class="subtitle">Live dashboard for the 6 x402-paid API endpoints. Updates on every page load.</div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="label">Total Calls (30d)</div>
+      <div class="value" id="total-calls">0</div>
+      <div class="delta">Across all 6 endpoints</div>
+    </div>
+    <div class="card">
+      <div class="label">Total Revenue (30d)</div>
+      <div class="value" id="total-revenue">$0.00</div>
+      <div class="delta">USDC on Base Sepolia (test) / Mainnet (prod)</div>
+    </div>
+    <div class="card">
+      <div class="label">Unique Payers (30d)</div>
+      <div class="value" id="unique-payers">0</div>
+      <div class="delta">Distinct wallet addresses</div>
+    </div>
+    <div class="card">
+      <div class="label">Last Payment</div>
+      <div class="value" id="last-payment" style="font-size:16px">Never</div>
+      <div class="delta" id="last-payment-ago">No payments yet</div>
+    </div>
+  </div>
+
+  <h2 style="font-size:14px; margin-bottom:12px; color:var(--text-dim);">Endpoints</h2>
+
+  <div class="endpoint">
+    <div class="name">/api/x-data/crypto <span class="status-pending">•</span> $0.005/call</div>
+    <div class="url">GET ?ids=bitcoin,ethereum — wraps CoinGecko free tier</div>
+    <a class="test-link" href="/api/x-data/crypto?ids=bitcoin,ethereum" target="_blank">Test →</a>
+  </div>
+
+  <div class="endpoint">
+    <div class="name">/api/x-data/search <span class="status-pending">•</span> $0.01/call</div>
+    <div class="url">GET ?q=query — wraps DuckDuckGo HTML search</div>
+    <a class="test-link" href="/api/x-data/search?q=AWM" target="_blank">Test →</a>
+  </div>
+
+  <div class="endpoint">
+    <div class="name">/api/x-data/news <span class="status-pending">•</span> $0.02/call</div>
+    <div class="url">GET ?topic=crypto|tech|ai|world|business&max=5 — RSS aggregator + auto-summary</div>
+    <a class="test-link" href="/api/x-data/news?topic=crypto&max=5" target="_blank">Test →</a>
+  </div>
+
+  <div class="endpoint">
+    <div class="name">/api/x-data/awm-intent <span class="status-pending">•</span> $0.001/call</div>
+    <div class="url">GET ?id=1&network=mainnet — read AWM work contract by ID (raw storage)</div>
+    <a class="test-link" href="/api/x-data/awm-intent?id=1" target="_blank">Test →</a>
+  </div>
+
+  <div class="endpoint">
+    <div class="name">/api/x-data/awm-reputation <span class="status-pending">•</span> $0.005/call</div>
+    <div class="url">GET ?address=0x... — on-chain agent reputation score</div>
+    <a class="test-link" href="/api/x-data/awm-reputation?address=0xec89c40CA296F502cD033e07f18DA5E01cdd197d" target="_blank">Test →</a>
+  </div>
+
+  <div class="endpoint">
+    <div class="name">/api/x-data/awm-verify <span class="status-pending">•</span> $0.01/call</div>
+    <div class="url">GET ?id=1 — verifier: returns decision (release/dispute/wait) + reasons</div>
+    <a class="test-link" href="/api/x-data/awm-verify?id=1" target="_blank">Test →</a>
+  </div>
+
+  <div class="footer">
+    <strong>Status:</strong> 6/6 endpoints live. Awaiting first x402 payment.<br>
+    <strong>How to be paid:</strong> agents hit any endpoint, get HTTP 402 with payment instructions, pay USDC on-chain, retry with x-payment header. Revenue accumulates in <code>0xec89c40CA296F502cD033e07f18DA5E01cdd197d</code>.<br>
+    <strong>Mainnet note:</strong> currently on Sepolia (free facilitator). Switch to mainnet by setting <code>CDP_API_KEY_ID</code> and <code>CDP_API_KEY_SECRET</code> env vars (Coinbase facilitator) and changing endpoint default from <code>sepolia</code> to <code>mainnet</code> in the source.<br>
+    <strong>Refresh:</strong> <a href="javascript:location.reload()" style="color:var(--blue)">click to refresh</a> (or just hit refresh in your browser).
+  </div>
+
+  <script>
+    // Optional: fetch live revenue if we have an API for it
+    fetch('/api/x-data/stats').then(r => r.json()).then(d => {
+      if (d.total_calls !== undefined) document.getElementById('total-calls').textContent = d.total_calls;
+      if (d.total_revenue !== undefined) document.getElementById('total-revenue').textContent = '$' + d.total_revenue.toFixed(4);
+      if (d.unique_payers !== undefined) document.getElementById('unique-payers').textContent = d.unique_payers;
+      if (d.last_payment_at) {
+        const ago = Math.floor((Date.now() - new Date(d.last_payment_at).getTime()) / 1000);
+        document.getElementById('last-payment').textContent = new Date(d.last_payment_at).toLocaleString();
+        document.getElementById('last-payment-ago').textContent = ago + 's ago';
+      }
+    }).catch(() => { /* stats endpoint not yet implemented */ });
+  </script>
+</body>
+</html>
