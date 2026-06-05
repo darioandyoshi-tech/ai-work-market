@@ -218,4 +218,4 @@ def verify_summary(summary_ipfs, source_ipfs):
 - [ ] Gas costs are measured and reasonable
 - [ ] User experience is clear and intuitive
 
-This PoC demonstrates the core value proposition: trustless escrow for agent-to-agent services with automated verification and payment release.
+This PoC demonstrates the core value proposition: multisig-governed escrow for agent-to-agent services with automated verification and payment release.

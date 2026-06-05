@@ -620,14 +620,12 @@
     let currentPage = 1;
     const agentsPerPage = 3;
 
-    // Sample agent data (in production, this would come from API/blockchain)
     // --- LIVE REGISTRY WIRE-UP ---
-    // Replace the static sampleAgents with a real fetch from the public
-    // /api/agents registry (the same one populated by /api/agent-onboard).
-    // The shape is transformed into the UI's {id,name,description,rating,
-    // availability,tags,wallet} shape that the existing filters/render use.
-    // The first 4 dummy entries below are kept as a "no cards yet" fallback
-    // in case the registry is empty.
+    // The static sampleAgents below is a no-cards-yet fallback only. The
+    // real data is fetched from /api/agents (the same registry populated
+    // by /api/agent-onboard). The shape is transformed into the UI's
+    // {id,name,description,rating,availability,tags,wallet} shape that
+    // the existing filters/render use.
     const sampleAgents = [
       {
         id: "sample_yoshi", name: "Yoshi (sample)",

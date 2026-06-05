@@ -11,7 +11,13 @@ const NETWORKS = {
   mainnet: {
     label: 'base-mainnet',
     chainId: 8453,
-    rpc: process.env.BASE_MAINNET_RPC_URL || process.env.BASE_RPC_URL || 'https://mainnet.base.org',
+    rpc: process.env.BASE_MAINNET_RPC_URL || 'https://mainnet.base.org',
+    rpcFallbacks: [
+      'https://base-rpc.publicnode.com',
+      'https://base-mainnet.public.blastapi.io',
+      'https://base.llamarpc.com',
+      'https://1rpc.io/base',
+    ].filter((u) => u !== (process.env.BASE_MAINNET_RPC_URL || 'https://mainnet.base.org')),
     escrow: process.env.ESCROW_ADDRESS || '0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2',
     usdc: process.env.USDC_ADDRESS || '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
     safe: '0x7f36896F6b6496B4E2fE95f672B3DAf28386b637',
@@ -24,6 +30,10 @@ const NETWORKS = {
     label: 'base-sepolia',
     chainId: 84532,
     rpc: process.env.BASE_SEPOLIA_RPC_URL || 'https://sepolia.base.org',
+    rpcFallbacks: [
+      'https://base-sepolia-rpc.publicnode.com',
+      'https://base-sepolia.public.blastapi.io',
+    ].filter((u) => u !== (process.env.BASE_SEPOLIA_RPC_URL || 'https://sepolia.base.org')),
     escrow: process.env.ESCROW_ADDRESS_SEPOLIA || '0x489C36738F46e395b4cd26DDf0f85756686A2f07',
     usdc: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
     safe: '0x5979B6b1e96a7e75702291190C30DF0731C016f1',
@@ -74,7 +84,30 @@ function pickNetwork(req) {
 }
 
 async function readProviderSnapshot(cfg) {
-  const provider = new ethers.JsonRpcProvider(cfg.rpc, cfg.chainId);
+  // Build a chain of providers (primary + fallbacks). The first one that
+  // returns a successful getBlockNumber is used for all reads. This handles
+  // the Vercel outbound-IP flakiness where mainnet.base.org can return
+  // "missing revert data" for a single call while a fallback RPC succeeds.
+  const rpcs = [cfg.rpc, ...(cfg.rpcFallbacks || [])];
+  let provider = null;
+  for (const rpc of rpcs) {
+    try {
+      const p = new ethers.JsonRpcProvider(rpc, cfg.chainId);
+      // Quick liveness probe with a short timeout
+      await Promise.race([
+        p.getBlockNumber(),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('rpc_timeout')), 4000)),
+      ]);
+      provider = p;
+      break;
+    } catch (_) {
+      // try next RPC
+    }
+  }
+  if (!provider) {
+    throw new Error('all_rpcs_unreachable');
+  }
+
   const escrow = new ethers.Contract(cfg.escrow, ESCROW_ABI, provider);
   const usdc = new ethers.Contract(cfg.usdc, ERC20_ABI, provider);
 

@@ -9,6 +9,9 @@ module.exports = async function handler(req, res) {
   }
 
   const body = await readBody(req);
+  if (body.__bodyTooLarge) {
+    return json(res, 413, { error: 'body_too_large', maxBytes: 64 * 1024 });
+  }
   const { name, email, twitter, followers, message } = body;
 
   if (!name || !email || !twitter || !message) {
@@ -109,8 +112,12 @@ function json(res, status, body) {
 async function readBody(req) {
   return new Promise((resolve) => {
     let data = '';
-    req.on('data', (c) => { data += c; if (data.length > 64 * 1024) { req.destroy(); } });
+    let tooLarge = false;
+    req.on('data', (c) => { data += c; if (data.length > 64 * 1024) { tooLarge = true; req.destroy(); } });
     req.on('end', () => {
+      if (tooLarge) {
+        return resolve({ __bodyTooLarge: true });
+      }
       if (!data) return resolve({});
       try { return resolve(JSON.parse(data)); } catch (_) {}
       try {

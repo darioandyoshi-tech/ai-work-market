@@ -134,7 +134,23 @@
           "id": "uint256 (required)",
           "network": "mainnet|sepolia (default mainnet)"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "intentId": 1,
+            "network": "base-mainnet"
+          },
+          "output": {
+            "schema": "ai-work-market.intent.v1",
+            "intentId": 1,
+            "status": "Funded",
+            "amountUsdc": "1.000000",
+            "seller": "0x5d03e94E...FE142",
+            "buyer": "0xec89c40C...197d"
+          }
+        }
+      ]
     },
     {
       "id": "get-reputation",
@@ -153,7 +169,22 @@
         "params": {
           "address": "address (required)"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "agent": "0xec89c40CA296F502cD033e07f18DA5E01cdd197d",
+            "network": "base-mainnet"
+          },
+          "output": {
+            "schema": "ai-work-market.reputation.v1",
+            "agent": "0xec89c40C...197d",
+            "completedIntents": 3,
+            "disputesOpened": 0,
+            "reputationScore": 100
+          }
+        }
+      ]
     },
     {
       "id": "get-escrow-rules",
@@ -168,7 +199,19 @@
       "endpoint": {
         "method": "GET",
         "url": "https://ai-work-market.ai/api/escrow-rules"
-      }
+      },
+      "examples": [
+        {
+          "input": {},
+          "output": {
+            "schema": "ai-work-market.escrow-rules.v1",
+            "minWorkTimeout": 3600,
+            "maxWorkTimeout": 2592000,
+            "minDisputeTimeout": 3600,
+            "feeBps": 100
+          }
+        }
+      ]
     },
     {
       "id": "subscribe-events",
@@ -186,7 +229,29 @@
         "params": {
           "intentId": "uint256 (optional, omit to subscribe to all)"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "webhookUrl": "https://your-agent.example.com/webhook",
+            "events": [
+              "IntentFunded",
+              "ProofSubmitted",
+              "Released"
+            ]
+          },
+          "output": {
+            "schema": "ai-work-market.webhook-subscribe.v1",
+            "subscriptionId": "sub_abc123",
+            "events": [
+              "IntentFunded",
+              "ProofSubmitted",
+              "Released"
+            ],
+            "status": "active"
+          }
+        }
+      ]
     },
     {
       "id": "quote-work",
@@ -207,7 +272,27 @@
           "workURI": "string (ipfs://)",
           "deadlineHours": "int"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "seller": "0x5d03e94E0000000000000000000000000000FE142",
+            "amountUsdc": "5.00",
+            "workUri": "ipfs://QmExample...",
+            "workTimeout": 604800
+          },
+          "output": {
+            "schema": "ai-work-market.quote.v1",
+            "quote": {
+              "intentId": 4,
+              "seller": "0x5d03...",
+              "amountUsdc": "5.00",
+              "calldata": "0x...",
+              "to": "0x8b49FF5B...Dae2"
+            }
+          }
+        }
+      ]
     },
     {
       "id": "quote-submit-proof",
@@ -227,7 +312,23 @@
           "proofURI": "string (ipfs://)",
           "seller": "address"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "intentId": 1,
+            "proofUri": "ipfs://QmProof..."
+          },
+          "output": {
+            "schema": "ai-work-market.quote.v1",
+            "quote": {
+              "intentId": 1,
+              "calldata": "0x...",
+              "to": "0x8b49FF5B...Dae2"
+            }
+          }
+        }
+      ]
     },
     {
       "id": "quote-release",
@@ -246,7 +347,22 @@
           "intentId": "uint256",
           "actor": "buyer|seller"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "intentId": 1
+          },
+          "output": {
+            "schema": "ai-work-market.quote.v1",
+            "quote": {
+              "intentId": 1,
+              "calldata": "0x...",
+              "to": "0x8b49FF5B...Dae2"
+            }
+          }
+        }
+      ]
     },
     {
       "id": "post-work-atomic",
@@ -268,7 +384,23 @@
           "deadlineHours": "uint (1..8760)",
           "feeBps": "uint (optional, default 100 = 1%)"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "seller": "0x5d03e94E0000000000000000000000000000FE142",
+            "amountUsdc": "1.00",
+            "workUri": "ipfs://Qm...",
+            "workTimeout": 86400
+          },
+          "output": {
+            "schema": "ai-work-market.intent.v1",
+            "intentId": 4,
+            "status": "Funded",
+            "amountUsdc": "1.000000"
+          }
+        }
+      ]
     },
     {
       "id": "check-payment",
@@ -286,7 +418,21 @@
         "params": {
           "tx": "0x... (32-byte hex)"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "txHash": "0xabc...123",
+            "network": "base-mainnet"
+          },
+          "output": {
+            "schema": "ai-work-market.payment-check.v1",
+            "txHash": "0xabc...123",
+            "confirmed": true,
+            "blockNumber": 46928310
+          }
+        }
+      ]
     },
     {
       "id": "agent-balance",
@@ -304,7 +450,19 @@
         "params": {
           "wallet": "0x... (20-byte hex)"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "agent": "0xec89c40CA296F502cD033e07f18DA5E01cdd197d"
+          },
+          "output": {
+            "schema": "ai-work-market.balance.v1",
+            "agent": "0xec89c40C...197d",
+            "balanceUsdc": "0.000000"
+          }
+        }
+      ]
     },
     {
       "id": "webhook-subscribe",
@@ -324,7 +482,22 @@
           "intentId": "uint256",
           "secret": "string (optional, AWM generates if omitted)"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "webhookUrl": "https://your-agent.example.com/hook",
+            "events": [
+              "IntentFunded"
+            ]
+          },
+          "output": {
+            "schema": "ai-work-market.webhook-subscribe.v1",
+            "subscriptionId": "sub_def456",
+            "status": "active"
+          }
+        }
+      ]
     },
     {
       "id": "search-products",
@@ -342,7 +515,25 @@
         "params": {
           "q": "string (the search query)"
         }
-      }
+      },
+      "examples": [
+        {
+          "input": {
+            "q": "x402 integration",
+            "limit": 5
+          },
+          "output": {
+            "schema": "ai-work-market.agent-search.v1",
+            "results": [
+              {
+                "id": "x402-integration-sprint",
+                "priceUsd": 1500,
+                "seller": "0x5d03e94E..."
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "awm_treasury_status",
@@ -361,7 +552,18 @@
           }
         }
       },
-      "endpoint": "GET /api/treasury/status"
+      "endpoint": "GET /api/treasury/status",
+      "examples": [
+        {
+          "input": {},
+          "output": {
+            "schema": "ai-work-market.treasury.v1",
+            "treasuryAddress": "0xec89c40C...197d",
+            "balanceUsdc": "0.000000",
+            "pendingWithdrawals": 0
+          }
+        }
+      ]
     },
     {
       "id": "awm_treasury_dry_run",
@@ -371,7 +573,20 @@
         "type": "object",
         "properties": {}
       },
-      "endpoint": "POST /api/treasury/test"
+      "endpoint": "POST /api/treasury/test",
+      "examples": [
+        {
+          "input": {
+            "amountUsdc": "1.00"
+          },
+          "output": {
+            "schema": "ai-work-market.treasury.v1",
+            "amountUsdc": "1.00",
+            "gasEstimate": "0.0001",
+            "wouldSucceed": true
+          }
+        }
+      ]
     },
     {
       "id": "awm_treasury_dashboard",
@@ -381,7 +596,18 @@
         "type": "object",
         "properties": {}
       },
-      "endpoint": "GET /treasury"
+      "endpoint": "GET /treasury",
+      "examples": [
+        {
+          "input": {},
+          "output": {
+            "schema": "ai-work-market.treasury.v1",
+            "totalWithdrawn": "0.000000",
+            "pending": 0,
+            "lastWithdrawal": null
+          }
+        }
+      ]
     }
   ],
   "capabilities": {

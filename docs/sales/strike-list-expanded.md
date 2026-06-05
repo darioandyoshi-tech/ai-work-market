@@ -44,7 +44,7 @@ Risk/spam score: **1 = highly contextual / low spam risk**, **5 = likely spam un
 ## 3. MoltMarkets — escrow bounties
 
 - **URL:** https://github.com/shirtlessfounder/moltmarkets-api/issues/180
-- **Why fit:** Open feature request for escrow-backed bounties, trustless agent-to-agent work, instant settlement, deliverables, approval, disputes, and reputation.
+- **Why fit:** Open feature request for escrow-backed bounties, agent-to-agent work with 2-of-3 Safe + 48h Timelock arbitration, instant settlement, deliverables, approval, disputes, and reputation.
 - **Recommended angle:** Offer AWM as a fast prototype for bounty proof packages and acceptance checklists, not as a replacement for their internal token ledger.
 - **Exact next action:** Comment with a proposed MVP shape: bounty terms, proof package, approve/reject route, dispute note object; offer 48h sprint.
 - **Risk/spam score:** 1/5 — very high fit.
