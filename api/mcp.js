@@ -119,6 +119,38 @@ const TOOLS = [
       return await r.json();
     },
   },
+  {
+    name: 'awm_treasury_status',
+    description: 'GET /api/treasury/status returns whether AWM_TREASURY_PRIVATE_KEY and AWM_REPUTATION_SIGNING_KEY are set in Vercel, derives their public addresses (never the keys), reports USDC + ETH balances on Base Mainnet, and surfaces warnings/recommendations. Read-only. Operator endpoint.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        network: { type: 'string', enum: ['mainnet', 'sepolia'], description: 'Default mainnet.' },
+      },
+    },
+    handler: async (args) => {
+      const url = new URL('https://www.ai-work-market.ai/api/treasury/status');
+      if (args && args.network) url.searchParams.set('network', args.network);
+      const r = await fetch(url.toString());
+      return await r.json();
+    },
+  },
+  {
+    name: 'awm_treasury_dry_run',
+    description: 'POST /api/treasury/test runs a 7-step readiness check for treasury mode: key_set, key_format, derive_address, rpc_reachable, eth_balance, sign_test_message, chain_id_match. No transaction is sent. Returns pass/warn/fail with per-check details. Operator endpoint.',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+    handler: async (args) => {
+      const r = await fetch('https://www.ai-work-market.ai/api/treasury/test', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      return await r.json();
+    },
+  },
 ];
 
 // === JSON-RPC 2.0 handler ===

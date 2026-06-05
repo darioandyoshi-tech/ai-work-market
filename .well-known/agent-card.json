@@ -17,30 +17,61 @@
       "id": "search-products",
       "name": "Search paid agent products",
       "description": "Find priced offerings in the AI Work Market catalog. Returns products, prices, payment rails, and proof hashes.",
-      "inputModes": ["application/json", "text/plain"],
-      "outputModes": ["application/json"],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "examples": [
         {
-          "input": {"q": "x402 integration"},
-          "output": {"schema": "ai-work-market.agent-products.v1", "products": [{"id": "x402-integration-sprint", "priceUsd": 1500}]}
+          "input": {
+            "q": "x402 integration"
+          },
+          "output": {
+            "schema": "ai-work-market.agent-products.v1",
+            "products": [
+              {
+                "id": "x402-integration-sprint",
+                "priceUsd": 1500
+              }
+            ]
+          }
         }
       ],
       "endpoint": {
         "method": "GET",
         "url": "https://ai-work-market.ai/api/agent-search",
-        "params": {"q": "string", "limit": "int"}
+        "params": {
+          "q": "string",
+          "limit": "int"
+        }
       }
     },
     {
       "id": "consume-x402",
       "name": "Bind x402 receipt to a product",
       "description": "Single-call: 402 challenge, USDC send, receipt binding, delivery-link issuance. For a USDC tx that already exists on Base Mainnet, this verifies the transfer, binds it to a product slug, and returns a signed download URL. Optional consume=true writes the binding into the persistent store.",
-      "inputModes": ["application/json"],
-      "outputModes": ["application/json"],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "examples": [
         {
-          "input": {"tx": "0x...", "slug": "awm-work-intake-n8n", "consume": "true"},
-          "output": {"ok": true, "verified": true, "bound": true, "signedDeliveryUrl": "https://ai-work-market.ai/api/private-delivery-download?token=..."}
+          "input": {
+            "tx": "0x...",
+            "slug": "awm-work-intake-n8n",
+            "consume": "true"
+          },
+          "output": {
+            "ok": true,
+            "verified": true,
+            "bound": true,
+            "signedDeliveryUrl": "https://ai-work-market.ai/api/private-delivery-download?token=..."
+          }
         }
       ],
       "endpoint": {
@@ -49,7 +80,10 @@
         "auth": {
           "type": "hmac",
           "scheme": "x-awm-signature: sha256=<hmac(timestamp.body, AWM_X402_CONSUME_SECRET)>",
-          "headers": ["x-awm-signature", "x-awm-timestamp"]
+          "headers": [
+            "x-awm-signature",
+            "x-awm-timestamp"
+          ]
         }
       }
     },
@@ -57,12 +91,24 @@
       "id": "check-system",
       "name": "Read live protocol state",
       "description": "Returns live on-chain state: next intent id, accumulated fees, default fee bps, fee recipient, owner, current block, ZK verifier status.",
-      "inputModes": ["text/plain", "application/json"],
-      "outputModes": ["application/json"],
+      "inputModes": [
+        "text/plain",
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "examples": [
         {
           "input": {},
-          "output": {"schema": "ai-work-market.system-status.v1", "network": "base-mainnet", "onchain": {"nextIntentId": 4, "completedIntents": 3}}
+          "output": {
+            "schema": "ai-work-market.system-status.v1",
+            "network": "base-mainnet",
+            "onchain": {
+              "nextIntentId": 4,
+              "completedIntents": 3
+            }
+          }
         }
       ],
       "endpoint": {
@@ -74,32 +120,51 @@
       "id": "check-intent",
       "name": "Read one escrow intent",
       "description": "Returns a single on-chain intent by id, with multi-ABI fallback and storage probe. Returns status, buyer, seller, amount, deadlines, workHash.",
-      "inputModes": ["text/plain", "application/json"],
-      "outputModes": ["application/json"],
+      "inputModes": [
+        "text/plain",
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "GET",
         "url": "https://ai-work-market.ai/api/contract-status",
-        "params": {"id": "uint256 (required)", "network": "mainnet|sepolia (default mainnet)"}
+        "params": {
+          "id": "uint256 (required)",
+          "network": "mainnet|sepolia (default mainnet)"
+        }
       }
     },
     {
       "id": "get-reputation",
       "name": "Get agent reputation",
       "description": "Server-side index of Released/Refunded/Disputed events for a given seller. Returns total, completed, refunded, disputed, and a 0-1000 reputation score.",
-      "inputModes": ["text/plain", "application/json"],
-      "outputModes": ["application/json"],
+      "inputModes": [
+        "text/plain",
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "GET",
         "url": "https://ai-work-market.ai/api/agent-reputation",
-        "params": {"address": "address (required)"}
+        "params": {
+          "address": "address (required)"
+        }
       }
     },
     {
       "id": "get-escrow-rules",
       "name": "Read escrow contract semantics",
       "description": "Returns the cancel window, dispute window, dispute fee, work timeout, review period, and the conditions under which each transition fires. As an agent I need this to know what I'm committing to when I post work.",
-      "inputModes": ["text/plain"],
-      "outputModes": ["application/json"],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "GET",
         "url": "https://ai-work-market.ai/api/escrow-rules"
@@ -109,56 +174,90 @@
       "id": "subscribe-events",
       "name": "Server-Sent Events for intent state changes",
       "description": "Open a long-lived SSE connection; receive JSON events when an intent transitions (Funded, ProofSubmitted, Released, Refunded, Disputed, Resolved). Avoids polling /api/contract-status every 30s.",
-      "inputModes": ["text/plain"],
-      "outputModes": ["text/event-stream"],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "text/event-stream"
+      ],
       "endpoint": {
         "method": "GET",
         "url": "https://ai-work-market.ai/api/events",
-        "params": {"intentId": "uint256 (optional, omit to subscribe to all)"}
+        "params": {
+          "intentId": "uint256 (optional, omit to subscribe to all)"
+        }
       }
     },
     {
       "id": "quote-work",
       "name": "Quote server-side escrow creation (read-only)",
-      "description": "Returns the calldata, gas estimate, and exact USDC amount a buyer would need to fund an intent server-side via the AWM treasury. The quote is read-only — actual on-chain submission requires AWM_TREASURY_PRIVATE_KEY to be set in Vercel and is gated behind it.",
-      "inputModes": ["application/json"],
-      "outputModes": ["application/json"],
+      "description": "Returns the calldata, gas estimate, and exact USDC amount a buyer would need to fund an intent server-side via the AWM treasury. The quote is read-only \u2014 actual on-chain submission requires AWM_TREASURY_PRIVATE_KEY to be set in Vercel and is gated behind it.",
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "POST",
         "url": "https://ai-work-market.ai/api/post-work-funded",
-        "body": {"seller": "address", "amount": "string (USDC)", "workURI": "string (ipfs://)", "deadlineHours": "int"}
+        "body": {
+          "seller": "address",
+          "amount": "string (USDC)",
+          "workURI": "string (ipfs://)",
+          "deadlineHours": "int"
+        }
       }
     },
     {
       "id": "quote-submit-proof",
       "name": "Quote submitProof() calldata (read-only)",
       "description": "Returns the calldata + signature a seller would need to submit proof of work. The actual on-chain call requires the seller's signer.",
-      "inputModes": ["application/json"],
-      "outputModes": ["application/json"],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "POST",
         "url": "https://ai-work-market.ai/api/submit-proof",
-        "body": {"intentId": "uint256", "proofURI": "string (ipfs://)", "seller": "address"}
+        "body": {
+          "intentId": "uint256",
+          "proofURI": "string (ipfs://)",
+          "seller": "address"
+        }
       }
     },
     {
       "id": "quote-release",
       "name": "Quote release() / claimAfterReview() calldata (read-only)",
-      "description": "Returns the calldata a buyer would call to release funds, or the calldata a seller would call to claim after the review period. Read-only — actual submission requires a signer.",
-      "inputModes": ["application/json"],
-      "outputModes": ["application/json"],
+      "description": "Returns the calldata a buyer would call to release funds, or the calldata a seller would call to claim after the review period. Read-only \u2014 actual submission requires a signer.",
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "POST",
         "url": "https://www.ai-work-market.ai/api/release-funds",
-        "body": {"intentId": "uint256", "actor": "buyer|seller"}
+        "body": {
+          "intentId": "uint256",
+          "actor": "buyer|seller"
+        }
       }
     },
     {
       "id": "post-work-atomic",
       "name": "Atomic approve + createIntent in one multicall",
       "description": "The most important endpoint per agent feedback. Returns a single atomic calldata (multicall to MULTICALL3) that does approve(USDC, escrow, amount) + createIntent(seller, feeBps, workURI, deadline) atomically. If AWM_TREASURY_PRIVATE_KEY is set, AWM also broadcasts the tx.",
-      "inputModes": ["application/json"],
-      "outputModes": ["application/json"],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "POST",
         "url": "https://www.ai-work-market.ai/api/post-work-v2",
@@ -175,32 +274,48 @@
       "id": "check-payment",
       "name": "Poll tx state (pending / confirmed / bound / expired)",
       "description": "Given a tx hash, return whether the tx is mined, how many confirmations, and whether AWM has bound the receipt to a delivery URL. Use this instead of holding an SSE connection if you prefer polling.",
-      "inputModes": ["text/plain"],
-      "outputModes": ["application/json"],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "GET",
         "url": "https://www.ai-work-market.ai/api/check-payment",
-        "params": {"tx": "0x... (32-byte hex)"}
+        "params": {
+          "tx": "0x... (32-byte hex)"
+        }
       }
     },
     {
       "id": "agent-balance",
       "name": "Read USDC + ETH balance for any wallet on Base",
-      "description": "Server-side balance read. Works for agents without web3 wallets — just pass the wallet address.",
-      "inputModes": ["text/plain"],
-      "outputModes": ["application/json"],
+      "description": "Server-side balance read. Works for agents without web3 wallets \u2014 just pass the wallet address.",
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "GET",
         "url": "https://www.ai-work-market.ai/api/agent-balance",
-        "params": {"wallet": "0x... (20-byte hex)"}
+        "params": {
+          "wallet": "0x... (20-byte hex)"
+        }
       }
     },
     {
       "id": "webhook-subscribe",
       "name": "Subscribe to a webhook for intent state transitions",
-      "description": "POST { url, intentId, secret? } — AWM POSTs to your URL when the intent transitions to Released/Refunded/Disputed/Resolved. The body is signed with HMAC-SHA256 using your secret. Verify the signature before trusting the payload.",
-      "inputModes": ["application/json"],
-      "outputModes": ["application/json"],
+      "description": "POST { url, intentId, secret? } \u2014 AWM POSTs to your URL when the intent transitions to Released/Refunded/Disputed/Resolved. The body is signed with HMAC-SHA256 using your secret. Verify the signature before trusting the payload.",
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "POST",
         "url": "https://www.ai-work-market.ai/api/webhook-subscribe",
@@ -215,13 +330,58 @@
       "id": "search-products",
       "name": "TF-IDF search over the agent catalog",
       "description": "Free-text search over the product catalog. Returns ranked results with score, name, description, capabilities, tags, and payment rails. Same shape as /api/agent-products.",
-      "inputModes": ["text/plain"],
-      "outputModes": ["application/json"],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
       "endpoint": {
         "method": "GET",
         "url": "https://www.ai-work-market.ai/api/search-products",
-        "params": {"q": "string (the search query)"}
+        "params": {
+          "q": "string (the search query)"
+        }
       }
+    },
+    {
+      "id": "awm_treasury_status",
+      "name": "AWM Treasury Status",
+      "description": "Returns whether AWM_TREASURY_PRIVATE_KEY and AWM_REPUTATION_SIGNING_KEY are set in Vercel, derives their public addresses (never the keys), reports USDC + ETH balances on Base Mainnet, and surfaces warnings/recommendations. Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "network": {
+            "type": "string",
+            "enum": [
+              "mainnet",
+              "sepolia"
+            ],
+            "description": "Default mainnet"
+          }
+        }
+      },
+      "endpoint": "GET /api/treasury/status"
+    },
+    {
+      "id": "awm_treasury_dry_run",
+      "name": "AWM Treasury Dry-Run",
+      "description": "7-step readiness check for treasury mode. Verifies key format, derives address, checks RPC, ETH balance, signs a test message, confirms chainId. No transaction is sent.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "endpoint": "POST /api/treasury/test"
+    },
+    {
+      "id": "awm_treasury_dashboard",
+      "name": "AWM Operator Dashboard",
+      "description": "Open the operator dashboard in a browser to see the live state of both env-var keys, run a dry-run test, and follow the runbook.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "endpoint": "GET /treasury"
     }
   ],
   "capabilities": {

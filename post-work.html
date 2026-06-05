@@ -659,11 +659,13 @@
           this.textContent = originalText; this.disabled = false; return;
         }
 
-        // Get a calldata quote from the server. This uses the deployed
+        // Get an ATOMIC calldata quote from the server. The server pre-packages
+        // approve(USDC) + createIntent into a single multicall3 call, so the
+        // user signs ONE tx instead of two. The server uses the deployed
         // Sourcify-verified ABI (so the calldata actually matches what's on
         // chain) and the live MIN/MAX constants.
         const requestId = 'ui-postwork-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-        const r = await fetch('/api/post-work-funded', {
+        const r = await fetch('/api/post-work-v2', {
           method: 'POST',
           headers: { 'content-type': 'application/json', 'accept': 'application/json' },
           body: JSON.stringify({
@@ -673,64 +675,38 @@
             workHash,
             workTimeoutSeconds,
             reviewPeriodSeconds,
-            requestId,
           }),
         });
         const j = await r.json();
-        if (!r.ok || !j.quote || !j.quote.calldata) {
+        if (!r.ok || !j.atomicCalldata) {
           throw new Error('quote_failed: ' + (j.message || j.error || ('HTTP ' + r.status)));
         }
-        const quote = j.quote;
 
-        // Two paths:
-        //   A) If a treasury is configured server-side, the server can
-        //      broadcast the transaction (signs with AWM_TREASURY_PRIVATE_KEY
-        //      and pays gas). We submit the user's MetaMask approval + a
-        //      server-broadcast createIntent.
-        //   B) Otherwise the user signs and broadcasts themselves.
-        // We always do the USDC approval first.
+        // The atomic calldata goes to Multicall3 (0xcA11...CA11) and does both
+        // approve(USDC, escrow, amount) and createIntent(...) in one tx.
+        const MULTICALL3 = '0xcA11bde05977b3631167028862bE2a173976CA11';
 
-        // USDC has 6 decimals on Base Mainnet.
-        const usdcAddress = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-        const usdcAbi = [
-          'function approve(address spender, uint256 amount) external returns (bool)',
-          'function allowance(address owner, address spender) view returns (uint256)',
-        ];
-        const usdc = new ethers.Contract(usdcAddress, usdcAbi, signer);
-        const escrowAddress = '0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2';
-        const amountRaw = BigInt(quote.amountRaw);
-
-        // Check current allowance
-        this.textContent = 'Checking USDC allowance...';
-        const currentAllowance = await usdc.allowance(walletAddress, escrowAddress);
-        if (currentAllowance < amountRaw) {
-          this.textContent = 'Approving USDC...';
-          // Reset to 0 first if non-zero (USDC approve requires resetting to 0 in some cases)
-          if (currentAllowance > 0n) {
-            const resetTx = await usdc.approve(escrowAddress, 0n);
-            await resetTx.wait();
-          }
-          const approveTx = await usdc.approve(escrowAddress, amountRaw);
-          await approveTx.wait();
-        }
-
-        // Now broadcast createIntent. Use the deployed ABI (same as /api/post-work-funded)
-        // so the selector matches the live contract.
-        const ESCROW_ABI = [
-          'function createIntent(address seller, uint256 amount, uint256 workTimeoutSeconds, uint256 reviewPeriodSeconds, bytes32 workHash, string workURI) external returns (uint256 intentId)',
-        ];
-        const escrow = new ethers.Contract(escrowAddress, ESCROW_ABI, signer);
-
-        this.textContent = 'Posting work...';
-        const tx = await escrow.createIntent(
-          walletAddress,           // seller
-          amountRaw,
-          BigInt(workTimeoutSeconds),
-          BigInt(reviewPeriodSeconds),
-          workHash,
-          workURI,
-        );
+        this.textContent = 'Sign the transaction in your wallet...';
+        const tx = await signer.sendTransaction({
+          to: MULTICALL3,
+          data: j.atomicCalldata,
+          value: 0n,
+        });
+        this.textContent = 'Waiting for confirmation...';
         const receipt = await tx.wait();
+
+        // Extract intentId from the createIntent event log (the second event in
+        // the multicall, but here we look for any log from the escrow contract
+        // that has the indexed intentId as topic[1]).
+        let intentId = null;
+        for (const log of (receipt.logs || [])) {
+          if (log.address && log.address.toLowerCase() === '0x8b49ff5b1dda19dc868e7a7f83a3e06cb869dae2') {
+            // IntentCreated event: topic[0] is the event sig, topic[1] is intentId (indexed)
+            if (log.topics && log.topics.length >= 2) {
+              try { intentId = Number(BigInt(log.topics[1])); break; } catch (_) {}
+            }
+          }
+        }
 
         // Success — show a real success card with intentId (if we can read it from the event) and CTAs
         const ok = document.createElement('div');
@@ -746,6 +722,7 @@
             <p style="margin:4px 0"><b>Work hash:</b> <code>${workHash.slice(0,10)}…${workHash.slice(-6)}</code></p>
             <p style="margin:4px 0"><b>Work URI:</b> <code style="word-break:break-all">${workURI}</code></p>
             <p style="margin:4px 0"><b>Tx:</b> <code>${receipt.hash}</code></p>
+            ${intentId != null ? `<p style="margin:4px 0"><b>Intent ID:</b> <a href="/api/contract-status?id=${intentId}&network=base-mainnet" style="color:#ffd166" target="_blank">#${intentId}</a></p>` : ''}
           </div>
           <p style="font-size:14px;color:#888">Sellers can now <a href="/work-list" style="color:#ffd166">claim this work</a> or you can <a href="/agents" style="color:#ffd166">browse agents</a>.</p>
           <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">

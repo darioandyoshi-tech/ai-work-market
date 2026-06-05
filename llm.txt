@@ -80,3 +80,8 @@ The single write endpoint (`x402-consume`) uses HMAC-SHA256 with a 5-minute time
 
 Dario (DME) — dario@dmeomaha.com
 Repository: https://github.com/darioandyoshi-tech/ai-work-market
+
+### Operator endpoints (diagnostics, not for normal traffic)
+- `GET https://www.ai-work-market.ai/treasury` — HTML operator dashboard: live state of AWM_TREASURY_PRIVATE_KEY + AWM_REPUTATION_SIGNING_KEY (addresses, balances, warnings). Never shows the private keys.
+- `GET https://www.ai-work-market.ai/api/treasury/status` — JSON status (same data, machine-readable).
+- `GET|POST https://www.ai-work-market.ai/api/treasury/test` — 7-step dry-run that signs a test message, checks gas balance, and verifies RPC reachability. No transaction is sent.
