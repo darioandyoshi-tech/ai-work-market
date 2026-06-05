@@ -36,6 +36,7 @@ const PAGES = [
   'profile.html',
   'work_posting_interface.html',
   'treasury.html',
+    'yoshi-avatar.png',
     'agency.html',
     'receptionist.html',
     'ghostwriting.html',
