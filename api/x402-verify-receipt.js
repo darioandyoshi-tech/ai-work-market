@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { ethers } = require('ethers');
 const { productBySlug, json } = require('./_commerce-shared');
+const { applyCors, handleOptions } = require('./_cors');
 const { consumeReceipt } = require('./_x402-receipt-store');
 
 const BASE_CHAIN_ID = 8453;
@@ -350,9 +351,14 @@ function verifyConsumeSignature(req, rawBody, now = Date.now()) {
 }
 
 async function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    return handleOptions(req, res, ['GET', 'POST', 'OPTIONS']);
+  }
+  applyCors(req, res, ['GET', 'POST', 'OPTIONS']);
+
   if (!['GET', 'POST'].includes(req.method)) {
     res.statusCode = 405;
-    res.setHeader('allow', 'GET, POST');
+    res.setHeader('allow', 'GET, POST, OPTIONS');
     res.end('method not allowed');
     return;
   }

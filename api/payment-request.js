@@ -1,5 +1,6 @@
 const catalog = require('../products/catalog.json');
 const paymentLinks = require('../products/payment-links.json');
+const { applyCors, handleOptions } = require('./_cors');
 const { x402RailForProduct } = require('./_commerce-shared');
 
 function origin(req) {
@@ -78,9 +79,14 @@ function requestFor(req, product) {
 }
 
 module.exports = async function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    return handleOptions(req, res, ['GET', 'POST', 'OPTIONS']);
+  }
+  applyCors(req, res, ['GET', 'POST', 'OPTIONS']);
+
   if (!['GET', 'POST'].includes(req.method)) {
     res.statusCode = 405;
-    res.setHeader('allow', 'GET, POST');
+    res.setHeader('allow', 'GET, POST, OPTIONS');
     res.end('method not allowed');
     return;
   }

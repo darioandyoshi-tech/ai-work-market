@@ -1,5 +1,6 @@
 const catalog = require('../products/catalog.json');
 const paymentLinks = require('../products/payment-links.json');
+const { applyCors, handleOptions } = require('./_cors');
 const { x402RailForProduct } = require('./_commerce-shared');
 
 const ORIGIN = 'https://ai-work-market.ai';
@@ -87,9 +88,14 @@ function paymentRequest(product) {
 }
 
 module.exports = async function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    return handleOptions(req, res, ['GET', 'OPTIONS']);
+  }
+  applyCors(req, res, ['GET', 'OPTIONS']);
+
   if (req.method !== 'GET') {
     res.statusCode = 405;
-    res.setHeader('allow', 'GET');
+    res.setHeader('allow', 'GET, OPTIONS');
     res.end('method not allowed');
     return;
   }

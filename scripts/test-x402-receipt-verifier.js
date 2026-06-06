@@ -9,6 +9,7 @@ const path = require('path');
 const { Readable } = require('stream');
 const agentProducts = require('../api/agent-products');
 const paymentRequest = require('../api/payment-request');
+const protectedResource = require('../api/protected-resource');
 const x402VerifyReceipt = require('../api/x402-verify-receipt');
 const { consumeReceipt } = require('../api/_x402-receipt-store');
 
@@ -50,6 +51,28 @@ function jsonPost(query, body, headers = {}) {
   req.headers = headers;
   req.socket = { remoteAddress: '127.0.0.1' };
   return req;
+}
+
+function preflight(path, method, headers = 'content-type,x-payment') {
+  return {
+    method: 'OPTIONS',
+    query: {},
+    url: path,
+    headers: {
+      origin: 'https://agent-client.example',
+      'access-control-request-method': method,
+      'access-control-request-headers': headers
+    },
+    socket: { remoteAddress: '127.0.0.1' }
+  };
+}
+
+function assertPreflight(response, allowedMethods) {
+  assert.strictEqual(response.res.statusCode, 204);
+  assert.strictEqual(response.headers['access-control-allow-origin'], 'https://agent-client.example');
+  assert.strictEqual(response.headers['access-control-allow-methods'], allowedMethods);
+  assert.match(response.headers['access-control-allow-headers'], /x-payment/);
+  assert.match(response.headers['access-control-expose-headers'], /x-payment-response/);
 }
 
 function signedConsumeHeaders(body, timestamp = String(Math.floor(Date.now() / 1000))) {
@@ -126,6 +149,24 @@ async function testAgentProductsExposeX402Rail() {
   assert.strictEqual(x402Rail.asset, 'native USDC');
   assert.strictEqual(x402Rail.amount.raw, '79000000');
   assert.match(x402Rail.verifierUrl, /\/api\/x402-verify-receipt\?slug=agent-commerce-market-map-2026$/);
+}
+
+async function testX402PreflightsAreAccepted() {
+  assertPreflight(
+    await call(paymentRequest, preflight('/api/payment-request', 'GET')),
+    'GET, POST, OPTIONS'
+  );
+  assertPreflight(
+    await call(protectedResource, preflight('/api/protected-resource', 'GET')),
+    'GET, OPTIONS'
+  );
+  assertPreflight(
+    await call(
+      x402VerifyReceipt,
+      preflight('/api/x402-verify-receipt', 'POST', 'content-type,x-awm-signature,x-awm-timestamp')
+    ),
+    'GET, POST, OPTIONS'
+  );
 }
 
 function testReceiptBindingIsStableAndScoped() {
@@ -525,6 +566,7 @@ async function main() {
   await testRejectsUnknownProductBeforeRpc();
   await testPaymentRequestExposesX402Rail();
   await testAgentProductsExposeX402Rail();
+  await testX402PreflightsAreAccepted();
   testReceiptBindingIsStableAndScoped();
   await testReceiptConsumptionRejectsReplayAndScopeConflict();
   testRateLimitRejectsBurst();
