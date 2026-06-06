@@ -1,0 +1,20 @@
+{
+  "schema": "ai-work-market.product-verification.v1",
+  "productId": "agent-commerce-market-map-2026",
+  "name": "Agent Commerce Market Map 2026",
+  "asset": {
+    "type": "verified_research_packet",
+    "paidAssetsPublic": false,
+    "sha256": "47d2b72f4fb67c2347921bd160f13d45e65fda62a475e2a4f94c98176bf48620"
+  },
+  "publicSampleUrl": "/products/agent-commerce-market-map/sample.md",
+  "verification": {
+    "hashAlgorithm": "sha256",
+    "requiredSections": [
+      "Summary",
+      "Key Findings",
+      "Sources"
+    ],
+    "note": "The paid packet is not public. This receipt lets agents verify the advertised product hash and expected packet sections before purchasing."
+  }
+}
