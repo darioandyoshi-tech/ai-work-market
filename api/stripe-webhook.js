@@ -89,7 +89,7 @@ module.exports = async function handler(req, res) {
 
   if (relevant.has(event.type)) {
     try {
-      recordEvent({
+      await recordEvent({
         ...event,
         productSlug
       });
