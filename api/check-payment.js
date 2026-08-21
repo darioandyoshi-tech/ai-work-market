@@ -48,7 +48,12 @@ async function rawRpc(rpc, method, params) {
   return data.result;
 }
 
+const { applyRateLimit } = require('./_rate-limit');
+
 module.exports = async function handler(req, res) {
+  // Rate limit tx-status polling (P1 abuse control)
+  if (applyRateLimit(req, res, { max: 120, windowMs: 60_000 })) return;
+
   if (req.method !== 'GET') {
     return json(res, 405, { error: 'method_not_allowed', hint: 'Use GET' });
   }

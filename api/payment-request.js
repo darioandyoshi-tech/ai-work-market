@@ -1,6 +1,7 @@
 const catalog = require('../products/catalog.json');
 const paymentLinks = require('../products/payment-links.json');
 const { x402RailForProduct } = require('./_commerce-shared');
+const { applyRateLimit } = require('./_rate-limit');
 
 function origin(req) {
   const host = req.headers['x-forwarded-host'] || req.headers.host || 'ai-work-market.vercel.app';
@@ -78,6 +79,9 @@ function requestFor(req, product) {
 }
 
 module.exports = async function handler(req, res) {
+  // Rate limit payment requests (P1 abuse control)
+  if (applyRateLimit(req, res, { max: 60, windowMs: 60_000 })) return;
+
   if (!['GET', 'POST'].includes(req.method)) {
     res.statusCode = 405;
     res.setHeader('allow', 'GET, POST');

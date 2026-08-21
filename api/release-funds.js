@@ -46,7 +46,12 @@ async function readBody(req) {
   });
 }
 
+const { applyRateLimit } = require('./_rate-limit');
+
 module.exports = async function handler(req, res) {
+  // Rate limit release-calldata requests (P1 abuse control)
+  if (applyRateLimit(req, res, { max: 60, windowMs: 60_000 })) return;
+
   if (req.method === 'GET') {
     return json(res, 200, {
       schema: 'ai-work-market.release-funds.v1',
