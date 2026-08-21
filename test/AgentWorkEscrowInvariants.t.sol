@@ -75,6 +75,11 @@ contract AgentWorkEscrowInvariants is Test {
         vm.startPrank(buyer);
         usdc.approve(address(escrow), type(uint256).max);
         vm.stopPrank();
+
+        // Exclude MockUSDC from fuzzer targets so it cannot mint arbitrary USDC
+        // to the escrow (which would break the accounting invariant). The fuzzer
+        // should only exercise the escrow lifecycle, not mint tokens.
+        excludeContract(address(usdc));
     }
 
     /// @notice Create a new intent (buyer funds escrow).
