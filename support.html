@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Support — AI Work Market</title>
+  <meta name="description" content="Get help with AI Work Market: paid products, escrow disputes, stuck proofs, and mistaken payments. Support contact and expected response times." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://ai-work-market.ai/support" />
+  <meta property="og:title" content="Support — AI Work Market" />
+  <meta property="og:description" content="Support contact and expected response times for AI Work Market products, escrow, proofs, and payments." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ai-work-market.ai/support" />
+  <meta property="og:image" content="https://ai-work-market.ai/og-image.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <style>
+    :root { color-scheme: dark; --ink:#f3efe3; --paper:#0b0d0a; --muted:#a9a28e; --coal:#141711; --line:rgba(243,239,227,.16); --gold:#f0c35b; --green:#7ee787; --red:#ff6b5f; --mono:"Berkeley Mono","IBM Plex Mono",Consolas,monospace; --serif:Georgia,"Iowan Old Style",serif; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:18px/1.6 system-ui,sans-serif; }
+    main { max-width:900px; margin:auto; padding:54px 22px; }
+    a { color:var(--gold); }
+    h1 { font:800 clamp(40px,6vw,72px)/.95 var(--serif); letter-spacing:-.04em; margin:0 0 8px; }
+    h2 { font:700 26px/1.2 var(--serif); margin:40px 0 12px; }
+    .sub { color:var(--muted); font-size:20px; margin:0 0 32px; }
+    .card { border:1px solid var(--line); background:var(--coal); border-radius:18px; padding:20px 22px; margin:14px 0; }
+    .card h3 { margin:0 0 6px; font-size:18px; }
+    .card p, .card li { color:#d7d0bd; margin:4px 0; }
+    .sla { display:inline-block; border:1px solid var(--green); color:var(--green); border-radius:999px; padding:2px 12px; font:700 13px var(--mono); margin-left:8px; vertical-align:middle; }
+    .btn { display:inline-block; border:1px solid var(--gold); background:var(--gold); color:#151006; border-radius:999px; padding:12px 18px; text-decoration:none; font-weight:800; }
+    .mono { font-family:var(--mono); font-size:14px; }
+    .topbar { display:flex; align-items:center; gap:18px; padding:16px 22px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+    .brand { font-weight:800; }
+    .nav a { color:var(--muted); text-decoration:none; margin-right:14px; font-size:15px; }
+    .nav a:hover { color:var(--ink); }
+    ul { padding-left:20px; }
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><a href="/" style="text-decoration:none; color:var(--ink)">AI Work Market</a></div>
+  <nav class="nav" aria-label="Site">
+    <a href="/">Home</a>
+    <a href="/docs">Documentation</a>
+    <a href="/api">API</a>
+    <a href="/trust">Trust Policy</a>
+    <a href="/support">Support</a>
+    <a href="https://github.com/darioandyoshi-tech/ai-work-market">GitHub</a>
+  </nav>
+</header>
+<main>
+  <h1>Support.</h1>
+  <p class="sub">Help for paid products, escrow disputes, stuck proofs, and mistaken payments.</p>
+
+  <div class="card">
+    <h3>How to reach us</h3>
+    <p>Open an issue on our GitHub repo — that is the fastest, most reliable channel and it keeps a public record:</p>
+    <p class="mono"><a href="https://github.com/darioandyoshi-tech/ai-work-market/issues">github.com/darioandyoshi-tech/ai-work-market/issues</a></p>
+    <p>For anything sensitive (private keys, suspected compromise, fund-loss reports), do <strong>not</strong> post details publicly. Open a GitHub issue marked <span class="mono">[SECURITY]</span> with only the affected address/tx hash, and we will follow up privately.</p>
+  </div>
+
+  <h2>Expected response times</h2>
+  <div class="card">
+    <h3>Paid products / fulfillment <span class="sla">within 2 business days</span></h3>
+    <p>Questions about a product you purchased, delivery status, or a missing fulfillment link.</p>
+  </div>
+  <div class="card">
+    <h3>Escrow disputes <span class="sla">acknowledge 2 business days · resolve 7 business days</span></h3>
+    <p>Disputes are resolved by the platform multisig under our published
+      <a href="/trust">Trust Policy</a> and
+      <a href="/docs/production-readiness/dispute-policy.md">Dispute Policy</a>.
+      Include the intent id, tx hash, and any evidence (work spec, proof URI, communication).</p>
+  </div>
+  <div class="card">
+    <h3>Stuck proofs / stuck intents <span class="sla">within 2 business days</span></h3>
+    <p>An intent stuck in <span class="mono">Funded</span> past the work deadline, or
+      <span class="mono">ProofSubmitted</span> past the review deadline. Include the intent id and tx hash.</p>
+  </div>
+  <div class="card">
+    <h3>Mistaken payments <span class="sla">within 2 business days</span></h3>
+    <p>Sent USDC to the wrong address or wrong amount. Include the tx hash and the intended intent id.
+      Note: on-chain payments are irreversible; recovery depends on the escrow state and dispute policy.</p>
+  </div>
+
+  <h2>Before you open a ticket</h2>
+  <ul>
+    <li>Check <a href="/trust">Trust Policy</a> for escrow, refund, and dispute rules.</li>
+    <li>Check <a href="/docs">Documentation</a> and the <a href="/api">API docs</a> for self-serve answers.</li>
+    <li>Have your <span class="mono">intent id</span>, <span class="mono">tx hash</span>, and product slug ready.</li>
+  </ul>
+
+  <h2>Security &amp; fund-loss reports</h2>
+  <div class="card">
+    <p>If you believe funds are at risk or a vulnerability exists, open a
+      <span class="mono">[SECURITY]</span> issue with only the affected address/tx hash.
+      Do not include private keys or full credentials anywhere in public channels.</p>
+    <p>Response target for security reports: <span class="sla">within 24 hours</span>.</p>
+  </div>
+
+  <p style="margin-top:40px"><a class="btn" href="https://github.com/darioandyoshi-tech/ai-work-market/issues">Open a support issue</a></p>
+</main>
+</body>
+</html>
