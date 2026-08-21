@@ -1,0 +1,22 @@
+{
+  "network": "Base Mainnet",
+  "chainId": 8453,
+  "contract": "AgenticCommerceAWM",
+  "erc": "ERC-8183",
+  "address": "PENDING_DEPLOYMENT",
+  "transactionHash": "PENDING_DEPLOYMENT",
+  "paymentToken": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  "treasury": "PENDING_DEPLOYMENT",
+  "trustedForwarder": "PENDING_DEPLOYMENT",
+  "zkVerifier": "PENDING_DEPLOYMENT",
+  "owner": "PENDING_DEPLOYMENT",
+  "deployedAt": "PENDING_DEPLOYMENT",
+  "explorer": "PENDING_DEPLOYMENT",
+  "verification": {
+    "sourcifyStatus": "pending",
+    "testsPassing": 83,
+    "slitherClean": true,
+    "halmosChecksPassing": 7
+  },
+  "notes": "Deploy via script/DeployAgenticCommerceAWM.s.sol. Set PAYMENT_TOKEN, TREASURY, TRUSTED_FORWARDER, ZK_VERIFIER, and SAFE_MULTISIG (to transfer ownership to the Safe). Fill in PENDING_DEPLOYMENT fields after broadcast + verify. See docs/production-readiness/security-launch-checklist.md mainnet runbook."
+}
