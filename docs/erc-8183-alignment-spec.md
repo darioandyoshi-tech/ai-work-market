@@ -162,11 +162,13 @@ don't hold gas).
 ### Phase 1 — Alignment spec (THIS DOCUMENT) ✅
 Review by Dario + Hermes before code.
 
-### Phase 2 — New ERC-8183-compliant contract
+### Phase 2 — New ERC-8183-compliant contract ✅ (committed 9457c50 + dd0c3be)
 - `AgenticCommerceAWM.sol`: implements ERC-8183 state machine + evaluator + hooks
 - Reuse: Safe governance, IPFS evidence, fee split, ZK verifier
 - Add: evaluator role, IACPHook interface, ERC-8004 attestation, ERC-2771 forwarder
-- Tests: extend the 31-test suite to cover the new contract
+- Tests: 48 new tests (46 unit + 2 invariants), all passing; full suite 83 passing
+- Slither: 0 high/medium/low (16 informational, all by-design; triaged)
+- Deployment script: `script/DeployAgenticCommerceAWM.s.sol`
 
 ### Phase 3 — Security hardening
 - Third-party audit (the #1 trust moat gap)
