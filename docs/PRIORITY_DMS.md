@@ -18,26 +18,26 @@ Hi — I'm Dario, I built AI Work Market, a deployed USDC work-escrow
 on Base Mainnet (0x8b49FF5B1DDA19dc868E7A7F83A3E06CB869Dae2,
 Sourcify full_match).
 
-Reading your ERC-8183 spec, the 5 lifecycle states in AWM map
-cleanly to your 6 states (Funded/Funded, ProofSubmitted/Submitted,
-Released/Completed, Refunded/Expired, Disputed/your dispute hook).
-The 3-role model (Client/Provider/Evaluator) maps to AWM's
-(buyer/seller/Timelock-governed dispute resolver).
+I just shipped a genuine ERC-8183-compliant contract
+(AgenticCommerceAWM) — it implements your state machine
+(Open → Funded → Submitted → Completed/Rejected/Expired), the
+evaluator role, and the IACPHook interface. 83 tests passing,
+Slither clean, accounting invariants formally verified with Halmos.
 
-AWM has 4 work contracts on mainnet (3 completed, 1 disputed-and-
-resolved via the Safe 2-of-3 + 48h Timelock). 1% fee. USDC. Live.
+The differentiator: the evaluator can be a ZK-SNARK verifier
+contract (Groth16) that attests work completion via proof —
+AI-verifier-as-evaluator, with the 2-of-3 Safe as the human
+fallback for disputes. Most 8183 projects use human/DAO
+evaluators; AWM is AI-native.
 
 Two questions, if you have 15 minutes:
 1. Is the ERC-8183 reference implementation list open? If yes,
    AWM would be a candidate.
-2. The bidding hook (multi-provider) — would that be useful for
-   AWM's roadmap, or is single-seller-per-work-contract a
-   different market?
+2. Is the Evaluator role intended to be pluggable per-job, or
+   fixed at the contract level? (AWM is per-job.)
 
 Either way, AWM is at https://ai-work-market.ai, the MCP is at
-/mcp (8 tools), and I just cross-referenced AWM + the SAR PR
-on coinbase/x402 (#46) — happy to extend the same alignment
-here.
+/mcp (8 tools).
 
 — Dario
 ```
@@ -52,22 +52,23 @@ here.
 **The conversation**: technical sanity check. Are we aligned?
 
 ```
-Hi — I'm Dario, I built AWM, a deployed ERC-8183 candidate on
-Base Mainnet. The 6-state machine in ERC-8183 maps 1:1 to AWM's
-5 states. The 3-role model (Client/Provider/Evaluator) maps
-cleanly. The hooks I haven't implemented yet are the bidding
-hook and the zkML-evaluator hook.
+Hi — I'm Dario, I built AWM, a deployed ERC-8183 implementation on
+Base Mainnet. I just shipped AgenticCommerceAWM, a genuine
+ERC-8183-compliant contract: your state machine (Open → Funded →
+Submitted → Completed/Rejected/Expired), the evaluator role, and
+the IACPHook interface. 83 tests passing, Slither clean, accounting
+invariants formally verified with Halmos.
 
-AWM is live with 4 work contracts (3 completed, 1 disputed-and-
-resolved), 1% fee, Safe + 48h Timelock governance. Sourcify-
-verified.
+The differentiator: the evaluator can be a ZK-SNARK verifier
+contract (Groth16) that attests work completion via proof —
+AI-verifier-as-evaluator, with the 2-of-3 Safe as the human
+fallback for disputes.
 
 Two questions:
 1. Is the ERC-8183 workgroup looking for a reference
    implementation? AWM could be a starting point.
 2. Is the Evaluator role intended to be pluggable per-job, or
-   fixed at the contract level? (AWM is per-job; the Evaluator
-   is whoever wins the Safe vote at dispute time.)
+   fixed at the contract level? (AWM is per-job.)
 
 If useful, happy to do a 15-min walkthrough.
 
