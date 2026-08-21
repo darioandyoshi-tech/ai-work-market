@@ -41,7 +41,6 @@ products/awm-work-intake-n8n/workflow.json
 # dev tooling, not part of the public deploy)
 logs/
 monitor/
-test/
 data/
 __pycache__/
 *.pyc
